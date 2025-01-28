@@ -31,7 +31,20 @@ jobs:
       - name: Run automation script
         run: python haupt.py
 
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git fetch
+          if git diff --quiet HEAD origin/main -- reflex_docs.txt; then
+            echo "No changes detected."
+            echo "::set-output name=changes_detected::false"
+          else
+            echo "Changes detected."
+            echo "::set-output name=changes_detected::true"
+          fi
+
       - name: Commit and push changes
+        if: steps.check_changes.outputs.changes_detected == 'true'
         env:
           PAT: ${{ secrets.PAT }}
         run: |
