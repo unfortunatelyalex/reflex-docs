@@ -20,10 +20,6 @@ The `haupt.py` script performs the following tasks:
 4. Removes any initial newlines from the merged content file.
 5. Cleans up the downloaded and extracted files.
 
-## Last Update
-
-The repository was last updated on $(date).
-
 ## How to Use
 
 To manually trigger the workflow, navigate to the Actions tab in the GitHub repository and select the "Reflex Docs Automation" workflow. Click on the "Run workflow" button to start the process.
