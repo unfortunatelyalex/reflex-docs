@@ -37,10 +37,10 @@ jobs:
           git fetch
           if git diff --quiet HEAD origin/main -- reflex_docs.txt; then
             echo "No changes detected."
-            echo "::set-output name=changes_detected::false"
+            echo "changes_detected=false"
           else
             echo "Changes detected."
-            echo "::set-output name=changes_detected::true"
+            echo "changes_detected=true"
           fi
 
       - name: Commit and push changes
