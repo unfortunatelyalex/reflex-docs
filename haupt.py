@@ -3,6 +3,7 @@ import zipfile
 import os
 import subprocess
 import shutil
+import requests
 
 def download_zip_with_playwright(download_page_url, download_dir):
     """Uses Playwright to automate downloading a zip file from the given page URL."""
@@ -53,12 +54,25 @@ def remove_initial_newlines(output_file):
         file.write(content)
         file.truncate()
 
+def check_for_changes(local_file, remote_url):
+    """Checks if there are changes between the local file and the remote file."""
+    response = requests.get(remote_url)
+    if response.status_code == 200:
+        remote_content = response.text
+        with open(local_file, 'r', encoding='utf-8') as file:
+            local_content = file.read()
+        return local_content != remote_content
+    else:
+        print(f"Failed to fetch remote file: {response.status_code}")
+        return True
+
 if __name__ == "__main__":
     github_url = "https://github.com/reflex-dev/reflex-web/tree/main/docs"
     download_page_url = f"https://download-directory.github.io/?url={github_url}"
     download_dir = "downloads"
     extraction_path = "extracted_files"
     output_file_name = "reflex_docs.txt"
+    remote_file_url = "https://raw.githubusercontent.com/unfortunatelyalex/reflex-docs/refs/heads/main/reflex_docs.txt"
 
     if not os.path.exists(download_dir):
         os.makedirs(download_dir)
@@ -86,6 +100,14 @@ if __name__ == "__main__":
 
     # Remove initial newlines from the output file
     remove_initial_newlines(output_file_name)
+
+    # Check for changes
+    if not check_for_changes(output_file_name, remote_file_url):
+        print("No changes found.")
+        # Clean up downloaded and extracted files
+        shutil.rmtree(download_dir)
+        shutil.rmtree(extraction_path)
+        exit(0)
 
     # Clean up downloaded and extracted files
     shutil.rmtree(download_dir)

@@ -34,17 +34,17 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          git fetch
-          if git diff --quiet HEAD origin/main -- reflex_docs.txt; then
-            echo "No changes detected."
-            echo "changes_detected=false"
+          if ! git diff --exit-code; then
+            echo "Changes found."
+            echo "changes=true" >> $GITHUB_ENV
           else
-            echo "Changes detected."
-            echo "changes_detected=true"
+            echo "No changes found."
+            echo "changes=false" >> $GITHUB_ENV
+            exit 0
           fi
 
       - name: Commit and push changes
-        if: steps.check_changes.outputs.changes_detected == 'true'
+        if: env.changes == 'true'
         env:
           PAT: ${{ secrets.PAT }}
         run: |
