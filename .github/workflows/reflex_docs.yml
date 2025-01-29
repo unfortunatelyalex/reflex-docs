@@ -36,18 +36,18 @@ jobs:
         run: |
           if ! git diff --exit-code; then
             echo "Changes found."
-            echo "changes=true" >> $GITHUB_ENV
+            echo "changes=true" >> $GITHUB_OUTPUT
           else
             echo "No changes found."
-            echo "changes=false" >> $GITHUB_ENV
+            echo "changes=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
       - name: Commit and push changes
-        if: env.changes == 'true'
+        if: steps.check_changes.outputs.changes == 'true'
         env:
-          PAT: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           git add .
           git commit -m "Update merged Reflex documentation"
-          git push https://unfortunatelyalex:${PAT}@github.com/unfortunatelyalex/reflex-docs.git main
+          git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main

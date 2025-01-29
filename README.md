@@ -9,7 +9,8 @@ The automation workflow is defined in the `.github/workflows/reflex_docs.yml` fi
 2. Sets up Python 3.10.6.
 3. Installs necessary dependencies including Playwright.
 4. Runs the automation script (`haupt.py`) to download, extract, and merge documentation files.
-5. Commits and pushes the changes to the repository with a commit message.
+5. Checks if the merged content file has changed and if not no further action is taken.
+6. Commits and pushes the changes to the repository with a commit message.
 
 ## Automation Script
 
