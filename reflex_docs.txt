@@ -26848,6 +26848,10 @@ Reflex AG Grid is a high-performance and highly customizable grid that wraps AG 
 pip install reflex-ag-grid
 ```
 
+```md alert warning
+# Starting from reflex 0.7.1, the reflex-ag-grid package is not maintained anymore. Go to https://enterprise.reflex.dev/ to get the latest version of AG Grid maintained by the Reflex Team.
+```
+
 ## Your First Reflex AG Grid
 
 A basic Reflex AG Grid contains column definitions `column_defs`, which define the columns to be displayed in the grid, and `row_data`, which contains the data to be displayed in the grid.
@@ -32912,7 +32916,7 @@ Whenever the user hovers over the heading, the `next_word` **event handler** wil
 
 Adding the `@rx.event` decorator above the event handler is strongly recommended. This decorator enables proper static type checking, which ensures event handlers receive the correct number and types of arguments.
 
-# What in this section?
+# What's in this section?
 
 In the event section of the documentation, you will explore the different types of events supported by Reflex, along with the different ways to call them.
 
