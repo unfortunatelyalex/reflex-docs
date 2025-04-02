@@ -5055,7 +5055,7 @@ image_style = {
 }
 ```
 
-In order to publish a Python package, an account with the package index is required. As of **0.4.3**, Reflex only supports publishing to PyPI and TestPyPI. PyPI is short for **Python Package Index**, the official third-party software repository for Python. TestPyPI is a separate instance of index that allows users to test the distribution and installation of the package before publishing it to the real index.
+In order to publish a Python package, you need to use a publishing utility. Any would work, but we recommend either [Twine](https://twine.readthedocs.io/en/stable/) or (uv)[https://docs.astral.sh/uv/guides/package/#publishing-your-package].
 
 ## PyPI
 
@@ -5067,7 +5067,7 @@ rx.center(
 )
 ```
 
-A user can use username and password to authenticate with PyPI when publishing. Reflex does not store your PyPI credentials. If an API token is preferred, it can be generated in the account settings.
+A user can use username and password to authenticate with PyPI when publishing.
 
 ```python eval
 rx.center(
@@ -5083,10 +5083,6 @@ rx.center(
 )
 ```
 
-## TestPyPI
-
-TestPyPI has the same look and feel as PyPI.
-
 
 # Custom Components Overview
 
@@ -5098,10 +5094,9 @@ from pcweb.pages.docs.custom_components import custom_components as custom_compo
 
 Reflex users create many components of their own: ready to use high level components, or nicely wrapped React components. With **Custom Components**, the community can easily share these components now.
 
-Release **0.4.3** introduces a series of `reflex component` commands that help developers wrap react components, test, and publish them as python packages. As shown in the image below, there are already a few custom components published on PyPI, such as `reflex-spline`, `reflex-webcam`. 
+Release **0.4.3** introduces a series of `reflex component` commands that help developers wrap react components, test, and publish them as python packages. As shown in the image below, there are already a few custom components published on PyPI, such as `reflex-spline`, `reflex-webcam`.
 
 Check out the custom components gallery [here]({custom_components_gallery.path}).
-
 
 ```python eval
 rx.center(
@@ -5119,7 +5114,8 @@ Follow these steps to publish the custom component as a python package:
 
 1. `reflex component init`: creates a new custom component project from templates.
 2. dev and test: developer implements and tests the custom component.
-3. `reflex component publish`: builds and uploads the package to a python package index.
+3. `reflex component build`: builds the package.
+4. `twine upload` or `uv publish`: uploads the package to a python package index.
 
 ### Initialization
 
@@ -5154,10 +5150,14 @@ After finishing the custom component implementation, the user is encouraged to f
 ### Publish
 
 ```bash
-reflex component publish
+reflex component build
 ```
 
-Once ready to publish, execute `reflex component publish` with the credentials in the command options (either `--username` and `--password` together or `--token`). First the command builds the distribution files if they are not already built. The end result is a `dist` folder containing the distribution files. The user does not need to do anything manually with these distribution files. The the command proceeds to publish those files. The same version of the package can only be published once. If already exists, the publish ends in error. The user can go to the `pyproject.toml` file and update the version number as desired. After the `publish` command finishes successfully, the package is uploaded to PyPI. 🎉
+Once you're ready to publish your package, run `reflex component build` to build the package. The command builds the distribution files if they are not already built. The end result is a `dist` folder containing the distribution files. The user does not need to do anything manually with these distribution files.
+
+In order to publish these files as a Python package, you need to use a publishing utility. Any would work, but we recommend either [Twine](https://twine.readthedocs.io/en/stable/) or (uv)[https://docs.astral.sh/uv/guides/package/#publishing-your-package]. Make sure to keep your package version in pyproject.toml updated.
+
+You can also share your components with the rest of the community at our website using the command `reflex component share`. See you there!
 
 
 # Command Reference
@@ -5184,10 +5184,9 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  build    Build a custom component.
   init     Initialize a custom component.
-  publish  Publish a custom component.
-""")
+  build    Build a custom component.
+  share    Collect more details on the published package for gallery.""")
 ```
 
 ## reflex component init
@@ -5302,54 +5301,9 @@ Options:
 
 ## reflex component publish
 
-To publish to a package index, a user is required to already have an account with them. As of **0.4.3**, Reflex only supports uploading to PyPI and TestPyPI. Those indices are separate PyPI and TestPyPI should have sufficient documentation on the account creation and how to generate API tokens. We also have a [short guide]({custom_components.overview.path}) covering this topic.
+To publish to a package index, a user is required to already have an account with them. As of **0.7.5**, Reflex does not handle the publishing process for you. You can do so manually by first running `reflex component build` followed by `twine upload` or `uv publish` or your choice of a publishing utility.
 
-The publish process starts with a build if needed. If the distribution files for the version specified in pyproject.toml file already exist, the command prompts the user to confirm rebuilding the files nor not. After making sure the distribution files are ready, the command proceeds to upload them to the specified python package index.
-
-```python eval
-doccmdoutput(
-    command="reflex component publish --help",
-    output="""
-reflex component publish --help
-Usage: reflex component publish [OPTIONS]
-
-  Publish a custom component. Must be run from the project root directory
-  where the pyproject.toml is.
-
-  Args:     repository: The name of the Python package repository, such pypi,
-  testpypi.     token: The token to use for authentication on python package
-  repository. If token is provided, no username/password should be provided at
-  the same time.     username: The username to use for authentication on
-  python package repository.     password: The password to use for
-  authentication on python package repository.     loglevel: The log level to
-  use.
-
-  Raises:     Exit: If arguments provided are not correct or the publish
-  fails.
-
-Options:
-  -r, --repository TEXT           The name of the repository. Defaults to
-                                  pypi. Only supports pypi and testpypi (Test
-                                  PyPI) for now.
-  -t, --token TEXT                The API token to use for authentication on
-                                  python package repository. If token is
-                                  provided, no username/password should be
-                                  provided at the same time
-  -u, --username TEXT             The username to use for authentication on
-                                  python package repository. Username and
-                                  password must both be provided.
-  -p, --password TEXT             The password to use for authentication on
-                                  python package repository. Username and
-                                  password must both be provided.
-  --build / --no-build            Whether to build the package before
-                                  publishing. If the package is already built,
-                                  set this to False.  [default: build]
-  --loglevel [debug|info|warning|error|critical]
-                                  The log level to use.  [default:
-                                  LogLevel.INFO]
-  --help                          Show this message and exit.
-""")
-```
+You can then share your build on our website with `reflex component share`.
 
 ## reflex component build
 
@@ -11199,6 +11153,111 @@ app = rx.App(
 Without a leading slash the path is considered relative to the current page route and may
 not work for routes containing more than one path component, like `/blog/my-cool-post`.
 ```
+
+
+## Styling with CSS
+
+You can use CSS variables directly in your Reflex app by passing them alongside the appropriae props. Create a `style.css` file inside the `assets` folder with the following lines:
+
+```css
+:root {
+    --primary-color: blue;
+    --accent-color: green;
+}
+```
+
+Then, after referencing the CSS file within the `stylesheets` props of `rx.App`, you can access the CSS props directly like this
+
+```python
+app = rx.App(
+    theme=rx.theme(appearance="light"),
+    stylesheets=["/style.css"],
+)
+app.add_page(
+    rx.center(
+        rx.text("CSS Variables!"),
+        width="100%",
+        height="100vh",
+        bg="var(--primary-color)",
+    ),
+    "/",
+)
+```
+
+## Styling with Tailwind
+
+You can integrate custom Tailwind themes within your Reflex app as well. The setup process is similar to the CSS Styling method mentioned above, with only a few minor variations.
+
+Begin by creating a CSS file inside your `assets` folder. Inside the CSS file, include the following Tailwind directives:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: blue;
+  --foreground: green;
+}
+
+.dark {
+  --background: darkblue;
+  --foreground: lightgreen;
+}
+```
+
+We define a couple of custom CSS variables (--background and --foreground) that will be used throughout your app for styling. These variables can be dynamically updated based on the theme.
+
+Tailwind defaults to light mode, but to handle dark mode, you can define a separate set of CSS variables under the .dark class. 
+
+Tailwind Directives (@tailwind base, @tailwind components, @tailwind utilities): These are essential Tailwind CSS imports that enable the default base styles, components, and utility classes.
+
+Next, you'll need to configure Tailwind in your `rxconfig.py` file to ensure that the Reflex app uses your custom Tailwind setup.
+
+```python
+import reflex as rx
+
+tailwind_config = {
+    "plugins": ["@tailwindcss/typography"],
+    "theme": {
+        "extend": {
+            "colors": {
+                "background": "var(--background)",
+                "foreground": "var(--foreground)"
+            },
+        }
+    },
+}
+
+config = rx.Config(
+    app_name="app",
+    tailwind=tailwind_config,
+)
+```
+
+In the theme section, we're extending the default Tailwind theme to include custom colors. Specifically, we're referencing the CSS variables (--background and --foreground) that were defined earlier in your CSS file.
+
+The rx.Config object is used to initialize and configure your Reflex app. Here, we're passing the tailwind_config dictionary to ensure Tailwind's custom setup is applied to the app.
+
+Finally, to apply your custom styles and Tailwind configuration, you need to reference the CSS file you created in your `assets` folder inside the `rx.App` setup. This will allow you to use the custom properties (variables) directly within your Tailwind classes.
+
+In your `app.py` (or main application file), make the following changes:
+
+```python
+app = rx.App(
+    theme=rx.theme(appearance="light"),
+    stylesheets=["/style.css"],
+)
+app.add_page(
+    rx.center(
+        rx.text("Tailwind & Reflex!"),
+        class_name="bg-background w-full h-[100vh]",
+    ),
+    "/",
+)
+```
+
+The bg-background class uses the --background variable (defined in the CSS file), which will be applied as the background color. 
 
 ## Fonts
 
