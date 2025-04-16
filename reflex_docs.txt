@@ -11186,7 +11186,115 @@ app.add_page(
 )
 ```
 
-## Styling with Tailwind
+## Fonts
+
+You can take advantage of Reflex's support for custom stylesheets to add custom fonts to your app.
+
+In this example, we will use the [IBM Plex Mono]({"https://fonts.google.com/specimen/IBM+Plex+Mono"}) font from Google Fonts. First, add the stylesheet with the font to your app. You can get this link from the "Get embed code" section of the Google font page.
+
+```python
+app = rx.App(
+    stylesheets=[
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap",
+    ],
+)
+```
+
+Then you can use the font in your component by setting the `font_family` prop.
+
+```python demo
+rx.text(
+    "Check out my font",
+    font_family="IBM Plex Mono",
+    font_size="1.5em",
+)
+```
+
+## Local Fonts
+
+By making use of the two previous points, we can also make a stylesheet that allow you to use a font hosted on your server.
+
+If your font is called `MyFont.otf`, copy it in `assets/fonts`.
+
+Now we have the font ready, let's create the stylesheet `myfont.css`.
+
+```css
+@font-face {
+    font-family: MyFont;
+    src: url("/fonts/MyFont.otf") format("opentype");
+}
+
+@font-face {
+    font-family: MyFont;
+    font-weight: bold;
+    src: url("/fonts/MyFont.otf") format("opentype");
+}
+```
+
+Add the reference to your new Stylesheet in your App.
+
+```python
+app = rx.App(
+    stylesheets=[
+        "/fonts/myfont.css",  # This path is relative to assets/
+    ],
+)
+```
+
+And that's it! You can now use `MyFont` like any other FontFamily to style your components.
+
+
+```python exec
+import reflex as rx
+from pcweb.pages.docs import library
+
+```
+
+# Tailwind
+
+Reflex supports [Tailwind CSS]({"https://tailwindcss.com/"}) out of the box. To enable it, pass in a dictionary for the `tailwind` argument of your `rxconfig.py`:
+
+```python
+import reflex as rx
+
+config = rx.Config(
+    app_name="myapp",
+    tailwind=\{},
+)
+```
+
+All Tailwind configuration options are supported. Plugins and presets are automatically wrapped in `require()`:
+
+```python
+config = rx.Config(
+    app_name="app",
+    tailwind={
+        "plugins": ["@tailwindcss/typography"],
+    },
+)
+```
+
+You can use any of the [utility classes]({"https://tailwindcss.com/docs/utility-first"}) under the `class_name` prop:
+
+```python demo
+rx.box(
+    "Hello World",
+    class_name="text-4xl text-center text-blue-500",
+)
+```
+
+### Disabling Tailwind
+
+If you want to disable Tailwind in your configuration, you can do so by setting the `tailwind` config to `None`. This can be useful if you need to temporarily turn off Tailwind for your project:
+
+```python
+config = rx.Config(app_name="app", tailwind=None)
+```
+
+With this configuration, Tailwind will be disabled, and no Tailwind styles will be applied to your application.
+
+
+## Custom theme
 
 You can integrate custom Tailwind themes within your Reflex app as well. The setup process is similar to the CSS Styling method mentioned above, with only a few minor variations.
 
@@ -11259,64 +11367,69 @@ app.add_page(
 )
 ```
 
-The bg-background class uses the --background variable (defined in the CSS file), which will be applied as the background color. 
+The bg-background class uses the --background variable (defined in the CSS file), which will be applied as the background color.
 
-## Fonts
+## Dynamic Styling
 
-You can take advantage of Reflex's support for custom stylesheets to add custom fonts to your app.
+You can style a component based of a condition using `rx.cond` or `rx.match`.
 
-In this example, we will use the [IBM Plex Mono]({"https://fonts.google.com/specimen/IBM+Plex+Mono"}) font from Google Fonts. First, add the stylesheet with the font to your app. You can get this link from the "Get embed code" section of the Google font page.
+```python demo exec
+class TailwindState(rx.State):
+    active = False
 
-```python
-app = rx.App(
-    stylesheets=[
-        "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap",
-    ],
-)
+    @rx.event
+    def toggle_active(self):
+        self.active = not self.active
+
+def tailwind_demo():
+    return rx.el.div(
+        rx.el.button(
+            "Click me",
+            on_click=TailwindState.toggle_active,
+            class_name=(
+                "px-4 py-2 text-white rounded-md",
+                rx.cond(
+                    TailwindState.active,
+                    "bg-red-500",
+                    "bg-blue-500",
+                ),
+            ),
+        ),
+    )
 ```
 
-Then you can use the font in your component by setting the `font_family` prop.
+## Using Tailwind Classes from the State
 
-```python demo
-rx.text(
-    "Check out my font",
-    font_family="IBM Plex Mono",
-    font_size="1.5em",
-)
+When using Tailwind with Reflex, it's important to understand that class names must be statically defined in your code for Tailwind to properly compile them. If you dynamically generate class names from state variables or functions at runtime, Tailwind won't be able to detect these classes during the build process, resulting in missing styles in your application.
+
+For example, this won't work correctly because the class names are defined in the state:
+
+```python demo exec
+class TailwindState(rx.State):
+    active = False
+
+    @rx.var
+    def button_class(self) -> str:
+        return "bg-accent" if self.active else "bg-secondary"
+
+    @rx.event
+    def toggle_active(self):
+        self.active = not self.active
+
+def tailwind_demo():
+    return rx.el.button(
+        f"Click me: {TailwindState.active}",
+        class_name=TailwindState.button_class,
+        on_click=TailwindState.toggle_active,
+    )
 ```
 
-## Local Fonts
+## Using Tailwind with Reflex Core Components
 
-By making use of the two previous points, we can also make a stylesheet that allow you to use a font hosted on your server.
+Reflex core components are built on Radix Themes, which means they come with pre-defined styling. When you apply Tailwind classes to these components, you may encounter styling conflicts or unexpected behavior as the Tailwind styles compete with the built-in Radix styles.
 
-If your font is called `MyFont.otf`, copy it in `assets/fonts`.
+For the best experience when using Tailwind CSS in your Reflex application, we recommend using the lower-level `rx.el` components. These components don't have pre-applied styles, giving you complete control over styling with Tailwind classes without any conflicts. Check the list of HTML components [here]({library.other.html.path}).
 
-Now we have the font ready, let's create the stylesheet `myfont.css`.
-
-```css
-@font-face {
-    font-family: MyFont;
-    src: url("/fonts/MyFont.otf") format("opentype");
-}
-
-@font-face {
-    font-family: MyFont;
-    font-weight: bold;
-    src: url("/fonts/MyFont.otf") format("opentype");
-}
-```
-
-Add the reference to your new Stylesheet in your App.
-
-```python
-app = rx.App(
-    stylesheets=[
-        "/fonts/myfont.css",  # This path is relative to assets/
-    ],
-)
-```
-
-And that's it! You can now use `MyFont` like any other FontFamily to style your components.
 
 
 ```python exec
@@ -11666,64 +11779,6 @@ app = rx.App(
 ```
 
 Additionally you can modify the theme of your app through using the `Theme Panel` component which can be found in the [Theme Panel docs]({library.other.theme.path}).
-
-
-
-
-## Tailwind
-
-Reflex supports [Tailwind CSS]({"https://tailwindcss.com/"}) out of the box. To enable it, pass in a dictionary for the `tailwind` argument of your `rxconfig.py`:
-
-```python
-import reflex as rx
-
-
-class AppConfig(rx.Config):
-    pass
-
-
-config = AppConfig(
-    app_name="app",
-    db_url="sqlite:///reflex.db",
-    env=rx.Env.DEV,
-    tailwind=\{},
-)
-```
-
-All Tailwind configuration options are supported. Plugins and presets are automatically wrapped in `require()`:
-
-```python
-config = AppConfig(
-    app_name="app",
-    db_url="sqlite:///reflex.db",
-    env=rx.Env.DEV,
-    tailwind={
-        "theme": {
-            "extend": \{},
-        },
-        "plugins": ["@tailwindcss/typography"],
-    },
-)
-```
-
-You can use any of the [utility classes]({"https://tailwindcss.com/docs/utility-first"}) under the `class_name` prop:
-
-```python demo
-rx.box(
-    "Hello World",
-    class_name="text-4xl text-center text-blue-500",
-)
-```
-
-### Disabling Tailwind
-
-If you want to disable Tailwind in your configuration, you can do so by setting the `tailwind` config to `None`. This can be useful if you need to temporarily turn off Tailwind for your project:
-
-```python
-config = rx.Config(app_name="app", tailwind=None)
-```
-
-With this configuration, Tailwind will be disabled, and no Tailwind styles will be applied to your application.
 
 ## Special Styles
 
