@@ -2827,7 +2827,7 @@ def my_page():
     )
 ```
 
-You can also use any base HTML element through the [`rx.el`]({docs.library.other.html.path}) namespace.
+You can also use any base HTML element through the [`rx.el`]({docs.library.other.html.path}) namespace. This allows you to use standard HTML elements directly in your Reflex app when you need more control or when a specific component isn't available in the Reflex component library.
 
 ```python demo exec
 def my_div():
@@ -9881,9 +9881,70 @@ rx.button(
 )
 ```
 
+## rx.SessionStorage
+
+Represents a state Var that is stored in sessionStorage in the browser. Similar to localStorage, but the data is cleared when the page session ends (when the browser/tab is closed). Currently only supports string values.
+
+Parameters
+
+- `name`: The name of the storage key on the client side.
+
+```python
+class SessionStorageState(rx.State):
+    # session storage with default settings
+    s1: str = rx.SessionStorage()
+
+    # session storage with custom settings
+    s2: str = rx.SessionStorage("s2 default")
+    s3: str = rx.SessionStorage(name="s3")
+```
+
+### Session Persistence
+
+SessionStorage data is cleared when the page session ends. A page session lasts as long as the browser is open and survives page refreshes and restores, but is cleared when the tab or browser is closed.
+
+Unlike LocalStorage, SessionStorage is isolated to the tab/window in which it was created, so it's not shared with other tabs/windows of the same origin.
+
+## rx.remove_session_storage
+
+Remove a session storage item from the client's browser.
+
+Parameters
+
+- `key`: The key to remove from session storage.
+
+```python
+rx.button(
+    'Remove Session Storage',
+    on_click=rx.remove_session_storage('key'),
+)
+```
+
+This event can also be returned from an event handler:
+
+```python
+class SessionStorageState(rx.State):
+    ...
+    def logout(self):
+        return rx.remove_session_storage('session_storage_state.s1')
+```
+
+## rx.clear_session_storage()
+
+Clear all session storage items from the client's browser. This may affect other
+apps running in the same domain or libraries within your app that use session
+storage.
+
+```python
+rx.button(
+    'Clear all Session Storage',
+    on_click=rx.clear_session_storage(),
+)
+```
+
 # Serialization Strategies
 
-If a non-trivial data structure should be stored in a `Cookie` or `LocalStorage` var it needs to be serialized before and after storing it. It is recommended to use a dataclass for the data which provides simple serialization helpers and works recursively in complex object structures.
+If a non-trivial data structure should be stored in a `Cookie`, `LocalStorage`, or `SessionStorage` var it needs to be serialized before and after storing it. It is recommended to use a dataclass for the data which provides simple serialization helpers and works recursively in complex object structures.
 
 ```python demo exec
 import reflex as rx
@@ -9973,6 +10034,42 @@ def app_settings_example():
         ),
     )
 ```
+
+# Comparison of Storage Types
+
+Here's a comparison of the different client-side storage options in Reflex:
+
+| Feature | rx.Cookie | rx.LocalStorage | rx.SessionStorage |
+|---------|-----------|----------------|------------------|
+| Persistence | Until cookie expires | Until explicitly deleted | Until browser/tab is closed |
+| Storage Limit | ~4KB | ~5MB | ~5MB |
+| Sent with Requests | Yes | No | No |
+| Accessibility | Server & Client | Client Only | Client Only |
+| Expiration | Configurable | Never | End of session |
+| Scope | Configurable (domain, path) | Origin (domain) | Tab/Window |
+| Syncing Across Tabs | No | Yes (with sync=True) | No |
+| Use Case | Authentication, Server-side state | User preferences, App state | Temporary session data |
+
+# When to Use Each Storage Type
+
+## Use rx.Cookie When:
+- You need the data to be accessible on the server side (cookies are sent with HTTP requests)
+- You're handling user authentication
+- You need fine-grained control over expiration and scope
+- You need to limit the data to specific paths in your app
+
+## Use rx.LocalStorage When:
+- You need to store larger amounts of data (up to ~5MB)
+- You want the data to persist indefinitely (until explicitly deleted)
+- You need to share data between different tabs/windows of your app
+- You want to store user preferences that should be remembered across browser sessions
+
+## Use rx.SessionStorage When:
+- You need temporary data that should be cleared when the browser/tab is closed
+- You want to isolate data to a specific tab/window
+- You're storing sensitive information that shouldn't persist after the session ends
+- You're implementing per-session features like form data, shopping carts, or multi-step processes
+- You want to persist data for a state after Redis expiration (for server-side state that needs to survive longer than Redis TTL)
 
 
 ```python exec
@@ -11066,6 +11163,76 @@ app.add_page(
     "/",
 )
 ```
+
+## SASS/SCSS Support
+
+Reflex supports SASS/SCSS stylesheets alongside regular CSS. This allows you to use more advanced styling features like variables, nesting, mixins, and more.
+
+### Using SASS/SCSS Files
+
+To use SASS/SCSS files in your Reflex app:
+
+1. Create a `.sass` or `.scss` file in your `assets` directory
+2. Reference the file in your `rx.App` configuration just like you would with CSS files
+
+```python
+app = rx.App(
+    stylesheets=[
+        "/styles.scss",  # This path is relative to assets/
+        "/sass/main.sass",  # You can organize files in subdirectories
+    ],
+)
+```
+
+Reflex automatically detects the file extension and compiles these files to CSS using the `libsass` package.
+
+### Example SASS/SCSS File
+
+Here's an example of a SASS file (`assets/styles.scss`) that demonstrates some of the features:
+
+```scss
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$padding: 16px;
+
+// Nesting
+.container {
+  background-color: $primary-color;
+  padding: $padding;
+  
+  .button {
+    background-color: $secondary-color;
+    padding: $padding / 2;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.centered-box {
+  @include flex-center;
+  height: 100px;
+}
+```
+
+### Dependency Requirement
+
+The `libsass` package is required for SASS/SCSS compilation. If it's not installed, Reflex will show an error message. You can install it with:
+
+```bash
+pip install "libsass>=0.23.0"
+```
+
+This package is included in the default Reflex installation, so you typically don't need to install it separately.
 
 ## Fonts
 
@@ -13118,20 +13285,18 @@ def index():
 
 ## Assets
 
-_Experimental feature added in v0.5.3_.
-
 If a wrapped component depends on assets such as images, scripts, or
-stylesheets, these can kept adjacent to the component code and
-included in the final build using the `rx._x.asset` function.
+stylesheets, these can be kept adjacent to the component code and
+included in the final build using the `rx.asset` function.
 
-`rx._x.asset` returns a relative path that references the asset in the compiled
+`rx.asset` returns a relative path that references the asset in the compiled
 output. The target files are copied into a subdirectory of `assets/external`
 based on the module where they are initially used. This allows third-party
 components to have external assets with the same name without conflicting
 with each other.
 
 For example, if there is an SVG file named `wave.svg` in the same directory as
-this component, it can be rendered using `rx.image` and `rx._x.asset`.
+this component, it can be rendered using `rx.image` and `rx.asset`.
 
 ```python
 class Hello(rx.Component):
@@ -13139,7 +13304,7 @@ class Hello(rx.Component):
     def create(cls, *children, **props) -> rx.Component:
         props.setdefault("align", "center")
         return rx.hstack(
-            rx.image(src=rx._x.asset("wave.svg"), width="50px", height="50px"),
+            rx.image(src=rx.asset("wave.svg", shared=True), width="50px", height="50px"),
             rx.heading("Hello ", *children),
             **props
         )
@@ -13149,6 +13314,7 @@ class Hello(rx.Component):
 ## Debugging
 
 If you encounter an error while wrapping a component it is recommended to check the Console in the browser developer tools. You can access this by going to inspect element and then clicking on the Console tab on Mac. This is because the Console is where most Javascript errors are logged.
+
 
 ```python exec
 import reflex as rx
@@ -13773,7 +13939,11 @@ when running in production mode. The `assets/` folder should only be used for st
 
 ## Referencing Assets
 
-To reference an image in the `assets/` simply pass the relative path as a prop.
+There are two ways to reference assets in your Reflex app:
+
+### 1. Direct Path Reference
+
+To reference an image in the `assets/` folder, pass the relative path as a prop.
 
 For example, you can store your logo in your assets folder:
 
@@ -13792,6 +13962,53 @@ rx.image(src="/Reflex.svg", width="5em")
 # Always prefix the asset path with a forward slash `/` to reference the asset from the root of the project, or it may not display correctly on non-root pages.
 ```
 
+### 2. Using rx.asset Function
+
+The `rx.asset` function provides a more flexible way to reference assets in your app. It supports both local assets (in the app's `assets/` directory) and shared assets (placed next to your Python files).
+
+#### Local Assets
+
+Local assets are stored in the app's `assets/` directory and are referenced using `rx.asset`:
+
+```python demo
+rx.image(src=rx.asset("Reflex.svg"), width="5em")
+```
+
+#### Shared Assets
+
+Shared assets are placed next to your Python file and are linked to the app's external assets directory. This is useful for creating reusable components with their own assets:
+
+```python box
+# my_component.py
+import reflex as rx
+
+# my_script.js is located in the same directory as this Python file
+def my_component():
+    return rx.box(
+        rx.script(src=rx.asset("my_script.js", shared=True)),
+        "Component with custom script"
+    )
+```
+
+You can also specify a subfolder for shared assets:
+
+```python box
+# my_component.py
+import reflex as rx
+
+# image.png is located in a subfolder next to this Python file
+def my_component_with_image():
+    return rx.image(
+        src=rx.asset("image.png", shared=True, subfolder="images")
+    )
+```
+
+```md alert
+# Shared assets are linked to your app via symlinks.
+
+When using `shared=True`, the asset is symlinked from its original location to your app's external assets directory. This allows you to keep assets alongside their related code.
+```
+
 ## Favicon
 
 The favicon is the small icon that appears in the browser tab.
@@ -13803,6 +14020,8 @@ You can add a `favicon.ico` file to the `assets/` folder to change the favicon.
 import reflex as rx
 from pcweb.pages.docs import library
 from pcweb.pages.docs import api_reference
+from pcweb.styles.styles import get_code_style
+from pcweb.styles.colors import c_color
 ```
 
 # Files
@@ -13810,6 +14029,67 @@ from pcweb.pages.docs import api_reference
 In addition to any assets you ship with your app, many web app will often need to receive or send files, whether you want to share media, allow user to import their data, or export some backend data.
 
 In this section, we will cover all you need to know for manipulating files in Reflex.
+
+## Assets vs Upload Directory
+
+Before diving into file uploads and downloads, it's important to understand the difference between assets and the upload directory in Reflex:
+
+```python eval
+# Simple table comparing assets vs upload directory
+rx.table.root(
+    rx.table.header(
+        rx.table.row(
+            rx.table.column_header_cell("Feature"),
+            rx.table.column_header_cell("Assets"),
+            rx.table.column_header_cell("Upload Directory"),
+        ),
+    ),
+    rx.table.body(
+        rx.table.row(
+            rx.table.cell(rx.text("Purpose", font_weight="bold")),
+            rx.table.cell(rx.text("Static files included with your app (images, stylesheets, scripts)")),
+            rx.table.cell(rx.text("Dynamic files uploaded by users during runtime")),
+        ),
+        rx.table.row(
+            rx.table.cell(rx.text("Location", font_weight="bold")),
+            rx.table.cell(rx.hstack(
+                rx.code("assets/", style=get_code_style("violet")),
+                rx.text(" folder or next to Python files (shared assets)"),
+                spacing="2",
+            )),
+            rx.table.cell(rx.hstack(
+                rx.code("uploaded_files/", style=get_code_style("violet")),
+                rx.text(" directory (configurable)"),
+                spacing="2",
+            )),
+        ),
+        rx.table.row(
+            rx.table.cell(rx.text("Access Method", font_weight="bold")),
+            rx.table.cell(rx.hstack(
+                rx.code("rx.asset()", style=get_code_style("violet")),
+                rx.text(" or direct path reference"),
+                spacing="2",
+            )),
+            rx.table.cell(rx.code("rx.get_upload_url()", style=get_code_style("violet"))),
+        ),
+        rx.table.row(
+            rx.table.cell(rx.text("When to Use", font_weight="bold")),
+            rx.table.cell(rx.text("For files that are part of your application's codebase")),
+            rx.table.cell(rx.text("For files that users upload or generate through your application")),
+        ),
+        rx.table.row(
+            rx.table.cell(rx.text("Availability", font_weight="bold")),
+            rx.table.cell(rx.text("Available at compile time")),
+            rx.table.cell(rx.text("Available at runtime")),
+        ),
+    ),
+    width="100%",
+)
+```
+
+
+
+For more information about assets, see the [Assets Overview](/docs/assets/overview/).
 
 ## Download
 
@@ -13895,35 +14175,144 @@ For detailed information, see the reference page of the component [here]({librar
 import reflex as rx
 ```
 
-# Backend API Routes
+# API Transformer
 
-In addition to your frontend app, Reflex also uses a FastAPI backend to serve your app.
+In addition to your frontend app, Reflex uses a FastAPI backend to serve your app. The API transformer feature allows you to transform or extend the ASGI app that serves your Reflex application.
 
-To add additional endpoints to the backend API, you can use `app.add_api_route` and add a route that returns JSON.
+## Overview
+
+The API transformer provides a way to:
+
+1. Integrate existing FastAPI or Starlette applications with your Reflex app
+2. Apply middleware or transformations to the ASGI app
+3. Extend your Reflex app with additional API endpoints
+
+This is useful for creating a backend API that can be used for purposes beyond your Reflex app, or for integrating Reflex with existing backend services.
+
+## Using API Transformer
+
+You can set the `api_transformer` parameter when initializing your Reflex app:
 
 ```python
-async def api_test(item_id: int):
-    return \{"my_result": item_id}
+import reflex as rx
+from fastapi import FastAPI, Depends
+from fastapi.security import OAuth2PasswordBearer
 
-app = rx.App()
-app.api.add_api_route("/items/\{item_id}", api_test)
+# Create a FastAPI app
+fastapi_app = FastAPI(title="My API")
+
+# Add routes to the FastAPI app
+@fastapi_app.get("/api/items")
+async def get_items():
+    return dict(items=["Item1", "Item2", "Item3"])
+
+# Create a Reflex app with the FastAPI app as the API transformer
+app = rx.App(api_transformer=fastapi_app)
 ```
 
-Now you can access the endpoint at `localhost:8000/items/23` and get the result.
+## Types of API Transformers
 
-This is useful for creating a backend API that can be used for purposes other than your Reflex app.
+The `api_transformer` parameter can accept:
+
+1. A Starlette or FastAPI instance
+2. A callable that takes an ASGIApp and returns an ASGIApp
+3. A sequence of the above
+
+### Using a FastAPI or Starlette Instance
+
+When you provide a FastAPI or Starlette instance as the API transformer, Reflex will mount its internal API to your app, allowing you to define additional routes:
+
+```python
+import reflex as rx
+from fastapi import FastAPI, Depends
+from fastapi.security import OAuth2PasswordBearer
+
+# Create a FastAPI app with authentication
+fastapi_app = FastAPI(title="Secure API")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# Add a protected route
+@fastapi_app.get("/api/protected")
+async def protected_route(token: str = Depends(oauth2_scheme)):
+    return dict(message="This is a protected endpoint")
+
+# Create a token endpoint
+@fastapi_app.post("/token")
+async def login(username: str, password: str):
+    # In a real app, you would validate credentials
+    if username == "user" and password == "password":
+        return dict(access_token="example_token", token_type="bearer")
+    return dict(error="Invalid credentials")
+
+# Create a Reflex app with the FastAPI app as the API transformer
+app = rx.App(api_transformer=fastapi_app)
+```
+
+### Using a Callable Transformer
+
+You can also provide a callable that transforms the ASGI app:
+
+```python
+import reflex as rx
+from starlette.middleware.cors import CORSMiddleware
+
+# Create a transformer function that returns a transformed ASGI app
+def add_cors_middleware(app):
+    # Wrap the app with CORS middleware and return the wrapped app
+    return CORSMiddleware(
+        app=app,
+        allow_origins=["https://example.com"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+# Create a Reflex app with the transformer
+app = rx.App(api_transformer=add_cors_middleware)
+```
+
+### Using Multiple Transformers
+
+You can apply multiple transformers by providing a sequence:
+
+```python
+import reflex as rx
+from fastapi import FastAPI
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+
+# Create a FastAPI app
+fastapi_app = FastAPI(title="My API")
+
+# Add routes to the FastAPI app
+@fastapi_app.get("/api/items")
+async def get_items():
+    return dict(items=["Item1", "Item2", "Item3"])
+
+# Create a transformer function
+def add_logging_middleware(app):
+    # This is a simple example middleware that logs requests
+    async def middleware(scope, receive, send):
+        # Log the request path
+        path = scope["path"]
+        print("Request:", path)
+        await app(scope, receive, send)
+    return middleware
+
+# Create a Reflex app with multiple transformers
+app = rx.App(api_transformer=[fastapi_app, add_logging_middleware])
+```
 
 ## Reserved Routes
 
 Some routes on the backend are reserved for the runtime of Reflex, and should not be overridden unless you know what you are doing.
 
-## Ping
+### Ping
 
 `localhost:8000/ping/`: You can use this route to check the health of the backend.
 
 The expected return is `"pong"`.
 
-## Event
+### Event
 
 `localhost:8000/_event`: the frontend will use this route to notify the backend that an event occurred.
 
@@ -13931,7 +14320,7 @@ The expected return is `"pong"`.
 # Overriding this route will break the event communication
 ```
 
-## Upload
+### Upload
 
 `localhost:8000/_upload`: This route is used for the upload of file when using `rx.upload()`.
 
@@ -14173,6 +14562,8 @@ from pcweb.pages import docs
 # Rendering Iterables
 
 Recall again from the [basics]({docs.getting_started.basics.path}) that we cannot use Python `for` loops when referencing state vars in Reflex. Instead, use the `rx.foreach` component to render components from a collection of data.
+
+For dynamic content that should automatically scroll to show the newest items, consider using the [auto scroll]({docs.library.dynamic_rendering.auto_scroll.path}) component together with `rx.foreach`.
 
 ```python demo exec
 class IterState(rx.State):
@@ -14466,11 +14857,12 @@ def packing_list():
 # Convert HTML to Reflex
 
 
-To convert HTML to Reflex code use this live converter tool: https://flexgen.reflex.run/reverse-compiler/
+To convert HTML to Reflex code use this live converter tool: https://reflex.build/reverse-compiler/
 
 ## Convert Figma file to Reflex
 
 Check out this [Notion doc](https://www.notion.so/reflex-dev/Convert-HTML-to-Reflex-fe22d0641dcd4d5c91c8404ca41c7e77) for a walk through on how to convert a Figma file into Reflex code.
+
 
 # Reflex Enterprise
 
@@ -14712,6 +15104,159 @@ class State(rx.State):
     def raw_user_tuples(self) -> list[list]:
         with rx.session() as session:
             return [list(row) for row in session.execute("SELECT * FROM user").all()]
+```
+
+## Async Database Operations
+
+Reflex provides an async version of the session function called `rx.asession` for asynchronous database operations. This is useful when you need to perform database operations in an async context, such as within async event handlers.
+
+The `rx.asession` function returns an async SQLAlchemy session that must be used with an async context manager. Most operations against the `asession` must be awaited.
+
+```python
+import sqlalchemy.ext.asyncio
+import sqlalchemy
+
+import reflex as rx
+
+
+class AsyncUserState(rx.State):
+    users: list[User] = []
+    
+    @rx.event(background=True)
+    async def get_users_async(self):
+        async with rx.asession() as asession:
+            result = await asession.execute(User.select())
+            async with self:
+                self.users = (await result.all())
+```
+
+### Async Select
+
+The following example shows how to query the database asynchronously:
+
+```python
+class AsyncQueryUser(rx.State):
+    name: str
+    users: list[User] = []
+
+    @rx.event(background=True)
+    async def get_users(self):
+        async with rx.asession() as asession:
+            stmt = User.select().where(User.username.contains(self.name))
+            result = await asession.execute(stmt)
+            async with self:
+                self.users = (await result.all())
+```
+
+### Async Insert
+
+To add a new record to the database asynchronously:
+
+```python
+class AsyncAddUser(rx.State):
+    username: str
+    email: str
+    
+    @rx.event(background=True)
+    async def add_user(self):
+        async with rx.asession() as asession:
+            asession.add(User(username=self.username, email=self.email))
+            await asession.commit()
+```
+
+### Async Update
+
+To update a user asynchronously:
+
+```python
+class AsyncChangeEmail(rx.State):
+    username: str
+    email: str
+
+    @rx.event(background=True)
+    async def modify_user(self):
+        async with rx.asession() as asession:
+            stmt = User.select().where(User.username == self.username)
+            result = await asession.execute(stmt)
+            user = (await result.first())
+            if user:
+                user.email = self.email
+                asession.add(user)
+                await asession.commit()
+```
+
+### Async Delete
+
+To delete a user asynchronously:
+
+```python
+class AsyncRemoveUser(rx.State):
+    username: str
+
+    @rx.event(background=True)
+    async def delete_user(self):
+        async with rx.asession() as asession:
+            stmt = User.select().where(User.username == self.username)
+            result = await asession.execute(stmt)
+            user = (await result.first())
+            if user:
+                await asession.delete(user)
+                await asession.commit()
+```
+
+### Async Refresh
+
+Similar to the regular session, you can refresh an object to ensure all fields are up to date:
+
+```python
+class AsyncAddUserForm(rx.State):
+    user: User | None = None
+    
+    @rx.event(background=True)
+    async def add_user(self, form_data: dict[str, str]):
+        async with rx.asession() as asession:
+            async with self:
+                self.user = User(**form_data)
+            asession.add(self.user)
+            await asession.commit()
+            await asession.refresh(self.user)
+```
+
+### Async SQL Execution
+
+You can also execute raw SQL asynchronously:
+
+```python
+class AsyncRawSQL(rx.State):
+    users: list[list] = []
+    
+    @rx.event(background=True)
+    async def insert_user_raw(self, username, email):
+        async with rx.asession() as asession:
+            await asession.execute(
+                sqlalchemy.text(
+                    "INSERT INTO user (username, email) "
+                    "VALUES (:username, :email)"
+                ),
+                dict(username=username, email=email),
+            )
+            await asession.commit()
+    
+    @rx.event(background=True)
+    async def get_raw_users(self):
+        async with rx.asession() as asession:
+            result = await asession.execute("SELECT * FROM user")
+            async with self:
+                self.users = [list(row) for row in (await result.all())]
+```
+
+```md alert info
+# Important Notes for Async Database Operations
+- Always use the `@rx.event(background=True)` decorator for async event handlers
+- Most operations against the `asession` must be awaited, including `commit()`, `execute()`, `refresh()`, and `delete()`
+- The `add()` method does not need to be awaited
+- Result objects from queries have methods like `all()` and `first()` that must be awaited
+- Use `async with self:` when updating state variables in background tasks
 ```
 
 
@@ -15593,6 +16138,7 @@ to calculate the value on the backend.
 ```python exec
 import random
 import time
+import asyncio
 
 import reflex as rx
 ```
@@ -15682,9 +16228,104 @@ depends on `counter_a`, so it only gets recomputed when `counter_a` has changes.
 Similarly `last_counter_b_update` only depends on `counter_b`, and thus is
 updated only when `counter_b` changes.
 
+## Async Computed Vars
+
+Async computed vars allow you to use asynchronous operations in your computed vars.
+They are defined as async methods in your State class with the same `@rx.var` decorator.
+Async computed vars are useful for operations that require asynchronous processing, such as:
+
+- Fetching data from external APIs
+- Database operations
+- File I/O operations
+- Any other operations that benefit from async/await
+
+```python demo exec
+class AsyncVarState(rx.State):
+    count: int = 0
+    
+    @rx.var
+    async def delayed_count(self) -> int:
+        # Simulate an async operation like an API call
+        await asyncio.sleep(0.5)
+        return self.count * 2
+    
+    @rx.event
+    def increment(self):
+        self.count += 1
+
+
+def async_var_example():
+    return rx.vstack(
+        rx.heading("Async Computed Var Example"),
+        rx.text(f"Count: {AsyncVarState.count}"),
+        rx.text(f"Delayed count (x2): {AsyncVarState.delayed_count}"),
+        rx.button("Increment", on_click=AsyncVarState.increment),
+        spacing="4",
+    )
+```
+
+In this example, `delayed_count` is an async computed var that returns the count multiplied by 2 after a simulated delay.
+When the count changes, the async computed var is automatically recomputed.
+
+### Caching Async Computed Vars
+
+Just like regular computed vars, async computed vars can also be cached. This is especially
+useful for expensive async operations like API calls or database queries.
+
+```python demo exec
+class AsyncCachedVarState(rx.State):
+    user_id: int = 1
+    refresh_trigger: int = 0
+    
+    @rx.var(cache=True)
+    async def user_data(self) -> dict:
+        # In a real app, this would be an API call
+        await asyncio.sleep(1)  # Simulate network delay
+        
+        # Simulate different user data based on user_id
+        users = {
+            1: {"name": "Alice", "email": "alice@example.com"},
+            2: {"name": "Bob", "email": "bob@example.com"},
+            3: {"name": "Charlie", "email": "charlie@example.com"},
+        }
+        
+        return users.get(self.user_id, {"name": "Unknown", "email": "unknown"})
+    
+    @rx.event
+    def change_user(self):
+        # Cycle through users 1-3
+        self.user_id = (self.user_id % 3) + 1
+    
+    @rx.event
+    def force_refresh(self):
+        # This will not affect user_data dependencies, but will trigger a state update
+        self.refresh_trigger += 1
+
+
+def async_cached_var_example():
+    return rx.vstack(
+        rx.heading("Cached Async Computed Var Example"),
+        rx.text(f"User ID: {AsyncCachedVarState.user_id}"),
+        rx.text(f"User Name: {AsyncCachedVarState.user_data['name']}"),
+        rx.text(f"User Email: {AsyncCachedVarState.user_data['email']}"),
+        rx.hstack(
+            rx.button("Change User", on_click=AsyncCachedVarState.change_user),
+            rx.button("Force Refresh (No Effect)", on_click=AsyncCachedVarState.force_refresh),
+        ),
+        rx.text("Note: The cached async var only updates when user_id changes, not when refresh_trigger changes."),
+        spacing="4",
+    )
+```
+
+In this example, `user_data` is a cached async computed var that simulates fetching user data.
+It is only recomputed when `user_id` changes, not when other state variables like `refresh_trigger` change.
+This demonstrates how caching works with async computed vars to optimize performance for expensive operations.
+
 
 ```python exec
 import reflex as rx
+import dataclasses
+from typing import TypedDict
 
 from pcweb.pages.docs import vars
 ```
@@ -15693,18 +16334,21 @@ from pcweb.pages.docs import vars
 
 As mentioned in the [vars page]({vars.base_vars.path}), Reflex vars must be JSON serializable.
 
-This means we can support any Python primitive types, as well as lists, dicts, and tuples. However, you can also create more complex var types by inheriting from `rx.Base` or decorating them as dataclasses with `@dataclasses.dataclass`.
+This means we can support any Python primitive types, as well as lists, dicts, and tuples. However, you can also create more complex var types using dataclasses (recommended), TypedDict, or Pydantic models.
 
 ## Defining a Type
 
-In this example, we will create a custom var type for storing translations.
+In this example, we will create a custom var type for storing translations using a dataclass.
 
 Once defined, we can use it as a state var, and reference it from within a component.
 
 ```python demo exec
 import googletrans
+import dataclasses
+from typing import TypedDict
 
-class Translation(rx.Base):
+@dataclasses.dataclass
+class Translation:
     original_text: str
     translated_text: str
 
@@ -15724,6 +16368,34 @@ def translation_example():
         rx.text(TranslationState.current_translation.translated_text),
     )
 ```
+
+## Alternative Approaches
+
+### Using TypedDict
+
+You can also use TypedDict for defining custom var types:
+
+```python
+from typing import TypedDict
+
+class Translation(TypedDict):
+    original_text: str
+    translated_text: str
+```
+
+### Using Pydantic Models
+
+Pydantic models are another option for complex data structures:
+
+```python
+from pydantic import BaseModel
+
+class Translation(BaseModel):
+    original_text: str
+    translated_text: str
+```
+
+For complex data structures, dataclasses are recommended as they provide a clean, type-safe way to define custom var types with good IDE support.
 
 
 ```python exec
@@ -16532,6 +17204,73 @@ def index():
         rx.text(GreeterState.message),
     )
 ```
+
+### Accessing Individual Var Values
+
+In addition to accessing entire state instances with `get_state`, you can retrieve individual variable values using the `get_var_value` method:
+
+```python
+# Access a var value from another state
+value = await self.get_var_value(OtherState.some_var)
+```
+
+This async method is particularly useful when you only need a specific value rather than loading the entire state. Using `get_var_value` can be more efficient than `get_state` when:
+
+1. You only need to access a single variable from another state
+2. The other state contains a large amount of data
+3. You want to avoid loading unnecessary data into memory
+
+Here's an example that demonstrates how to use `get_var_value` to access data between states:
+
+```python demo exec
+# Define a state that holds a counter value
+class CounterState(rx.State):
+    # This variable will be accessed from another state
+    count: int = 0
+    
+    @rx.event
+    async def increment(self):
+        # Increment the counter when the button is clicked
+        self.count += 1
+
+# Define a separate state that will display information
+class DisplayState(rx.State):
+    # This will show the current count value
+    message: str = ""
+    
+    @rx.event
+    async def show_count(self):
+        # Use get_var_value to access just the count variable from CounterState
+        # This is more efficient than loading the entire state with get_state
+        current = await self.get_var_value(CounterState.count)
+        self.message = f"Current count: {current}"
+
+def var_value_example():
+    return rx.vstack(
+        rx.heading("Get Var Value Example"),
+        rx.hstack(
+            # This button calls DisplayState.show_count to display the current count
+            rx.button("Get Count Value", on_click=DisplayState.show_count),
+            # This button calls CounterState.increment to increase the counter
+            rx.button("Increment", on_click=CounterState.increment),
+        ),
+        # Display the message from DisplayState
+        rx.text(DisplayState.message),
+        width="100%",
+        align="center",
+        spacing="4",
+    )
+```
+
+In this example:
+1. We have two separate states: `CounterState` which manages a counter, and `DisplayState` which displays information
+2. When you click "Increment", it calls `CounterState.increment()` to increase the counter value
+3. When you click "Show Count", it calls `DisplayState.show_count()` which uses `get_var_value` to retrieve just the count value from `CounterState` without loading the entire state
+4. The current count is then displayed in the message
+
+This pattern is useful when you have multiple states that need to interact with each other but don't need to access all of each other's data.
+
+If the var is not retrievable, `get_var_value` will raise an `UnretrievableVarValueError`.
 
 ## Performance Implications
 
@@ -20044,6 +20783,78 @@ rx.cond(
     "false value"
 )
 ```
+
+
+```python exec
+import reflex as rx
+```
+
+# Auto Scroll
+
+The `rx.auto_scroll` component is a div that automatically scrolls to the bottom when new content is added. This is useful for chat interfaces, logs, or any container where new content is dynamically added and you want to ensure the most recent content is visible.
+
+## Basic Usage
+
+```python demo exec
+import reflex as rx
+
+class AutoScrollState(rx.State):
+    messages: list[str] = ["Initial message"]
+    
+    def add_message(self):
+        self.messages.append(f"New message #{len(self.messages) + 1}")
+
+def auto_scroll_example():
+    return rx.vstack(
+        rx.auto_scroll(
+            rx.foreach(
+                AutoScrollState.messages,
+                lambda message: rx.box(
+                    message,
+                    padding="0.5em",
+                    border_bottom="1px solid #eee",
+                    width="100%"
+                )
+            ),
+            height="200px",
+            width="300px",
+            border="1px solid #ddd",
+            border_radius="md",
+        ),
+        rx.button("Add Message", on_click=AutoScrollState.add_message),
+        width="300px",
+        align_items="center",
+    )
+```
+
+The `auto_scroll` component automatically scrolls to show the newest content when it's added. In this example, each time you click "Add Message", a new message is added to the list and the container automatically scrolls to display it.
+
+## When to Use Auto Scroll
+
+- **Chat applications**: Keep the chat window scrolled to the most recent messages.
+- **Log viewers**: Automatically follow new log entries as they appear.
+- **Feed interfaces**: Keep the newest content visible in dynamically updating feeds.
+
+## Props
+
+`rx.auto_scroll` is based on the `rx.div` component and inherits all of its props. By default, it sets `overflow="auto"` to enable scrolling.
+
+Some common props you might use with `auto_scroll`:
+
+- `height`: Set the height of the scrollable container.
+- `width`: Set the width of the scrollable container.
+- `padding`: Add padding inside the container.
+- `border`: Add a border around the container.
+- `border_radius`: Round the corners of the container.
+
+## How It Works
+
+The component tracks when new content is added and maintains the scroll position in two scenarios:
+
+1. When the user is already near the bottom of the content (within 50 pixels), it will scroll to the bottom when new content is added.
+2. When the container didn't have a scrollbar before but does now (due to new content), it will automatically scroll to the bottom.
+
+This behavior ensures that users can scroll up to view older content without being forced back to the bottom, while still automatically following new content in most cases.
 
 
 ```python exec
@@ -25468,11 +26279,14 @@ rx.flex(
 
 ## Dynamic Icons
 
-It is not possible to use dynamic values as the `tag` prop, because it is used to import the icon from the Lucide library.
-If you have a specific subset of icons you want to use dynamically, define an rx.match with them:
+There are two ways to use dynamic icons in Reflex:
+
+### Using rx.match
+
+If you have a specific subset of icons you want to use dynamically, you can define an `rx.match` with them:
 
 ```python
-def dynamic_icon(icon_name):
+def dynamic_icon_with_match(icon_name):
     return rx.match(
         icon_name,
         ("plus", rx.icon("plus")),
@@ -25482,7 +26296,7 @@ def dynamic_icon(icon_name):
 ```
 
 ```python exec
-def dynamic_icon(icon_name):
+def dynamic_icon_with_match(icon_name):
     return rx.match(
         icon_name,
         ("plus", rx.icon("plus")),
@@ -25491,10 +26305,34 @@ def dynamic_icon(icon_name):
     )
 ```
 
-You can then use the `dynamic_icon` function to display the icons dynamically.
+### Using Dynamic Icon Tags
+
+Reflex also supports using dynamic values directly as the `tag` prop in `rx.icon()`. This allows you to use any icon from the Lucide library dynamically at runtime.
+
+```python exec
+class DynamicIconState(rx.State):
+    current_icon: str = "heart"
+    
+    def change_icon(self):
+        icons = ["heart", "star", "bell", "calendar", "settings"]
+        import random
+        self.current_icon = random.choice(icons)
+```
 
 ```python demo
-rx.foreach(["plus", "minus", "equal"], dynamic_icon)    
+rx.vstack(
+    rx.heading("Dynamic Icon Example"),
+    rx.icon(DynamicIconState.current_icon, size=30, color="red"),
+    rx.button("Change Icon", on_click=DynamicIconState.change_icon),
+    spacing="4",
+    align="center",
+)
+```
+
+Under the hood, when a dynamic value is passed as the `tag` prop to `rx.icon()`, Reflex automatically uses a special `DynamicIcon` component that can load icons at runtime.
+
+```md alert
+When using dynamic icons, make sure the icon names are valid. Invalid icon names will cause runtime errors.
 ```
 
 ## Styling
@@ -25600,6 +26438,7 @@ rx.badge(
     color_scheme="gray",
 )
 ```
+
 
 ---
 components:
