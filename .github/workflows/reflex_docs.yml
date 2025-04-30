@@ -20,16 +20,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10.6'
+          python-version: '3.12.10'
 
       - name: Install dependencies
         run: |
-          /home/ubuntu/.pyenv/versions/3.10.6/bin/python -m pip install --upgrade pip
-          /home/ubuntu/.pyenv/versions/3.10.6/bin/python -m pip install playwright
-          /home/ubuntu/.pyenv/versions/3.10.6/bin/python -m playwright install
+          /home/ubuntu/.pyenv/versions/3.12.10/bin/python -m pip install --upgrade pip
+          /home/ubuntu/.pyenv/versions/3.12.10/bin/python -m pip install playwright
+          /home/ubuntu/.pyenv/versions/3.12.10/bin/python -m playwright install
 
       - name: Run automation script
-        run: /home/ubuntu/.pyenv/versions/3.10.6/bin/python haupt.py
+        run: /home/ubuntu/.pyenv/versions/3.12.10/bin/python haupt.py
 
       - name: Check for changes
         id: check_changes

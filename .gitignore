@@ -1,2 +1,4 @@
 dev*
 .git
+.txt
+.python-version
