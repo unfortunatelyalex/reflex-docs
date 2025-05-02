@@ -6,7 +6,7 @@ This repository contains an automation script for merging the Reflex Documentati
 
 The automation workflow is defined in the `.github/workflows/reflex_docs.yml` file. It runs every 2 hours and can also be triggered manually. The workflow performs the following steps:
 1. Checks out the repository.
-2. Sets up Python 3.10.6.
+2. Sets up Python 3.12.10
 3. Installs necessary dependencies including Playwright.
 4. Runs the automation script (`haupt.py`) to download, extract, and merge documentation files.
 5. Checks if the merged content file has changed and if not no further action is taken.
@@ -27,7 +27,7 @@ To manually trigger the workflow, navigate to the Actions tab in the GitHub repo
 
 ## Requirements
 
-- Python 3.10.6
+- Python 3.12.10
 - Playwright
 
 ## License
