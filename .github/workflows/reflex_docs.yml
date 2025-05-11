@@ -5,6 +5,9 @@ on:
     - cron: '0 */2 * * *' # Runs every 2 hours
   workflow_dispatch: # Allows manual triggering of the workflow
 
+env:
+  PYTHON_EXEC: /home/ubuntu/.pyenv/versions/3.12.10/bin/python
+
 jobs:
   update-docs:
     runs-on: self-hosted
@@ -24,12 +27,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          /home/ubuntu/.pyenv/versions/3.12.10/bin/python -m pip install --upgrade pip
-          /home/ubuntu/.pyenv/versions/3.12.10/bin/python -m pip install playwright
-          /home/ubuntu/.pyenv/versions/3.12.10/bin/python -m playwright install
+          ${{ env.PYTHON_EXEC }} -m pip install --upgrade pip
+          ${{ env.PYTHON_EXEC }} -m pip install -r requirements.txt
+          ${{ env.PYTHON_EXEC }} -m playwright install
 
       - name: Run automation script
-        run: /home/ubuntu/.pyenv/versions/3.12.10/bin/python haupt.py
+        run: ${{ env.PYTHON_EXEC }} haupt.py
 
       - name: Check for changes
         id: check_changes
