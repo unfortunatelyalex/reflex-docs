@@ -2546,7 +2546,7 @@ default_url = "http://localhost:3000"
 
 # Installation
 
-Reflex requires Python 3.8+.
+Reflex requires Python 3.10+.
 
 
 ```md video https://youtube.com/embed/ITOZkzjtjUA?start=758&end=1206
@@ -2722,6 +2722,7 @@ reflex run --loglevel debug
 ```
 
 Reflex will *hot reload* any code changes in real time when running in development mode. Your code edits will show up on [http://localhost:3000](http://localhost:3000) automatically.
+
 
 from __future__ import annotations
 
@@ -6128,7 +6129,7 @@ github_actions_configs = [
         "name": "python_version",
         "description": "The Python version to use for the deployment environment.",
         "required": False,
-        "default": "3.9"
+        "default": "3.12"
     }
 ]
 ```
@@ -6212,6 +6213,7 @@ rx.table.root(
     variant="surface",
 )
 ```
+
 
 ```python exec
 import reflex as rx
@@ -9779,11 +9781,761 @@ def signup_multiple_thirdparty() -> rx.Component:
 ```
 
 
+## Overview
 
 
-## Some placeholder text ...
 
 ## Overview
+
+# Environment Variables (Secrets)
+
+```python exec
+import reflex as rx
+```
+
+It is possible to add environment variables to your app. This is useful for storing secrets such as API keys, and other sensitive information.
+
+## Adding Environment Variables
+
+You can add environment variables to your app by clicking the `Secrets` button at the bottom of the chat input box, as seen below:
+
+```python eval
+rx.image(
+    src="/ai_builder/secrets_and_custom_packages.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+After you add the environment variables the AI now has context of these and you can prompt it to use them in your code.
+
+You can also add environment variables after your app is built, by again clicking the `Secrets` button at the bottom of the chat input box on the generation page.
+
+# Deploy your App
+
+```python exec
+import reflex as rx
+```
+
+It is easy to deploy your app into production from Reflex Build to Reflex Cloud. 
+
+Simply click the `Deploy` button in the bottom right corner of Reflex Build, as shown below:
+
+
+```python eval
+rx.image(
+    src="/ai_builder/deploy_app.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+When deploying you can set the following options:
+- **App Name**: The name of your app
+- **Hostname**: Set your url by setting your hostname, i.e. if you set `myapp` as your hostname, your app will be available at `myapp.reflex.run`
+- **Region**: The regions where your app will be deployed
+- **VM Size**: The size of the VM where your app will be deployed
+- **Secrets**: The environment variables that will be set for your app, you can load the variables currently being used by your app by clicking the `Load from settings` button
+
+# Download your App
+
+```python exec
+import reflex as rx
+```
+
+It is easy to download your app to work on locally or self-host. (It is recommended to use the GitHub integration, but if this is not possible, you can download your app to work on locally.) 
+
+Simply click the `Download` button in the bottom right corner of Reflex Build, as shown below:
+
+
+```python eval
+rx.image(
+    src="/ai_builder/download_app.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+# Reflex Build's IDE
+
+Reflex Build includes a powerful, in-browser IDE designed to streamline the entire development process—from writing code
+to deploying your app. With an intuitive layout, real-time editing, and seamless integration with the rest of the
+platform, the IDE empowers users to stay focused and productive without ever leaving the browser.
+
+
+
+<div class="p-4 rounded-lg bg-slate-5">
+  <video controls width="100%">
+  <source src="/ide_demo.mov" type="video/quicktime">
+  Your browser does not support the video tag.
+  </video>  
+
+</div>
+
+
+## IDE Features
+
+
+### Real-Time Editing
+
+Changes you make in the editor are immediately reflected across your project—no manual saves or rebuilds required. Stay in flow and iterate faster.
+
+### File & Folder Management
+
+Easily create, rename, or delete files and folders directly in the workspace. The file tree gives you full visibility into your application structure at all times.
+
+### Context-Aware Code Editor
+
+The built-in code editor supports syntax highlighting, inline error detection, and AI-assisted suggestions to help you write clean, efficient code with confidence.
+
+### One-Click Deployment
+
+From the IDE, you can deploy your app with a single click. No terminal, no external tools—just build and ship straight from your browser.
+
+
+
+# Templates
+
+```python exec
+import reflex as rx
+```
+
+Reflex has many certified templates, seen on the `Trending` tab of the Reflex Build, that can be used to kickstart your app. You can also use any app created by the community as a template. 
+
+## Using a Template
+
+To use a template, simply click the template and then in the bottom right corner of the app click the `Fork` button. This will create a copy of the template in your own account. You can then edit the app as you like with further prompting.
+
+Below is an example of how to use a template:
+
+```python eval
+rx.image(
+    src="/ai_builder/using_templates.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+Templates are great to get started if they have similar UI to what you are looking to build. You can then add your own data to the app.
+
+# Installing External Packages
+
+```python exec
+import reflex as rx
+```
+
+Reflex Build allows you to install external python packages to use in your app. This is useful if you want to use a package that is not included in the default Reflex Build environment. Examples might include `openai`, `langsmith`, `requests`, etc.
+
+There are two ways to install external packages:
+
+1. **Through the Chat Interface**: You can ask the AI to install a package for you.
+2. **Add to the `requirements.txt` file**: You can add the package to the `requirements.txt` file and then save the app. This will install the package in your app's environment.
+
+## Installing through the Chat Interface
+
+Enter the name of the package you want to install in the chat interface. The AI will then install the package for you.
+
+```python eval
+rx.image(
+    src="/ai_builder/external_packages_input.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+
+## Installing through the `requirements.txt` file
+
+Add the package to the `requirements.txt` file and then save the app. This will install the package in your app's environment and recompile your app.
+
+```python eval
+rx.image(
+    src="/ai_builder/external_packages_requirements.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+# Use Images as a prompt
+
+```python exec
+import reflex as rx
+```
+
+Uploading an image (screenshot) of a website (web) app of what you are looking to build gives the AI really good context. 
+
+*This is the recommended way to start an app generation.*
+
+
+Below is a GIF showing how to upload an image to the AI Builder:
+
+```python eval
+rx.image(
+    src="/ai_builder/image_upload.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+The advised prompt to use is:
+
+`Build an app from a reference image`
+
+# Connecting to a Database
+
+```python exec
+import reflex as rx
+```
+
+Connecting to a database is critical to give your app access to real data. This section will cover how to connect to a database using the AI Builder. 
+
+To connect to a database you will need a `DB_URI`. Reflex.build currently supports `postgresql` and `mysql` databases.
+
+This is what it looks like for a Postgres database:
+
+```bash
+postgresql://username:password@hostname:port/database_name
+```
+
+```bash
+postgresql://admin:secret123@db.mycompany.com:5432/mydatabase
+```
+
+```python eval
+rx.box(height="1rem")
+```
+
+```python eval
+rx.accordion.root(
+    rx.accordion.item(
+        header="DB URI (More Details)",
+        content=rx.table.root(
+            rx.table.header(
+                rx.table.row(
+                    rx.table.column_header_cell("Component"),
+                    rx.table.column_header_cell("Example"),
+                    rx.table.column_header_cell("Description"),
+                ),
+            ),
+            rx.table.body(
+                rx.table.row(
+                    rx.table.row_header_cell(rx.code("postgresql://")),
+                    rx.table.cell(rx.code("postgresql://")),
+                    rx.table.cell("The database ", rx.el.span("dialect", font_weight="bold"), " or driver (can also be ", 
+                                rx.code("mysql://"), ", ", rx.code("sqlite:///"), ", etc.)"),
+                ),
+                rx.table.row(
+                    rx.table.row_header_cell(rx.code("username")),
+                    rx.table.cell(rx.code("admin")),
+                    rx.table.cell("The ", rx.el.span("username", font_weight="bold"), " used to authenticate with the database"),
+                ),
+                rx.table.row(
+                    rx.table.row_header_cell(rx.code("password")),
+                    rx.table.cell(rx.code("secret123")),
+                    rx.table.cell("The ", rx.el.span("password", font_weight="bold"), " for the database user (insecure to expose this in plain text)"),
+                ),
+                rx.table.row(
+                    rx.table.row_header_cell(rx.code("hostname")),
+                    rx.table.cell(rx.code("db.mycompany.com")),
+                    rx.table.cell("The ", rx.el.span("host", font_weight="bold"), " where the database server is running"),
+                ),
+                rx.table.row(
+                    rx.table.row_header_cell(rx.code("port")),
+                    rx.table.cell(rx.code("5432")),
+                    rx.table.cell("The ", rx.el.span("port", font_weight="bold"), " the database server is listening on (default for PostgreSQL)"),
+                ),
+                rx.table.row(
+                    rx.table.row_header_cell(rx.code("database_name")),
+                    rx.table.cell(rx.code("mydatabase")),
+                    rx.table.cell("The ", rx.el.span("name", font_weight="bold"), " of the database to connect to"),
+                ),
+            ),
+            width="100%",
+        ),
+    ),
+    variant="surface",
+)
+```
+
+```python eval
+rx.box(height="1rem")
+```
+
+You can also use a MySQL database. The connection string looks like this:
+
+```bash
+mysql://username:password@hostname:port/database_name
+```
+
+
+
+## Connecting your Database before the app is generated
+
+You can add your `Database URI` at the start of your generation as shown below. 
+
+```python eval
+rx.image(
+    src="/ai_builder/add_db_before_app.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+Here if you wanted to build a dashboard for example we recommend a prompt as follows: 
+
+`Build a dashboard around my database data`
+
+
+
+## Connecting your Database after the app is generated
+
+You can add your `Database URI` after you've already generated an app or directly from a template that you have forked as shown below.
+
+```python eval
+rx.image(
+    src="/ai_builder/add_db_in_app.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+Here if you wanted to hook up your data correctly we recommend a prompt as follows: 
+
+`Use the database I added to rewrite the dashboard to display my expense reporting data, keep the existing layout charts and structure the same`
+
+# Connecting to Github
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+The Github integration is important to make sure that you don't lose your progress. It also allows you to revert to previous versions of your app. 
+
+
+```python eval
+rx.image(
+    src="/ai_builder/connecting_to_github.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+The GitHub integration allows you to:
+
+- Save your app progress
+- Work on your code locally and push your local changes back to Reflex.Build
+
+
+## Github Commit History
+
+The commit history is a great way to see the changes that you have made to your app. You can also revert to previous versions of your app from here. 
+
+```python eval
+image_zoom(rx.image(src="/ai_builder/github_commit_history.png"))
+```
+
+
+
+# FAQs
+
+Still to come!
+
+# What Is Reflex Build
+
+Reflex Build is an AI-powered platform that empowers users of all skill levels to create full-stack web applications
+without writing any code—just by describing their ideas in plain English. Instead of hiring developers, users can
+instantly generate web apps or websites, turning ideas into functional apps as quickly as possible.
+
+
+Reflex Build provides everything you need to create stunning websites, front-end interfaces, and full-stack web
+applications—all from a single browser tab, with no installation required. It includes AI-powered coding tools,
+real-time collaboration (currently in beta), and easy project sharing to give you a head start on your app development
+journey.
+
+
+
+```python exec
+from typing import List, TypedDict
+
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+
+class Feature(TypedDict):
+    title: str
+    description: str
+    icon: str
+
+
+class LandingState(rx.State):
+    features: List[Feature] = [
+        {
+            "title": "Database Integration",
+            "description": "Automatically integrate your database\ninto your application with ease",
+            "icon": "database",
+        },
+        {
+            "title": "Secure Secrets",
+            "description": "Safely manage your API keys and tokens\nwith a built in secrets manager",
+            "icon": "shield",
+        },
+        {
+            "title": "Live Preview",
+            "description": "See all application changes in real-time\nwith our interactive preview tab",
+            "icon": "eye",
+        },
+        {
+            "title": "Quick Download",
+            "description": "Download your complete project files\nwith just a single click operation",
+            "icon": "download",
+        },
+        {
+            "title": "Easy Deployment",
+            "description": "Deploy your application to production\nwith just a single click process",
+            "icon": "rocket",
+        },
+        {
+            "title": "Manual File Editing",
+            "description": "Edit your project files directly\nwith our intuitive code editor",
+            "icon": "code",
+        },
+        {
+            "title": "AI Package Manager",
+            "description": "Let AI handle your package installations\nvia natural prompting",
+            "icon": "sparkles",
+        },
+        {
+            "title": "Smart Prompting",
+            "description": "Get better development results\nwith AI-optimized prompt templates",
+            "icon": "message-circle",
+        },
+    ]
+
+
+class BuildDocState(rx.State):
+    current_feature: dict[str, str] = {
+        "light": "/ai_builder/what_is_reflex_build/project_bar_light.png",
+        "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.png",
+    }
+
+    image_opacity: float = 1.0  # Use float instead of string for opacity
+    transition_in_progress: bool = False
+
+    features: list[dict[str, str | dict[str, str]]] = [
+        {
+            "title": "Project Menu Bar",
+            "subtitle": "Browse previously built applications, create new sessions, store database variables, and much more!",
+            "img": {
+                "light": "/ai_builder/what_is_reflex_build/project_bar_light.png",
+                "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.png",
+            },
+            "selected": True,
+        },
+        {
+            "title": "Chat Area",
+            "subtitle": "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
+            "img": {
+                "light": "/ai_builder/what_is_reflex_build/chat_light.png",
+                "dark": "/ai_builder/what_is_reflex_build/chat_dark.png",
+            },
+            "selected": False,
+        },
+        {
+            "title": "Application Workspace",
+            "subtitle": "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
+            "img": {
+                "light": "/ai_builder/what_is_reflex_build/file_tree_light.png",
+                "dark": "/ai_builder/what_is_reflex_build/file_tree_dark.png",
+            },
+            "selected": False,
+        },
+        {
+            "title": "Code Editor",
+            "subtitle": "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
+            "img": {
+                "light": "/ai_builder/what_is_reflex_build/code_light.png",
+                "dark": "/ai_builder/what_is_reflex_build/code_dark.png",
+            },
+            "selected": False,
+        },
+        {
+            "title": "Bottom Menu Bar",
+            "subtitle": "This menu contains important actions such as deploying, downloading, and sharing your application.",
+            "img": {
+                "light": "/ai_builder/what_is_reflex_build/bottom_light.png",
+                "dark": "/ai_builder/what_is_reflex_build/bottom_dark.png",
+            },
+            "selected": False,
+        },
+        {
+            "title": "Preview Tab",
+            "subtitle": "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
+            "img": {
+                "light": "/ai_builder/what_is_reflex_build/preview_light.png",
+                "dark": "/ai_builder/what_is_reflex_build/preview_dark.png",
+            },
+            "selected": False,
+        },
+    ]
+
+    @rx.event(background=True)
+    async def select_feature(self, index: int):
+        import asyncio
+
+        # Prevent multiple transitions at once
+        if self.transition_in_progress:
+            return
+
+        # Update the selected feature and image
+        async with self:
+            for i, feature in enumerate(self.features):
+                feature["selected"] = i == index
+
+            self.transition_in_progress = True
+
+            # Fade out
+            self.image_opacity = 0.0
+            yield
+            await asyncio.sleep(0.1)
+
+            self.current_feature = self.features[index]["img"]
+            await asyncio.sleep(0.2)
+
+            # # Fade in
+            self.image_opacity = 1.0
+            self.transition_in_progress = False
+
+
+feature_images = [
+    [
+        "/ai_builder/what_is_reflex_build/project_bar_light.png",
+        "/ai_builder/what_is_reflex_build/project_bar_dark.png",
+        "Project Menu Bar",
+        "Browse previously built applications, create new sessions, store database variables, and much more!",
+    ],
+    [
+        "/ai_builder/what_is_reflex_build/chat_light.png",
+        "/ai_builder/what_is_reflex_build/chat_dark.png",
+        "Chat Area",
+        "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
+    ],
+    [
+        "/ai_builder/what_is_reflex_build/file_tree_light.png",
+        "/ai_builder/what_is_reflex_build/file_tree_dark.png",
+        "Application Workspace",
+        "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
+    ],
+    [
+        "/ai_builder/what_is_reflex_build/code_light.png",
+        "/ai_builder/what_is_reflex_build/code_dark.png",
+        "Code Editor",
+        "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
+    ],
+    [
+        "/ai_builder/what_is_reflex_build/bottom_light.png",
+        "/ai_builder/what_is_reflex_build/bottom_dark.png",
+        "Bottom Menu Bar",
+        "This menu contains important actions such as deploying, downloading, and sharing your application.",
+    ],
+    [
+        "/ai_builder/what_is_reflex_build/preview_light.png",
+        "/ai_builder/what_is_reflex_build/preview_dark.png",
+        "Preview Tab",
+        "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
+    ],
+]
+
+
+def feature_card(feature: dict) -> rx.Component:
+    return rx.el.div(
+        rx.el.div(
+            rx.el.span(
+                rx.icon(
+                    tag=feature["icon"],
+                    size=15,
+                    class_name="inline-block pr-2 "
+                    + rx.color_mode_cond(
+                        "stroke-purple-8",
+                        "stroke-purple-9",
+                    ),
+                ),
+                rx.el.span(f"{feature['title']} ", class_name="text-sm font-bold"),
+                class_name="text-sm font-medium block align-center pt-5 px-2",
+            ),
+            rx.el.span(
+                feature["description"],
+                class_name="text-sm font-regular block align-center px-2",
+            ),
+            class_name="flex flex-col",
+        ),
+        class_name="w-full rounded-md",
+    )
+
+
+def _docs_features() -> rx.Component:
+    return rx.el.div(
+        rx.el.div(
+            rx.foreach(LandingState.features, feature_card),
+            class_name="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4",
+        ),
+        class_name="flex flex-col w-full h-full justify-start align-start items-start py-4 gap-x-4 z-[99]",
+    )
+
+
+def _docs_app_section_features_small_screen(feature: list[str]):
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(feature[0], feature[1]),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        rx.el.div(
+            rx.el.label(feature[2], class_name="text-sm font-bold cursor-pointer"),
+            rx.el.label(feature[3], class_name="text-sm font-light cursor-pointer"),
+            class_name="flex flex-col px-1 py-2",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+
+
+def _docs_app_section_toggles(feature: dict, index: int):
+    return rx.el.div(
+        rx.el.label(feature["title"], class_name="text-sm font-bold cursor-pointer"),
+        rx.el.label(
+            feature["subtitle"], class_name="text-sm font-light cursor-pointer"
+        ),
+        on_click=BuildDocState.select_feature(index),
+        class_name="w-full flex flex-col max-w-md rounded-md p-4 cursor-pointer "
+        + rx.cond(
+            feature["selected"],
+            "",
+            rx.color_mode_cond("hover:bg-slate-5", "hover:bg-slate-3"),
+        ),
+        border=rx.cond(
+            feature["selected"],
+            f"0.81px solid {rx.color('purple', 7)}",
+            "",
+        ),
+        box_shadow=rx.cond(
+            feature["selected"],
+            rx.color_mode_cond(
+                "5px 5px oklch(0.946 0.033 307.174 / 0.5)",
+                "",
+            ),
+            "",
+        ),
+    )
+
+
+def _docs_app_sections():
+    return rx.el.div(
+        rx.el.div(
+            rx.el.div(
+                rx.el.label(
+                    "Small details, big impact", class_name="text-sm font-light"
+                ),
+                rx.el.label(
+                    "Made With Exceptional Care", class_name="text-3xl font-bold"
+                ),
+                rx.el.label(
+                    "Every feature in Reflex Build is carefully crafted to set new standards. Mediocre isn't an option.",
+                    class_name="text-md font-regular",
+                ),
+                class_name="flex flex-col w-full max-w-lg gap-y-1",
+            ),
+            rx.foreach(
+                BuildDocState.features[:5],
+                lambda feature, index: _docs_app_section_toggles(feature, index),
+            ),
+            class_name="flex flex-col gap-y-4 justify-start max-w-sm",
+        ),
+        rx.el.div(
+            image_zoom(
+                rx.image(
+                    src=rx.color_mode_cond(
+                        BuildDocState.current_feature["light"],
+                        BuildDocState.current_feature["dark"],
+                    ),
+                    class_name="p-2 rounded-md h-auto",
+                    border=f"0.81px solid {rx.color('slate', 5)}",
+                ),
+                class_name="rounded-md overflow-hidden",
+            ),
+            style={
+                "opacity": f"{BuildDocState.image_opacity}",
+                "transition": "opacity 300ms ease-in-out",
+            },
+            class_name="w-full max-w-4xl",
+        ),
+        class_name="flex flex-row w-full h-full justify-between align-center items-center py-4 gap-x-4 z-[99]",
+        display=["none" if i <= 4 else "flex" for i in range(6)],
+    )
+
+
+def _docs_app_sections_small_screen():
+    return rx.el.div(
+        rx.el.div(
+            rx.grid(
+                rx.foreach(
+                    feature_images,
+                    lambda feature: _docs_app_section_features_small_screen(feature),
+                ),
+                class_name="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-full",
+            ),
+            class_name="flex flex-col gap-y-4 justify-start py-4",
+        ),
+    )
+
+
+
+
+
+
+screen_normalization = (
+        "z-[99] w-full"
+    )
+```
+
+
+## Feature Overview
+
+Reflex Build provides a streamlined interface for building AI applications. The **Project Menu Bar** helps you manage sessions and stored variables, while the **Chat Area** displays real-time prompts, edits, and file generations. The **Application Workspace** organizes your project structure, and the **Code Editor** allows direct, instant code editing. Key actions like deploy and share are accessible via the **Bottom Menu Bar**, and the **Preview Tab** lets you view and interact with your live app at any time.
+
+```python eval
+rx.el.div(
+    _docs_app_sections_small_screen(),
+)
+```
+
+## Interface Highlights
+
+Reflex Build’s interface is designed for clarity and efficiency. The **Project Menu Bar** helps you manage sessions, apps, and variables. The **Chat Area** shows prompts in action with visual feedback and file generation. In the **Application Workspace**, you can view and organize your project files. The **Code Editor** allows quick, direct edits with instant saving. Use the **Bottom Menu Bar** for key actions like deploy and download. The **Preview Tab** lets you interact with a live version of your app, including refresh and full-screen options.
+
+```python eval
+rx.el.div(
+    rx.el.div(_docs_features(), class_name=screen_normalization),
+)
+```
+
+
+# Quickstart
+
+
+Still to come!
+
+# Fixing Errors
+
+
+Still to come!
+
+# Breaking up complex prompts
+
+
+Still to come!
 
 # Browser Storage
 
