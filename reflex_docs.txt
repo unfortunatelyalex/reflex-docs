@@ -2869,7 +2869,7 @@ def my_div():
     )
 ```
 
-If you need a component not provided by Reflex, you can check the [3rd party ecosystem]({custom_components.path}) or [wrap your own React component]({docs.wrapping_react.guide.path}).
+If you need a component not provided by Reflex, you can check the [3rd party ecosystem]({custom_components.path}) or [wrap your own React component]({docs.wrapping_react.library_and_tags.path}).
 
 ## Customizing and styling components
 
@@ -13404,6 +13404,260 @@ rx.box(
 )
 ```
 
+
+When wrapping a React component, you may need to define custom code or hooks that are specific to the component. This is done by defining the `add_custom_code`or `add_hooks` methods in your component class.
+
+## Custom Code
+
+Custom code is any JS code that need to be included in your page, but not necessarily in the component itself. This can include things like CSS styles, JS libraries, or any other code that needs to be included in the page.
+
+```python
+class CustomCodeComponent(MyBaseComponent):
+    """MyComponent."""
+
+    def add_custom_code(self) -> list[str]:
+        """Add custom code to the component."""
+        code1 = """const customVariable = "Custom code1";"""
+        code2 = """console.log(customVariable);"""
+
+        return [code1, code2]
+```
+
+The above example will render the following JS code in the page:
+
+```javascript
+/* import here */
+
+const customVariable = "Custom code1";
+console.log(customVariable);
+
+/* rest of the page code */
+```
+
+## Custom Hooks
+Custom hooks are any hooks that need to be included in your component. This can include things like `useEffect`, `useState`, or any other hooks from the library you are wrapping.
+
+- Simple hooks can be added as strings.
+- More complex hooks that need to have special import or be written in a specific order can be added as `rx.Var` with a `VarData` object to specify the position of the hook.
+    - The `imports` attribute of the `VarData` object can be used to specify any imports that need to be included in the component.
+    - The `position` attribute of the `VarData` object can be set to `Hooks.HookPosition.PRE_TRIGGER` or `Hooks.HookPosition.POST_TRIGGER` to specify the position of the hook in the component.
+
+```md alert info
+# The `position` attribute is only used for hooks that need to be written in a specific order. 
+- If an event handler need to refer to a variable defined in a hook, the hook should be written before the event handler.
+- If a hook need to refer to the memoized event handler by name, the hook should be written after the event handler.
+```
+
+```python
+from reflex.vars.base import Var, VarData
+from reflex.constants import Hooks
+from reflex.components.el.elements import Div
+
+class ComponentWithHooks(Div, MyBaseComponent):
+    """MyComponent."""
+
+    def add_hooks(self) -> list[str| Var]:
+        """Add hooks to the component."""
+        hooks = []
+        hooks1 = """const customHookVariable = "some value";"""
+        hooks.append(hooks1)
+
+        # A hook that need to be written before the memoized event handlers.
+        hooks2 = Var(
+            """useEffect(() => {
+                console.log("PreTrigger: " + customHookVariable);
+            }, []);
+            """,
+            _var_data=VarData(
+                imports=\{"react": ["useEffect"],\},
+                position=Hooks.HookPosition.PRE_TRIGGER
+            ),
+        )
+        hooks.append(hooks2)
+
+        hooks3 = Var(
+            """useEffect(() => {
+                console.log("PostTrigger: " + customHookVariable);
+            }, []);
+            """,
+            _var_data=VarData(
+                imports=\{"react": ["useEffect"],\},
+                position=Hooks.HookPosition.POST_TRIGGER
+            ),
+        )
+        hooks.append(hooks3)
+        return hooks
+```
+
+The `ComponentWithHooks` will be rendered in the component in the following way:
+
+```javascript
+export function Div_7178f430b7b371af8a12d8265d65ab9b() {
+  const customHookVariable = "some value";
+
+  useEffect(() => {
+    console.log("PreTrigger: " + customHookVariable);
+  }, []);
+
+  /* memoized triggers such as on_click, on_change, etc will render here */
+
+  useEffect(() => {
+    console.log("PostTrigger: "+ customHookVariable);
+  }, []);
+
+  return jsx("div", \{\});
+}
+```
+
+```md alert info
+# You can mix custom code and hooks in the same component. Hooks can access a variable defined in the custom code, but custom code cannot access a variable defined in a hook.
+```
+
+
+---
+title: Wrapping Local Packages
+---
+
+```python exec
+import reflex as rx
+```
+
+# Assets
+
+If a wrapped component depends on assets such as images, scripts, or
+stylesheets, these can be kept adjacent to the component code and
+included in the final build using the `rx.asset` function.
+
+`rx.asset` returns a relative path that references the asset in the compiled
+output. The target files are copied into a subdirectory of `assets/external`
+based on the module where they are initially used. This allows third-party
+components to have external assets with the same name without conflicting
+with each other.
+
+For example, if there is an SVG file named `wave.svg` in the same directory as
+this component, it can be rendered using `rx.image` and `rx.asset`.
+
+```python
+class Hello(rx.Component):
+    @classmethod
+    def create(cls, *children, **props) -> rx.Component:
+        props.setdefault("align", "center")
+        return rx.hstack(
+            rx.image(src=rx.asset("wave.svg", shared=True), width="50px", height="50px"),
+            rx.heading("Hello ", *children),
+            **props
+        )
+```
+
+
+# Local Components
+
+You can also wrap components that you have written yourself. For local components (when the code source is directly in the project), we recommend putting it beside the files that is wrapping it.
+
+You can then use the path obtained via `rx.asset` to reference the component path.
+
+So if you create a file called `hello.js` in the same directory as the component with this content:
+
+```javascript
+// /path/to/components/hello.js
+import React from 'react';
+
+export function Hello() {
+  return (
+    <div>
+      <h1>Hello!</h1>
+    </div>
+  )
+}
+```
+
+You can specify the library as follow (note: we use the `public` directory here instead of `assets` as this is the directory that is served by the web server):
+
+```python
+import reflex as rx
+
+hello_path = rx.asset("hello.js", shared=True)
+public_hello_path = "$/public/" + hello_path
+
+class Hello(rx.Component):
+    # Use an absolute path starting with $/public
+    library = public_hello_path
+
+    # Define everything else as normal.
+    tag = "Hello"
+```
+
+# Local Packages
+
+If the component is part of a local package, available on Github, or
+downloadable via a web URL, it can also be wrapped in Reflex. Specify the path
+or URL after an `@` following the package name.
+
+Any local paths are relative to the `.web` folder, so you can use `../` prefix
+to reference the Reflex project root.
+
+Some examples of valid specifiers for a package called 
+[`@masenf/hello-react`](https://github.com/masenf/hello-react) are:
+
+* GitHub: `@masenf/hello-react@github:masenf/hello-react`
+* URL: `@masenf/hello-react@https://github.com/masenf/hello-react/archive/refs/heads/main.tar.gz`
+* Local Archive: `@masenf/hello-react@../hello-react.tgz`
+* Local Directory: `@masenf/hello-react@../hello-react`
+
+It is important that the package name matches the name in `package.json` so
+Reflex can generate the correct import statement in the generated javascript
+code.
+
+These package specifiers can be used for `library` or `lib_dependencies`.
+
+```python demo exec toggle
+class GithubComponent(rx.Component):
+    library = "@masenf/hello-react@github:masenf/hello-react"
+    tag = "Counter"
+
+    def add_imports(self):
+        return {
+            "": ["@masenf/hello-react/dist/style.css"]
+        }
+
+def github_component_example():
+    return GithubComponent.create()
+```
+
+Although more complicated, this approach is useful when the local components
+have additional dependencies or build steps required to prepare the component
+for use.
+
+Some important notes regarding this approach:
+
+* The repo or archive must contain a `package.json` file.
+* `prepare` or `build` scripts will NOT be executed. The distribution archive,
+  directory, or repo must already contain the built javascript files (this is common).
+
+```md alert
+# Ensure CSS files are exported in `package.json`
+
+In addition to exporting the module containing the component, any CSS files
+intended to be imported by the wrapped component must also be listed in the
+`exports` key of `package.json`.
+
+```json
+{
+  // ...,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  // ...
+}
+```
+
 ```python exec
 import reflex as rx
 from typing import Any
@@ -13814,479 +14068,130 @@ rx.vstack(
 ```
 
 
-```python exec
-import reflex as rx
-from typing import Any
+---
+title: Props - Wrapping React 
+---
 
-from pcweb.pages.docs import events, api_reference
-```
+# Props
 
-```python exec
-class ColorPicker(rx.Component):
-    library = "react-colorful"
-    tag = "HexColorPicker"
-    color: rx.Var[str]
-    on_change: rx.EventHandler[lambda color: [color]]
+When wrapping a React component, you want to define the props that will be accepted by the component.
+This is done by defining the props and annotating them with a `rx.Var`.
 
-color_picker = ColorPicker.create
+Broadly, there are three kinds of props you can encounter when wrapping a React component:
+1. **Simple Props**: These are props that are passed directly to the component. They can be of any type, including strings, numbers, booleans, and even lists or dictionaries.
+2. **Callback Props**: These are props that expect to receive a function. That function will usually be called by the component as a callback. (This is different from event handlers.)
+3. **Component Props**: These are props that expect to receive a components themselves. They can be used to create more complex components by composing them together.
+4. **Event Handlers**: These are props that expect to receive a function that will be called when an event occurs. They are defined as `rx.EventHandler` with a signature function to define the spec of the event.
 
-ColorPickerState = rx._x.client_state(default="#db114b", var_name="color")
-```
+## Simple Props
 
-# Full Guide
-
-Let's walk step by step through how to wrap a React component in Reflex, using the color picker as our primary example. You can also see the full [API reference]({api_reference.component.path}).
-
-```python eval
-rx.box(
-    ColorPickerState,
-    rx.vstack(
-        rx.heading(ColorPickerState.value, color="white"),
-        color_picker(
-            on_change=ColorPickerState.set_value
-        ),
-    ),
-    background_color=ColorPickerState.value,
-    padding="5em",
-    border_radius="12px",
-    margin_bottom="1em",
-)
-```
-
-## Find The Component
-
-There are two ways to find a component to wrap:
-1. Write the component yourself locally.
-2. Find a well-maintained React library on [npm](https://www.npmjs.com/) that contains the component you need.
-
-In both cases, the process of wrapping the component is the same except for the `library` field.
-
-In this guide we are wrapping the `HexColorPicker` component from the [react-colorful](https://www.npmjs.com/package/react-colorful) library.
-
-## Define the Component
-
-The first step to wrapping any React component is to subclass `rx.Component`.
+Simple props are the most common type of props you will encounter when wrapping a React component. They are passed directly to the component and can be of any type (but most commonly strings, numbers, booleans, and structures).
 
 ```python
-class ColorPicker(rx.Component):
-    """A color picker component."""
+class CustomReactType(TypedDict):
+    """Custom React type."""
+
+    # Define the structure of the custom type to match the Javascript structure.
+    attribute1: str
+    attribute2: bool
+    attribute3: int
+
+class SimplePropsComponent(MyBaseComponent):
+    """MyComponent."""
+
+    # Type the props according the component documentation.
+    
+    # props annotated as `string` in javascript
+    prop1: rx.Var[str] 
+    
+    # props annotated as `number` in javascript
+    prop2: rx.Var[int]
+    
+    # props annotated as `boolean` in javascript
+    prop3: rx.Var[bool] 
+    
+    # props annotated as `string[]` in javascript
+    prop4: rx.Var[list[str]] 
+    
+    # props annotated as `CustomReactType` in javascript
+    props5: rx.Var[CustomReactType] 
+
+    # Sometimes a props will accept multiple types. You can use `|` to specify the types.
+    # props annotated as `string | boolean` in javascript
+    props6: rx.Var[str | bool] 
 ```
 
-## Set the Library and Tag
+## Callback Props
 
-The library is just the name of the `npm` package, and the tag is the name of the React component from the package that you want to wrap. Some packages have multiple components, and you can wrap each one as a separate Reflex component.
-
-You can generally find the library and tag by looking at the import statement in the React code.
-
-```javascript
-import \{ HexColorPicker } from "react-colorful"
-```
-
-In this case, the library is `react-colorful` and the tag is `HexColorPicker`.
-
+Callback props are used to handle events or to pass data back to the parent component. They are defined as `rx.Var` with a type of `FunctionVar` or `Callable`.
 
 ```python
-class ColorPicker(rx.Component):
-    """Color picker component."""
+from typing import Callable
+from reflex.vars.function import FunctionVar
 
-    library = "react-colorful"
-    tag = "HexColorPicker"
+class CallbackPropsComponent(MyBaseComponent):
+    """MyComponent."""
+
+    # A callback prop that takes a single argument.
+    callback_props: rx.Var[Callable]
 ```
 
-When you create your component, Reflex will automatically install the library for you.
-
-### Local Components
-
-You can also wrap components that you have written yourself. Local components should be stored in your `assets` directory. For example, you could define a basic `Hello` component like this:
-
-```javascript
-// assets/hello.js
-import React from 'react';
-
-export function Hello() {
-  return (
-    <div>
-      <h1>Hello!</h1>
-    </div>
-  )
-}
-```
-
-Then specify the library as following (note: we use the `public` directory here instead of `assets` as this is the directory that is served by the web server):
+## Component Props
+Some components will occasionally accept other components as props, usually annotated as `ReactNode`. In Reflex, these are defined as `rx.Component`.
 
 ```python
-import reflex as rx
-
-class Hello(rx.Component):
-    # Use an absolute path starting with /public
-    library = "/public/hello"
-
-    # Define everything else as normal.
-    tag = "Hello"
-```
-
-### Local Packages
-
-If the component is part of a local package, available on Github, or
-downloadable via a web URL, it can also be wrapped in Reflex. Specify the path
-or URL after an `@` following the package name.
-
-Any local paths are relative to the `.web` folder, so you can use `../` prefix
-to reference the Reflex project root.
-
-Some examples of valid specifiers for a package called 
-[`@masenf/hello-react`](https://github.com/masenf/hello-react) are:
-
-* GitHub: `@masenf/hello-react@github:masenf/hello-react`
-* URL: `@masenf/hello-react@https://github.com/masenf/hello-react/archive/refs/heads/main.tar.gz`
-* Local Archive: `@masenf/hello-react@../hello-react.tgz`
-* Local Directory: `@masenf/hello-react@../hello-react`
-
-It is important that the package name matches the name in `package.json` so
-Reflex can generate the correct import statement in the generated javascript
-code.
-
-These package specifiers can be used for `library` or `lib_dependencies`.
-
-```python demo exec
-class GithubComponent(rx.Component):
-    library = "@masenf/hello-react@github:masenf/hello-react"
-    tag = "Counter"
-
-    def add_imports(self):
-        return {
-            "": ["@masenf/hello-react/dist/style.css"]
-        }
-
-def github_component_example():
-    return GithubComponent.create()
-```
-
-Although more complicated, this approach is useful when the local components
-have additional dependencies or build steps required to prepare the component
-for use.
-
-Some important notes regarding this approach:
-
-* The repo or archive must contain a `package.json` file.
-* `prepare` or `build` scripts will NOT be executed. The distribution archive,
-  directory, or repo must already contain the built javascript files (this is common).
-
-```md alert
-# Ensure CSS files are exported in `package.json`
-
-In addition to exporting the module containing the component, any CSS files
-intended to be imported by the wrapped component must also be listed in the
-`exports` key of `package.json`.
-
-```json
-{
-  // ...,
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.umd.cjs"
-    },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    }
-  },
-  // ...
-}
-```
-
-### Import Types
-
-Sometimes the component is a default export from the module (meaning it doesn't require curly braces in the import statement).
-
-```javascript
-import Spline from '@splinetool/react-spline';
-```
-
-In these cases you must set `is_default = True` in your component class, as we did in the Spline example in the overview section:
-
-```python
-class Spline(rx.Component):
-    """Spline component."""
- 
-    library = "@splinetool/react-spline"
-    tag = "Spline"
-    is_default = True  # Needed for default imports
-```
-
-### Library Dependencies
-
-By default Reflex will install the library you have specified in the library property. However, sometimes you may need to install other libraries to use a component. In this case you can use the `lib_dependencies` property to specify other libraries to install.
-
-As seen in the Spline example in the overview section, we need to import the `@splinetool/runtime` library to use the `Spline` component. We can specify this in our component class like this:
-
-```python
-class Spline(rx.Component):
-    """Spline component."""
-
-    library = "@splinetool/react-spline"  # This is installed by default
-    lib_dependencies: list[str] = ["@splinetool/runtime@1.5.5"]  # Specify extra npm packages to install.
-```
-
-In this example we are adding this dependency to pin its version. It would be automatically installed alongside the `react-spline` library when the component is created.
-
-A useful time to add `lib_dependencies` is when we are wrapping a component and we want plugins or extensions for the library. A good example is the React component `react-markdown` with its [extensions](https://www.npmjs.com/package/react-markdown#plugins). 
-
-### Versions
-
-You can specify the version of the library you want to install by appending `@` and the version number to the library name.
-
-```python
-class Spline(rx.Component):
-    """Spline component."""
-
-    library = "@splinetool/react-spline@1.0.0"
-```
-
-This is recommended to ensure that your app works consistently across different environments.
-
-### Dynamic Imports
-
-Some libraries you may want to wrap may require dynamic imports. This is because they they may not be compatible with Server-Side Rendering (SSR).
-
-To handle this in Reflex, subclass `NoSSRComponent` when defining your component.
-
-Often times when you see an import something like this:
-
-```javascript
-import dynamic from 'next/dynamic';
-
-const MyLibraryComponent = dynamic(() => import('./MyLibraryComponent'), {
-  ssr: false
-});
-```
-
-You can wrap it in Reflex like this, here we are wrapping the `react-plotly.js` library which requires dynamic imports:
-
-```python
-from reflex.components.component import NoSSRComponent
-
-class PlotlyLib(NoSSRComponent):
-    """A component that wraps a plotly lib."""
-
-    library = "react-plotly.js@2.6.0"
-
-    lib_dependencies: List[str] = ["plotly.js@2.22.0"]
-```
-
-It may not always be clear when a library requires dynamic imports. A few things to keep in mind are if the component is very client side heavy i.e. the view and structure depends on things that are fetched at run time, or if it uses `window` or `document` objects directly it will need to be wrapped as a `NoSSRComponent`. 
-
-Some examples are:
-
-1. Video and Audio Players
-2. Maps
-3. Drawing Canvas
-4. 3D Graphics
-5. QR Scanners
-6. Reactflow
-
-The reason for this is that it does not make sense for your server to render these components as the server does not have access to your camera, it cannot draw on your canvas or render a video from a file. 
-
-In addition, if in the component documentation it mentions nextJS compatibility or server side rendering compatibility, it is a good sign that it requires dynamic imports.
-
-
-### Additional Imports
-
-Sometimes you may need to import additional files or stylesheets to use a component. You can do this by overriding the `add_imports` method in your component class. The method returns a dictionary where the key is the library and the values are a list of imports.
-
-```python
-class ReactFlowLib(rx.Component):
-    """A component that wraps a react flow lib."""
-
-    library = "reactflow"
-
-    def add_imports(self):
-        return {
-            "": ['reactflow/dist/style.css']
-        }
-```
-
-You can use the empty string as the key to import files that are not part of a library.
-
-### Aliases
-
-If you are wrapping another component with the same tag as a component in your project you can use aliases to differentiate between them and avoid naming conflicts.
-
-Lets check out the code below, in this case if we needed to wrap another color picker library with the same tag we use an alias to avoid a conflict.
-
-```python
-class AnotherColorPicker(rx.Component):
-    library = "some-other-colorpicker"
-    tag = "HexColorPicker"
-    alias = "OtherHexColorPicker" # This can now coexist with the original HexColorPicker
-```
-
-## Custom Code
-
-Sometimes you may need to add custom code to your component, such as defining constants and functions used. Custom code will be inserted _outside_ of the react component function.
-
-```javascript
-import React from "react";
-// Other imports...
-...
-
-// Custom code
-const customCode = "const customCode = 'customCode';";
-```
-
-To add custom code to your component you can use the `add_custom_code` method in your component class.
-
-```python
-from reflex.components.component import NoSSRComponent
-
-class PlotlyLib(NoSSRComponent):
-    """A component that wraps a plotly lib."""
-
-    library = "react-plotly.js@2.6.0"
-
-    lib_dependencies: List[str] = ["plotly.js@2.22.0"]
-
-    def add_custom_code(self) -> str:
-        return "const customCode = 'customCode';"
-```
-
-## Props
-
-Props are the variables that you can pass to the component. In the case of our color picker, we have a single prop `color`. Props are defined using `rx.Var` with the type of the prop. Specifying the type helps the compiler catch errors and provides better intellisense.
-
-```python
-class ColorPicker(rx.Component):
-    library = "react-colorful"
-    tag = "HexColorPicker"
-
-    # Define all props using rx.Var
-    color: rx.Var[str]
-
-color_picker = ColorPicker.create
-```
-
-Then when you create the component, you can pass in the props as keyword arguments.
-
-```python demo
-color_picker(color="#db114b")
-```
-
-### Default Value
-
-You can set a default value for the prop by assigning it in the class definition.
-
-```python
-class ColorPicker(rx.Component):
-    library = "react-colorful"
-    tag = "HexColorPicker"
-
-    # Set a default value for the color prop
-    color: rx.Var[str] = "#db114b" 
-```
-
-## Serializers
-
-Vars can be any type that can be serialized to JSON. This includes primitive types like strings, numbers, and booleans, as well as more complex types like lists, dictionaries, and dataframes.
-
-In case you need to serialize a more complex type, you can use the `serializer` decorator to convert the type to a primitive type that can be stored in the state. Just define a method that takes the complex type as an argument and returns a primitive type. We use type annotations to determine the type that you want to serialize.
-
-For example, the Plotly component serializes a plotly figure into a JSON string that can be stored in the state.
-
-```python
-import json
-import reflex as rx
-from plotly.graph_objects import Figure
-from plotly.io import to_json
-
-# Use the serializer decorator to convert the figure to a JSON string.
-# Specify the type of the argument as an annotation.
-@rx.serializer
-def serialize_figure(figure: Figure) -> list:
-    # Use Plotly's to_json method to convert the figure to a JSON string.
-    return json.loads(str(to_json(figure)))["data"]
-```
-
-We can then define a var of this type as a prop in our component.
-
-```python
-import reflex as rx
-from plotly.graph_objects import Figure
-
-class Plotly(rx.Component):
-    """Display a plotly graph."""
-    library = "react-plotly.js@2.6.0"
-    lib_dependencies: List[str] = ["plotly.js@2.22.0"]
-
-    tag = "Plot"
-
-    is_default = True
-
-    # Since a serialize is defined now, we can use the Figure type directly.
-    data: rx.Var[Figure]
+class ComponentPropsComponent(MyBaseComponent):
+    """MyComponent."""
+
+    # A prop that takes a component as an argument.
+    component_props: rx.Var[rx.Component]
 ```
 
 ## Event Handlers
-
-Recall that [event handlers]({events.events_overview.path}) are ways that components can handle user interactions. In the case of the color picker, we have a single event trigger `on_change` that triggers when the color changes. The event trigger takes a single argument `color` which is the new color.
-
-```python
-class ColorPicker(rx.Component):
-    library = "react-colorful"
-    tag = "HexColorPicker"
-    color: rx.Var[str]
-    on_change: rx.EventHandler[lambda color: [color]]
-```
-
-We can then bind this event trigger to an event handler in our state that takes the color as an argument.
+Event handlers are props that expect to receive a function that will be called when an event occurs. They are defined as `rx.EventHandler` with a signature function to define the spec of the event.
 
 ```python
-class ColorPickerState(rx.State):
-    color: str = "#db114b"
+from reflex.vars.event_handler import EventHandler
+from reflex.vars.function import FunctionVar
+from reflex.vars.object import ObjectVar
 
-    def set_color(self, color: str):
-        self.color = color
+class InputEventType(TypedDict):
+    """Input event type."""
 
-def index():
-    return color_picker(
-        color=ColorPickerState.color,
-        # Set the event handler.
-        on_change=ColorPickerState.set_color
+    # Define the structure of the input event.
+    foo: str
+    bar: int
+
+
+def custom_spec(event: ObjectVar[InputEventType]) -> tuple[str, int]:
+    """Custom event spec."""
+    return (
+        event.foo.to(str),
+        event.bar.to(int),
     )
+
+class EventHandlerComponent(MyBaseComponent):
+    """MyComponent."""
+
+    # An event handler that take no argument.
+    on_event: rx.EventHandler[rx.event.no_args_event_spec]
+
+    # An event handler that takes a single string argument.
+    on_event_with_arg: rx.EventHandler[rx.event.passthrough_event_spec(str)]
+
+    # An event handler specialized for input events, accessing event.target.value from the event.
+    on_input_change: rx.EventHandler[rx.event.input_event]
+
+    # An event handler specialized for key events, accessing event.key from the event and provided modifiers (ctrl, alt, shift, meta).
+    on_key_down: rx.EventHandler[rx.event.key_event]
+
+    # An event handler that takes a custom spec.
+    on_custom_event: rx.EventHandler[custom_spec]
 ```
 
-## Assets
-
-If a wrapped component depends on assets such as images, scripts, or
-stylesheets, these can be kept adjacent to the component code and
-included in the final build using the `rx.asset` function.
-
-`rx.asset` returns a relative path that references the asset in the compiled
-output. The target files are copied into a subdirectory of `assets/external`
-based on the module where they are initially used. This allows third-party
-components to have external assets with the same name without conflicting
-with each other.
-
-For example, if there is an SVG file named `wave.svg` in the same directory as
-this component, it can be rendered using `rx.image` and `rx.asset`.
-
-```python
-class Hello(rx.Component):
-    @classmethod
-    def create(cls, *children, **props) -> rx.Component:
-        props.setdefault("align", "center")
-        return rx.hstack(
-            rx.image(src=rx.asset("wave.svg", shared=True), width="50px", height="50px"),
-            rx.heading("Hello ", *children),
-            **props
-        )
+```md alert info
+# Custom event specs have a few use case where they are particularly useful. If the event returns non-serializable data, you can filter them out so the event can be sent to the backend. You can also use them to transform the data before sending it to the backend.
 ```
-
-
-## Debugging
-
-If you encounter an error while wrapping a component it is recommended to check the Console in the browser developer tools. You can access this by going to inspect element and then clicking on the Console tab on Mac. This is because the Console is where most Javascript errors are logged.
-
 
 ```python exec
 import reflex as rx
@@ -14444,6 +14349,208 @@ export default function App() {
 In the next page, we will go step by step through a more complex example of wrapping a React component.
 
 
+---
+title: Serializers
+---
+
+# Serializers
+
+Vars can be any type that can be serialized to JSON. This includes primitive types like strings, numbers, and booleans, as well as more complex types like lists, dictionaries, and dataframes.
+
+In case you need to serialize a more complex type, you can use the `serializer` decorator to convert the type to a primitive type that can be stored in the state. Just define a method that takes the complex type as an argument and returns a primitive type. We use type annotations to determine the type that you want to serialize.
+
+For example, the Plotly component serializes a plotly figure into a JSON string that can be stored in the state.
+
+```python
+import json
+import reflex as rx
+from plotly.graph_objects import Figure
+from plotly.io import to_json
+
+# Use the serializer decorator to convert the figure to a JSON string.
+# Specify the type of the argument as an annotation.
+@rx.serializer
+def serialize_figure(figure: Figure) -> list:
+    # Use Plotly's to_json method to convert the figure to a JSON string.
+    return json.loads(to_json(figure))["data"]
+```
+
+We can then define a var of this type as a prop in our component.
+
+```python
+import reflex as rx
+from plotly.graph_objects import Figure
+
+class Plotly(rx.Component):
+    """Display a plotly graph."""
+    library = "react-plotly.js@2.6.0"
+    lib_dependencies: List[str] = ["plotly.js@2.22.0"]
+
+    tag = "Plot"
+
+    is_default = True
+
+    # Since a serialize is defined now, we can use the Figure type directly.
+    data: rx.Var[Figure]
+```
+
+
+---
+title: Library and Tags
+---
+
+```python exec
+from pcweb.pages.docs import api_reference
+```
+
+# Find The Component
+
+There are two ways to find a component to wrap:
+1. Write the component yourself locally.
+2. Find a well-maintained React library on [npm](https://www.npmjs.com/) that contains the component you need.
+
+In both cases, the process of wrapping the component is the same except for the `library` field.
+
+In this guide we are wrapping the `HexColorPicker` component from the [react-colorful](https://www.npmjs.com/package/react-colorful) library.
+
+# Wrapping the Component
+
+When wrapping a React component, the first step is to create a new component in your Reflex app. This is done by creating a new class that inherits from `rx.Component` or `rx.NoSSRComponent`. 
+
+See the [API Reference]({api_reference.component.path}) for more details on the `rx.Component` class.
+
+This is when we will define the most important attributes of the component:
+1. **library**: The name of the npm package that contains the component.
+2. **tag**: The name of the component to import from the package.
+3. **alias**: (Optional) The name of the alias to use for the component. This is useful if multiple component from different package have a name in common. If `alias` is not specified, `tag` will be used.
+4. **lib_dependencies**: Any additional libraries needed to use the component.
+5. **is_default**: (Optional) If the component is a default export from the module, set this to `True`. Default is `False`.
+
+```md alert warning
+# When setting the `library` attribute, it is recommended to included a pinned version of the package. Doing so, the package will only change when you intentionally update the version, avoid unexpected breaking changes.
+```
+
+```python
+class MyBaseComponent(rx.Component):
+    """MyBaseComponent."""
+
+    # The name of the npm package.
+    library = "my-library@x.y.z"
+
+    # The name of the component to use from the package.
+    tag = "MyComponent"
+
+    # Any additional libraries needed to use the component.
+    lib_dependencies: list[str] = ["package-deps@x.y.z"]
+
+    # The name of the alias to use for the component.
+    alias = "MyComponentAlias"
+
+    # If the component is a default export from the module, set this to True.
+    is_default = True/False
+```
+
+# Wrapping a Dynamic Component 
+
+When wrapping some libraries, you may want to use dynamic imports. This is because they may not be compatible with Server-Side Rendering (SSR).
+
+To handle this in Reflex, subclass `NoSSRComponent` when defining your component. It works the same as `rx.Component`, but it will automatically add the correct custom code for a dynamic import.
+
+Often times when you see an import something like this:
+
+```javascript
+import dynamic from 'next/dynamic';
+
+const MyLibraryComponent = dynamic(() => import('./MyLibraryComponent'), {
+  ssr: false
+});
+```
+
+You can wrap it in Reflex like this:
+
+```python
+from reflex.components.component import NoSSRComponent
+
+class MyLibraryComponent(NoSSRComponent):
+    """A component that wraps a lib needing dynamic import."""
+
+    library = "my-library@x.y.z"
+
+    tag="MyLibraryComponent"
+```
+
+It may not always be clear when a library requires dynamic imports. A few things to keep in mind are if the component is very client side heavy i.e. the view and structure depends on things that are fetched at run time, or if it uses `window` or `document` objects directly it will need to be wrapped as a `NoSSRComponent`. 
+
+Some examples are:
+
+1. Video and Audio Players
+2. Maps
+3. Drawing Canvas
+4. 3D Graphics
+5. QR Scanners
+6. Reactflow
+
+The reason for this is that it does not make sense for your server to render these components as the server does not have access to your camera, it cannot draw on your canvas or render a video from a file. 
+
+In addition, if in the component documentation it mentions nextJS compatibility or server side rendering compatibility, it is a good sign that it requires dynamic imports.
+
+
+
+
+
+
+# Styles and Imports
+
+When wrapping a React component, you may need to define styles and imports that are specific to the component. This is done by defining the `add_styles` and `add_imports` methods in your component class.
+
+### Imports
+
+Sometimes, the component you are wrapping will need to import other components or libraries. This is done by defining the `add_imports` method in your component class.
+That method should return a dictionary of imports, where the keys are the names of the packages to import and the values are the names of the components or libraries to import.
+
+Values can be either a string or a list of strings. If the import needs to be aliased, you can use the `ImportVar` object to specify the alias and whether the import should be installed as a dependency.
+
+```python
+from reflex.utils.imports import ImportVar
+
+class ComponentWithImports(MyBaseComponent):
+    def add_imports(self):
+        """Add imports to the component."""
+        return {
+            # If you only have one import, you can use a string.
+            "my-package1": "my-import1",
+            # If you have multiple imports, you can pass a list.
+            "my-package2": ["my-import2"],
+            # If you need to control the import in a more detailed way, you can use an ImportVar object.
+            "my-package3": ImportVar(tag="my-import3", alias="my-alias", install=False, is_default=False),
+            # To import a CSS file, pass the full path to the file, and use an empty string as the key.
+            "": "my-package-with-css/styles.css",
+        }
+```
+
+```md alert info
+# The tag and library of the component will be automatically added to the imports. They do not need to be added again in `add_imports`.
+```
+
+### Styles
+
+Styles are any CSS styles that need to be included in the component. The style will be added inline to the component, so you can use any CSS styles that are valid in React.
+
+```python
+class StyledComponent(MyBaseComponent):
+    """MyComponent."""
+
+    def add_style(self) -> dict[str, Any] | None:
+        """Add styles to the component."""
+
+        return rx.Style({
+            "backgroundColor": "red",
+            "color": "white",
+            "padding": "10px",
+        })
+```
+
+
 # More React Libraries 
 
 
@@ -14559,7 +14666,7 @@ from pcweb.pages import docs
 
 In this example we are wrapping the React Leaflet library from the NPM package [react-leaflet](https://www.npmjs.com/package/react-leaflet).
 
-On line `1` we import the `dynamic` function from Next.js and on line `21` we set `ssr: false`. Lines `4` and `6` use the `dynamic` function to import the `MapContainer` and `TileLayer` components from the `react-leaflet` library. This is used to dynamically import the `MapContainer` and `TileLayer` components from the `react-leaflet` library. This is done in Reflex by using the `NoSSRComponent` class when defining the component. There is more information of when this is needed on the `Dynamic Imports` section of this [page]({docs.wrapping_react.guide.path}).
+On line `1` we import the `dynamic` function from Next.js and on line `21` we set `ssr: false`. Lines `4` and `6` use the `dynamic` function to import the `MapContainer` and `TileLayer` components from the `react-leaflet` library. This is used to dynamically import the `MapContainer` and `TileLayer` components from the `react-leaflet` library. This is done in Reflex by using the `NoSSRComponent` class when defining the component. There is more information of when this is needed on the `Dynamic Imports` section of this [page]({docs.wrapping_react.library_and_tags.path}).
 
 It mentions in the documentation that it is necessary to include the Leaflet CSS file, which is added on line `2` in the React code below. This can be done in Reflex by using the `add_imports` method in the `MapContainer` component. We can add a relative path from within the React library or a full URL to the CSS file.
 
@@ -14664,7 +14771,7 @@ app.add_page(index)
 
 In this example we are wrapping the React renderer for creating PDF files on the browser and server from the NPM package [@react-pdf/renderer](https://www.npmjs.com/package/@react-pdf/renderer).
 
-This example is similar to the previous examples, and again Dynamic Imports are required for this library. This is done in Reflex by using the `NoSSRComponent` class when defining the component. There is more information on why this is needed on the `Dynamic Imports` section of this [page]({docs.wrapping_react.guide.path}).
+This example is similar to the previous examples, and again Dynamic Imports are required for this library. This is done in Reflex by using the `NoSSRComponent` class when defining the component. There is more information on why this is needed on the `Dynamic Imports` section of this [page]({docs.wrapping_react.library_and_tags.path}).
 
 The main difference with this example is that the `style` prop, used on lines `20`, `21` and `24` in React code, is a reserved name in Reflex so can not be wrapped. A different name must be used when wrapping this prop and then this name must be changed back to the original with the `rename_props` method. In this example we name the prop `theme` in our Reflex code and then change it back to `style` with the `rename_props` method in both the `Page` and `View` components.
 
