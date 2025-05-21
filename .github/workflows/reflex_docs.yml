@@ -36,7 +36,12 @@ jobs:
 
       - name: Update README with last checked time
         run: |
-          sed -i "s|<!-- LAST_CHECKED_PLACEHOLDER -->|$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md
+          echo "Attempting to update Last checked time in README.md"
+          if sed -i "s|^Last checked:.*|Last checked: $(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md; then
+            echo "Successfully updated Last checked time."
+          else
+            echo "Failed to update Last checked time or placeholder not found."
+          fi
           git add README.md
           git commit -m "Update last checked time in README" || echo "No changes to commit for last checked time"
           git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main || echo "No changes to push for last checked time"
@@ -58,7 +63,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
-          sed -i "s|<!-- LAST_UPDATED_PLACEHOLDER -->|$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md
+          echo "Attempting to update Last updated time in README.md"
+          if sed -i "s|^Last updated:.*|Last updated: $(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md; then
+            echo "Successfully updated Last updated time."
+          else
+            echo "Failed to update Last updated time or placeholder not found."
+          fi
           git add .
           git commit -m "Update merged Reflex documentation"
           git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
