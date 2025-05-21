@@ -37,19 +37,31 @@ jobs:
       - name: Update README with last checked time
         run: |
           echo "Attempting to update Last checked time in README.md"
-          if sed -i "s|^- Last checked: `.*`|- Last checked: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
-            echo "Successfully updated Last checked time."
-          else
-            # Fallback for when the line might not have backticks yet (e.g., first run after this change)
-            if sed -i "s|^- Last checked:.*|- Last checked: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
-              echo "Successfully updated Last checked time (fallback)."
-            else
-              echo "Failed to update Last checked time or placeholder not found."
+          NEW_TIME_STRING="- Last checked: \`$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')\`"
+          
+          # First, try to replace the placeholder specifically
+          sed -i "s|^- Last checked: <!-- LAST_CHECKED_PLACEHOLDER -->|${NEW_TIME_STRING}|g" README.md
+          
+          # Then, try to replace an existing backticked timestamp (covers subsequent runs AND the case where the above command just ran)
+          sed -i "s|^- Last checked: \`.*\`|${NEW_TIME_STRING}|g" README.md
+          
+          echo "Sed commands for 'Last checked' executed."
+
+          # Check if README.md was actually changed by sed from its last committed state or working tree state
+          if ! git diff --quiet README.md; then
+            echo "README.md changed for 'Last checked'. Committing and pushing."
+            git add README.md
+            git commit -m "Update last checked time in README"
+            echo "Pushing 'Last checked' time update..."
+            git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
+            if [ $? -ne 0 ]; then
+              echo "::error::Failed to push 'Last checked' time update. Please check PAT permissions and branch protection rules."
+              exit 1
             fi
+            echo "'Last checked' time update pushed successfully."
+          else
+            echo "No changes to 'Last checked' time in README.md by sed commands, or changes were already present/committed."
           fi
-          git add README.md
-          git commit -m "Update last checked time in README" || echo "No changes to commit for last checked time"
-          git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main || echo "No changes to push for last checked time"
 
       - name: Check for changes
         id: check_changes
@@ -69,16 +81,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           echo "Attempting to update Last updated time in README.md"
-          if sed -i "s|^- Last updated: `.*`|- Last updated: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
-            echo "Successfully updated Last updated time."
-          else
-            # Fallback for when the line might not have backticks yet
-            if sed -i "s|^- Last updated:.*|- Last updated: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
-              echo "Successfully updated Last updated time (fallback)."
-            else
-              echo "Failed to update Last updated time or placeholder not found."
+          NEW_UPDATED_TIME_STRING="- Last updated: \`$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')\`"
+
+          # First, try to replace the placeholder specifically
+          sed -i "s|^- Last updated: <!-- LAST_UPDATED_PLACEHOLDER -->|${NEW_UPDATED_TIME_STRING}|g" README.md
+          
+          # Then, try to replace an existing backticked timestamp
+          sed -i "s|^- Last updated: \`.*\`|${NEW_UPDATED_TIME_STRING}|g" README.md
+          
+          echo "Sed commands for 'Last updated' executed."
+          
+          echo "Staging all changes including README.md and reflex_docs.txt..."
+          git add . # This adds reflex_docs.txt (if changed) and the updated README.md
+
+          if ! git diff --cached --quiet; then
+            echo "Changes staged. Committing..."
+            git commit -m "Update merged Reflex documentation and README timestamps"
+            echo "Pushing all changes..."
+            git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
+            if [ $? -ne 0 ]; then
+              echo "::error::Failed to push 'Update merged Reflex documentation'. Please check PAT permissions and branch protection rules."
+              exit 1
             fi
+            echo "All changes pushed successfully."
+          else
+            echo "No new changes were staged for commit."
           fi
-          git add .
-          git commit -m "Update merged Reflex documentation"
-          git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
