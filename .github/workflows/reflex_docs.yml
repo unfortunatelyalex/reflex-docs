@@ -37,7 +37,7 @@ jobs:
       - name: Update README with last checked time
         run: |
           echo "Attempting to update Last checked time in README.md"
-          if sed -i "s|^- Last checked:.*|- Last checked: $(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md; then
+          if sed -i "s|^- Last checked:.*|- Last checked: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
             echo "Successfully updated Last checked time."
           else
             echo "Failed to update Last checked time or placeholder not found."
@@ -64,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           echo "Attempting to update Last updated time in README.md"
-          if sed -i "s|^- Last updated:.*|- Last updated: $(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md; then
+          if sed -i "s|^- Last updated:.*|- Last updated: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
             echo "Successfully updated Last updated time."
           else
             echo "Failed to update Last updated time or placeholder not found."
