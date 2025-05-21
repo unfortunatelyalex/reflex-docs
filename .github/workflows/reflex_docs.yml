@@ -52,6 +52,13 @@ jobs:
             echo "README.md changed for 'Last checked'. Committing and pushing."
             git add README.md
             git commit -m "Update last checked time in README"
+            
+            echo "Pulling with rebase before pushing 'Last checked' time update..."
+            if ! git pull --rebase origin main; then
+              echo "::error::git pull --rebase failed for 'Last checked' time update. Please check runner state or resolve conflicts if any."
+              exit 1
+            fi
+            
             echo "Pushing 'Last checked' time update..."
             git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
             if [ $? -ne 0 ]; then
@@ -97,6 +104,13 @@ jobs:
           if ! git diff --cached --quiet; then
             echo "Changes staged. Committing..."
             git commit -m "Update merged Reflex documentation and README timestamps"
+            
+            echo "Pulling with rebase before pushing all changes..."
+            if ! git pull --rebase origin main; then
+              echo "::error::git pull --rebase failed for final commit. Please check runner state or resolve conflicts if any."
+              exit 1
+            fi
+
             echo "Pushing all changes..."
             git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
             if [ $? -ne 0 ]; then
