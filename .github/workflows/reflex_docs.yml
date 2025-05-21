@@ -34,6 +34,13 @@ jobs:
       - name: Run automation script
         run: ${{ env.PYTHON_EXEC }} haupt.py
 
+      - name: Update README with last checked time
+        run: |
+          sed -i "s|<!-- LAST_CHECKED_PLACEHOLDER -->|$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md
+          git add README.md
+          git commit -m "Update last checked time in README" || echo "No changes to commit for last checked time"
+          git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main || echo "No changes to push for last checked time"
+
       - name: Check for changes
         id: check_changes
         run: |
@@ -51,6 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
+          sed -i "s|<!-- LAST_UPDATED_PLACEHOLDER -->|$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')|g" README.md
           git add .
           git commit -m "Update merged Reflex documentation"
           git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main

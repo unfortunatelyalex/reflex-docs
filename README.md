@@ -2,6 +2,9 @@
 
 This repository contains an automation script for merging the Reflex Documentation into one singular file. The automation is handled using GitHub Actions and Playwright to download, extract, and merge documentation files from the Reflex GitHub repository.
 
+Last checked: <!-- LAST_CHECKED_PLACEHOLDER -->
+Last updated: <!-- LAST_UPDATED_PLACEHOLDER -->
+
 ## Workflow
 
 The automation workflow is defined in the `.github/workflows/reflex_docs.yml` file. It runs every 2 hours and can also be triggered manually. The workflow performs the following steps:
