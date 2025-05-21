@@ -37,10 +37,15 @@ jobs:
       - name: Update README with last checked time
         run: |
           echo "Attempting to update Last checked time in README.md"
-          if sed -i "s|^- Last checked:.*|- Last checked: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
+          if sed -i "s|^- Last checked: `.*`|- Last checked: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
             echo "Successfully updated Last checked time."
           else
-            echo "Failed to update Last checked time or placeholder not found."
+            # Fallback for when the line might not have backticks yet (e.g., first run after this change)
+            if sed -i "s|^- Last checked:.*|- Last checked: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
+              echo "Successfully updated Last checked time (fallback)."
+            else
+              echo "Failed to update Last checked time or placeholder not found."
+            fi
           fi
           git add README.md
           git commit -m "Update last checked time in README" || echo "No changes to commit for last checked time"
@@ -64,10 +69,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           echo "Attempting to update Last updated time in README.md"
-          if sed -i "s|^- Last updated:.*|- Last updated: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
+          if sed -i "s|^- Last updated: `.*`|- Last updated: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
             echo "Successfully updated Last updated time."
           else
-            echo "Failed to update Last updated time or placeholder not found."
+            # Fallback for when the line might not have backticks yet
+            if sed -i "s|^- Last updated:.*|- Last updated: `$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')`|g" README.md; then
+              echo "Successfully updated Last updated time (fallback)."
+            else
+              echo "Failed to update Last updated time or placeholder not found."
+            fi
           fi
           git add .
           git commit -m "Update merged Reflex documentation"
