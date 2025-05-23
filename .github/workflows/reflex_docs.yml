@@ -45,19 +45,20 @@ jobs:
           sed -i "s|^- Last checked: \`.*\`|${NEW_TIME_STRING}|g" README.md
           echo "Sed commands for 'Last checked' executed."
 
-          # Stage changes to README.md (from sed) and reflex_docs.txt (from haupt.py)
-          # git add is idempotent, so it's safe to run even if files haven't changed.
-          echo "Staging potential changes in README.md and reflex_docs.txt"
-          git add README.md reflex_docs.txt
+          # Stage ONLY README.md for this specific commit
+          git add README.md
+          echo "Staged potential changes in README.md"
 
-          # Check if README.md has staged changes to be committed for "last checked" time.
-          # `git diff --cached --quiet README.md` returns true (0) if staged README.md is same as HEAD, false (1) if different.
+          # Check if README.md has staged changes to be committed
           if ! git diff --cached --quiet README.md; then
             echo "README.md has staged changes for 'Last checked'. Committing it."
-            # Commit only README.md. reflex_docs.txt (if changed and staged) remains staged for the next commit.
             git commit -m "Update last checked time in README" README.md 
             
             echo "Pulling with rebase before pushing 'Last checked' time update..."
+            # At this point, if reflex_docs.txt was modified by haupt.py, it's an unstaged
+            # working directory change. This is usually fine for 'git pull --rebase'
+            # unless it directly conflicts with incoming changes. The error "index contains
+            # uncommitted changes" should now be resolved.
             if ! git pull --rebase origin main; then
               echo "::error::git pull --rebase failed for 'Last checked' time update. Please check runner state or resolve conflicts if any."
               exit 1
@@ -72,9 +73,11 @@ jobs:
             echo "'Last checked' time update pushed successfully."
           else
             echo "No new changes to commit for 'Last checked' time in README.md (already up-to-date or no changes made by sed)."
-            # If README.md didn't have new staged changes, reflex_docs.txt might still be staged if haupt.py changed it.
-            # This is fine and will be handled by the subsequent 'Check for changes' and 'Commit and push changes' steps.
           fi
+          # Changes to reflex_docs.txt (if any from haupt.py) remain as working directory
+          # modifications. They will be detected by the 'Check for changes' step (which uses
+          # 'git diff --exit-code') and then staged and committed by the
+          # 'Commit and push changes' step.
 
       - name: Check for changes
         id: check_changes
