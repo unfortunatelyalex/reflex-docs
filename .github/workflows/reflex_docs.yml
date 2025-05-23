@@ -56,11 +56,9 @@ jobs:
             
             echo "Pulling with rebase before pushing 'Last checked' time update..."
             # At this point, if reflex_docs.txt was modified by haupt.py, it's an unstaged
-            # working directory change. This is usually fine for 'git pull --rebase'
-            # unless it directly conflicts with incoming changes. The error "index contains
-            # uncommitted changes" should now be resolved.
-            if ! git pull --rebase origin main; then
-              echo "::error::git pull --rebase failed for 'Last checked' time update. Please check runner state or resolve conflicts if any."
+            # working directory change. --autostash will handle this.
+            if ! git pull --rebase --autostash origin main; then
+              echo "::error::git pull --rebase --autostash failed for 'Last checked' time update. Please check runner state or resolve conflicts if any."
               exit 1
             fi
             
@@ -115,8 +113,9 @@ jobs:
             git commit -m "Update merged Reflex documentation and README timestamps"
             
             echo "Pulling with rebase before pushing all changes..."
-            if ! git pull --rebase origin main; then
-              echo "::error::git pull --rebase failed for final commit. Please check runner state or resolve conflicts if any."
+            # Working directory should be clean here after the commit, but --autostash is safe.
+            if ! git pull --rebase --autostash origin main; then
+              echo "::error::git pull --rebase --autostash failed for final commit. Please check runner state or resolve conflicts if any."
               exit 1
             fi
 
