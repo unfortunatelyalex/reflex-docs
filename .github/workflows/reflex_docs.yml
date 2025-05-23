@@ -37,21 +37,25 @@ jobs:
       - name: Update README with last checked time
         run: |
           echo "Attempting to update Last checked time in README.md"
-          NEW_TIME_STRING="- Last checked: \`$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')\`"
+          current_time_str="$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')"
+          NEW_TIME_STRING="- Last checked: \`$current_time_str\`"
           
-          # First, try to replace the placeholder specifically
+          # Apply sed to README.md
           sed -i "s|^- Last checked: <!-- LAST_CHECKED_PLACEHOLDER -->|${NEW_TIME_STRING}|g" README.md
-          
-          # Then, try to replace an existing backticked timestamp (covers subsequent runs AND the case where the above command just ran)
           sed -i "s|^- Last checked: \`.*\`|${NEW_TIME_STRING}|g" README.md
-          
           echo "Sed commands for 'Last checked' executed."
 
-          # Check if README.md was actually changed by sed from its last committed state or working tree state
-          if ! git diff --quiet README.md; then
-            echo "README.md changed for 'Last checked'. Committing and pushing."
-            git add README.md
-            git commit -m "Update last checked time in README"
+          # Stage changes to README.md (from sed) and reflex_docs.txt (from haupt.py)
+          # git add is idempotent, so it's safe to run even if files haven't changed.
+          echo "Staging potential changes in README.md and reflex_docs.txt"
+          git add README.md reflex_docs.txt
+
+          # Check if README.md has staged changes to be committed for "last checked" time.
+          # `git diff --cached --quiet README.md` returns true (0) if staged README.md is same as HEAD, false (1) if different.
+          if ! git diff --cached --quiet README.md; then
+            echo "README.md has staged changes for 'Last checked'. Committing it."
+            # Commit only README.md. reflex_docs.txt (if changed and staged) remains staged for the next commit.
+            git commit -m "Update last checked time in README" README.md 
             
             echo "Pulling with rebase before pushing 'Last checked' time update..."
             if ! git pull --rebase origin main; then
@@ -67,7 +71,9 @@ jobs:
             fi
             echo "'Last checked' time update pushed successfully."
           else
-            echo "No changes to 'Last checked' time in README.md by sed commands, or changes were already present/committed."
+            echo "No new changes to commit for 'Last checked' time in README.md (already up-to-date or no changes made by sed)."
+            # If README.md didn't have new staged changes, reflex_docs.txt might still be staged if haupt.py changed it.
+            # This is fine and will be handled by the subsequent 'Check for changes' and 'Commit and push changes' steps.
           fi
 
       - name: Check for changes
