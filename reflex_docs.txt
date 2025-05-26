@@ -14087,6 +14087,8 @@ Broadly, there are three kinds of props you can encounter when wrapping a React 
 
 Simple props are the most common type of props you will encounter when wrapping a React component. They are passed directly to the component and can be of any type (but most commonly strings, numbers, booleans, and structures).
 
+For custom types, you can use `TypedDict` to define the structure of the custom types. However, if you need the attributes to be automatically converted to camelCase once compiled in JS, you can use `rx.PropsBase` instead of `TypedDict`.
+
 ```python
 class CustomReactType(TypedDict):
     """Custom React type."""
@@ -14095,6 +14097,15 @@ class CustomReactType(TypedDict):
     attribute1: str
     attribute2: bool
     attribute3: int
+
+
+class CustomReactType2(rx.PropsBase):
+    """Custom React type."""
+
+    # Define the structure of the custom type to match the Javascript structure.
+    attr_foo: str # will be attrFoo in JS
+    attr_bar: bool # will be attrBar in JS
+    attr_baz: int # will be attrBaz in JS
 
 class SimplePropsComponent(MyBaseComponent):
     """MyComponent."""
@@ -14116,9 +14127,12 @@ class SimplePropsComponent(MyBaseComponent):
     # props annotated as `CustomReactType` in javascript
     props5: rx.Var[CustomReactType] 
 
+    # props annotated as `CustomReactType2` in javascript
+    props6: rx.Var[CustomReactType2]
+
     # Sometimes a props will accept multiple types. You can use `|` to specify the types.
     # props annotated as `string | boolean` in javascript
-    props6: rx.Var[str | bool] 
+    props7: rx.Var[str | bool] 
 ```
 
 ## Callback Props
@@ -14162,13 +14176,29 @@ class InputEventType(TypedDict):
     foo: str
     bar: int
 
+class OutputEventType(TypedDict):
+    """Output event type."""
 
-def custom_spec(event: ObjectVar[InputEventType]) -> tuple[str, int]:
-    """Custom event spec."""
+    # Define the structure of the output event.
+    baz: str
+    qux: int
+
+
+def custom_spec1(event: ObjectVar[InputEventType]) -> tuple[str, int]:
+    """Custom event spec using ObjectVar with custom type as input and tuple as output."""
     return (
         event.foo.to(str),
         event.bar.to(int),
     )
+
+def custom_spec2(event: ObjectVar[dict]) -> tuple[Var[OutputEventType]]:
+    """Custom event spec using ObjectVar with dict as input and custom type as output."""
+    return Var.create(
+        {
+            "baz": event["foo"],
+            "qux": event["bar"],
+        },
+    ).to(OutputEventType)
 
 class EventHandlerComponent(MyBaseComponent):
     """MyComponent."""
@@ -14185,8 +14215,11 @@ class EventHandlerComponent(MyBaseComponent):
     # An event handler specialized for key events, accessing event.key from the event and provided modifiers (ctrl, alt, shift, meta).
     on_key_down: rx.EventHandler[rx.event.key_event]
 
-    # An event handler that takes a custom spec.
-    on_custom_event: rx.EventHandler[custom_spec]
+    # An event handler that takes a custom spec. (Event handler must expect a tuple of two values [str and int])
+    on_custom_event: rx.EventHandler[custom_spec1]
+
+    # Another event handler that takes a custom spec. (Event handler must expect a tuple of one value, being a OutputEventType)
+    on_custom_event2: rx.EventHandler[custom_spec2]
 ```
 
 ```md alert info
@@ -14424,6 +14457,8 @@ This is when we will define the most important attributes of the component:
 4. **lib_dependencies**: Any additional libraries needed to use the component.
 5. **is_default**: (Optional) If the component is a default export from the module, set this to `True`. Default is `False`.
 
+Optionally, you can override the default component creation behavior by implementing the `create` class method. Most components won't need this when props are straightforward conversions from Python to JavaScript. However, this is useful when you need to add custom initialization logic, transform props, or handle special cases when the component is created.
+
 ```md alert warning
 # When setting the `library` attribute, it is recommended to included a pinned version of the package. Doing so, the package will only change when you intentionally update the version, avoid unexpected breaking changes.
 ```
@@ -14446,6 +14481,21 @@ class MyBaseComponent(rx.Component):
 
     # If the component is a default export from the module, set this to True.
     is_default = True/False
+
+    @classmethod
+    def create(cls, *children, **props):
+        """Create an instance of MyBaseComponent.
+        
+        Args:
+            *children: The children of the component.
+            **props: The props of the component.
+            
+        Returns:
+            The component instance.
+        """
+        # Your custom creation logic here
+        return super().create(*children, **props)
+
 ```
 
 # Wrapping a Dynamic Component 
@@ -14492,7 +14542,58 @@ The reason for this is that it does not make sense for your server to render the
 
 In addition, if in the component documentation it mentions nextJS compatibility or server side rendering compatibility, it is a good sign that it requires dynamic imports.
 
+# Advanced - Parsing a state Var with a JS Function
+When wrapping a component, you may need to parse a state var by applying a JS function to it. 
 
+## Define the parsing function
+
+First you need to define the parsing function by writing it in `add_custom_code`.
+
+```python
+
+def add_custom_code(self) -> list[str]:
+    """Add custom code to the component."""
+    # Define the parsing function
+    return [
+        """
+        function myParsingFunction(inputProp) {
+            // Your parsing logic here
+            return parsedProp;
+        }"""
+    ]
+```
+
+## Apply the parsing function to your props
+
+Then, you can apply the parsing function to your props in the `create` method. 
+
+```python
+from reflex.vars.base import Var
+from reflex.vars.function import FunctionStringVar
+
+    ...
+    @classmethod
+    def create(cls, *children, **props):
+        """Create an instance of MyBaseComponent.
+        
+        Args:
+            *children: The children of the component.
+            **props: The props of the component.
+            
+        Returns:
+            The component instance.
+        """
+        # Apply the parsing function to the props
+        if (prop_to_parse := props.get("propsToParse")) is not None:
+            if isinstance(prop_to_parse, Var):
+                props["propsToParse"] = FunctionStringVar.create("myParsingFunction").call(prop_to_parse)
+            else:
+                # This is not a state Var, so you can parse the value directly in python
+                parsed_prop = python_parsing_function(prop_to_parse)
+                props["propsToParse"] = parsed_prop
+        return super().create(*children, **props)
+    ...
+```
 
 
 
@@ -16471,8 +16572,10 @@ to initialize alembic and create a migration script with the current schema.
 After making changes to the schema, use
 `reflex db makemigrations --message 'something changed'`
 to generate a script in the `alembic/versions` directory that will update the
-database schema. It is recommended that scripts be inspected before applying
-them.
+database schema.  It is recommended that generated scripts be inspected before applying them.
+
+Bear in mind that your newest models will not be detected by the `reflex db makemigrations`
+command unless imported and used somewhere within the application.
 
 The `reflex db migrate` command is used to apply migration scripts to bring the
 database up to date. During app startup, if Reflex detects that the current
@@ -16494,6 +16597,7 @@ with rx.session() as session:
 ```md video https://youtube.com/embed/ITOZkzjtjUA?start=6835&end=8225
 # Video: Tutorial of Database Model with Forms, Model Field Changes and Migrations, and adding a DateTime Field
 ```
+
 
 # Relationships
 
