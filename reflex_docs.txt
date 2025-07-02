@@ -16412,29 +16412,643 @@ To convert HTML to Reflex code use this live converter tool: https://reflex.buil
 Check out this [Notion doc](https://www.notion.so/reflex-dev/Convert-HTML-to-Reflex-fe22d0641dcd4d5c91c8404ca41c7e77) for a walk through on how to convert a Figma file into Reflex code.
 
 
-# Reflex Enterprise
+---
+title: Drag and Drop
+---
 
 ```python exec
 import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
 ```
 
-Reflex Enterprise is a package containing premium features built on top of Reflex designed to help you build enterprise-grade applications faster.
+# Drag and Drop
 
-See complete docs at [Enterprise Docs](https://enterprise.reflex.dev)
+Reflex Enterprise provides comprehensive drag and drop functionality for creating interactive UI elements using the `rxe.dnd` module. Built on top of react-dnd, it offers both high-level components for common use cases and low-level hooks for advanced scenarios.
 
-## Features
+```md alert warning
+# Important: Always decorate functions defining `rxe.dnd.draggable` components with `@rx.memo` to avoid compilation errors.
+```
 
-So far the enterprise package contains the following features:
+## Basic Usage
 
-- AgGrid and AgCharts
-- Single Port Proxy
+### Simple Drag and Drop
 
-More features will be added in the future. If you have any feature requests, please [open an issue](https://github.com/reflex-dev/reflex/issues/new/choose).
+Here's a basic example showing how to create a draggable item and drop target:
 
-## Installation of reflex_enterprise.
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class BasicDndState(rx.State):
+    drop_count: int = 0
+
+@rx.memo
+def draggable_card():
+    return rxe.dnd.draggable(
+        rx.card(
+            rx.text("Drag me!", weight="bold"),
+            rx.text("I can be moved around"),
+            bg="blue.500",
+            color="white",
+            p=4,
+            cursor="grab",
+            width="200px",
+            height="100px"
+        ),
+        type="BasicCard",
+        item={"message": "Hello from draggable!"},
+    )
+
+def basic_drag_drop():
+    return rx.vstack(
+        rx.text(f"Items dropped: {BasicDndState.drop_count}"),
+        rx.hstack(
+            draggable_card(),
+            rxe.dnd.drop_target(
+                rx.box(
+                    "Drop Zone",
+                    bg="gray.100",
+                    border="2px dashed gray",
+                    min_height="150px",
+                    min_width="200px",
+                    display="flex",
+                    align_items="center",
+                    justify_content="center",
+                    font_weight="bold"
+                ),
+                accept=["BasicCard"],
+                on_drop=BasicDndState.setvar("drop_count", BasicDndState.drop_count + 1),
+            ),
+            spacing="4",
+            align="start"
+        ),
+        spacing="4"
+    )
+```
+
+### Multi-Position Drag and Drop
+
+Create a draggable item that can be moved between multiple drop targets:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class MultiPositionState(rx.State):
+    card_position: int = 0
+
+@rx.memo
+def movable_card():
+    return rxe.dnd.draggable(
+        rx.card(
+            rx.text("Movable Card", weight="bold"),
+            rx.text("Position: " + MultiPositionState.card_position.to_string()),
+            bg="purple.500",
+            color="white",
+            p=4,
+            width="180px",
+            height="120px"
+        ),
+        type="MovableCard",
+        border="2px solid purple",
+    )
+
+def drop_zone(position: int):
+    params = rxe.dnd.DropTarget.collected_params
+    return rxe.dnd.drop_target(
+        rx.cond(
+            MultiPositionState.card_position == position,
+            movable_card(),
+            rx.box(
+                f"Drop Zone {position}",
+                color="gray.600",
+                font_weight="bold"
+            )
+        ),
+        width="200px",
+        height="200px",
+        border="2px solid red",
+        border_color=rx.cond(params.is_over, "green.500", "red.500"),
+        bg=rx.cond(params.is_over, "green.100", "blue.100"),
+        accept=["MovableCard"],
+        on_drop=MultiPositionState.setvar("card_position", position),
+        display="flex",
+        align_items="center",
+        justify_content="center"
+    )
+
+def multi_position_example():
+    return rx.vstack(
+        rx.text("Drag the card between positions", weight="bold"),
+        rx.grid(
+            drop_zone(0),
+            drop_zone(1), 
+            drop_zone(2),
+            drop_zone(3),
+            columns="2",
+            spacing="4"
+        ),
+        spacing="4"
+    )
+```
+
+## Advanced Features
+
+### State Tracking with Collected Parameters
+
+Access drag and drop state information using collected parameters:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class StateTrackingState(rx.State):
+    drag_info: str = "No drag activity"
+
+@rx.memo  
+def tracked_draggable():
+    drag_params = rxe.dnd.Draggable.collected_params
+    return rxe.dnd.draggable(
+        rx.card(
+            rx.text("Tracked Draggable"),
+            rx.text(rx.cond(drag_params.is_dragging, "Dragging...", "Ready to drag")),
+            bg=rx.cond(drag_params.is_dragging, "orange.500", "blue.500"),
+            color="white",
+            p=4,
+            opacity=rx.cond(drag_params.is_dragging, 0.5, 1.0)
+        ),
+        type="TrackedItem",
+        on_end=StateTrackingState.setvar("drag_info", "Drag ended")
+    )
+
+def tracked_drop_target():
+    drop_params = rxe.dnd.DropTarget.collected_params
+    return rxe.dnd.drop_target(
+        rx.box(
+            rx.text("Smart Drop Zone"),
+            rx.text(rx.cond(drop_params.is_over, "Ready to receive!", "Waiting...")),
+            bg=rx.cond(drop_params.is_over, "green.200", "gray.100"),
+            border=rx.cond(drop_params.is_over, "2px solid green", "2px dashed gray"),
+            p=4,
+            min_height="150px",
+            display="flex",
+            flex_direction="column",
+            align_items="center",
+            justify_content="center"
+        ),
+        accept=["TrackedItem"],
+        on_drop=StateTrackingState.setvar("drag_info", "Item successfully dropped!"),
+        on_hover=StateTrackingState.setvar("drag_info", "Item hovering over drop zone")
+    )
+
+def state_tracking_example():
+    return rx.vstack(
+        rx.text(f"Status: {StateTrackingState.drag_info}"),
+        rx.hstack(
+            tracked_draggable(),
+            tracked_drop_target(),
+            spacing="4"
+        ),
+        spacing="4"
+    )
+```
+
+### Dynamic Lists with Drag and Drop
+
+Create dynamic draggable lists using `rx.foreach`:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class ListItem(rx.Base):
+    id: str
+    text: str
+    list_id: str
+
+class DynamicListState(rx.State):
+    list_a: list[ListItem] = [
+        ListItem(id="1", text="Item 1", list_id="A"),
+        ListItem(id="2", text="Item 2", list_id="A"),
+        ListItem(id="3", text="Item 3", list_id="A"),
+    ]
+    list_b: list[ListItem] = [
+        ListItem(id="4", text="Item 4", list_id="B"),
+        ListItem(id="5", text="Item 5", list_id="B"),
+    ]
+
+    def move_item(self, item_data: dict, target_list: str):
+        item_id = item_data.get("id")
+        
+        # Remove from source list
+        self.list_a = [item for item in self.list_a if item.id != item_id]
+        self.list_b = [item for item in self.list_b if item.id != item_id]
+        
+        # Add to target list
+        new_item = ListItem(
+            id=item_id,
+            text=item_data.get("text", ""),
+            list_id=target_list
+        )
+        
+        if target_list == "A":
+            self.list_a.append(new_item)
+        else:
+            self.list_b.append(new_item)
+
+@rx.memo
+def draggable_list_item(item: ListItem):
+    return rxe.dnd.draggable(
+        rx.card(
+            rx.text(item.text, weight="bold"),
+            rx.text(f"From List {item.list_id}", size="2", color="gray.600"),
+            p=3,
+            cursor="grab",
+            _hover={"bg": "gray.50"}
+        ),
+        type="ListItem",
+        item={"id": item.id, "text": item.text, "list_id": item.list_id},
+    )
+
+def droppable_list(title: str, items: list[ListItem], list_id: str):
+    return rxe.dnd.drop_target(
+        rx.vstack(
+            rx.text(title, weight="bold", size="5"),
+            rx.vstack(
+                rx.foreach(items, lambda item, index: draggable_list_item(item=item)),
+                spacing="2",
+                min_height="200px",
+                width="100%"
+            ),
+            bg="gray.50",
+            p=4,
+            border_radius="md",
+            border="2px dashed gray",
+            width="250px"
+        ),
+        accept=["ListItem"],
+        on_drop=lambda item: DynamicListState.move_item(item, list_id)
+    )
+
+def dynamic_list_example():
+    return rx.hstack(
+        droppable_list("List A", DynamicListState.list_a, "A"),
+        droppable_list("List B", DynamicListState.list_b, "B"),
+        spacing="6",
+        align="start"
+    )
+```
+
+## Core Components
+
+### Draggable
+
+The `rxe.dnd.draggable` component makes any element draggable:
+
+**Key Properties:**
+- `type`: String identifier for drag type matching
+- `item`: Data object passed to drop handlers
+- `on_end`: Called when drag operation ends
+
+### Drop Target
+
+The `rxe.dnd.drop_target` component creates areas that accept draggable items:
+
+**Key Properties:**
+- `accept`: List of drag types this target accepts
+- `on_drop`: Called when item is dropped
+- `on_hover`: Called when item hovers over target
+
+### Collected Parameters
+
+Access real-time drag/drop state:
+
+**Draggable Parameters (`rxe.dnd.Draggable.collected_params`):**
+- `is_dragging`: Boolean indicating if item is being dragged
+
+**Drop Target Parameters (`rxe.dnd.DropTarget.collected_params`):**
+- `is_over`: Boolean indicating if draggable is hovering
+- `can_drop`: Boolean indicating if drop is allowed
+
+## Provider
+
+Drag and drop functionality requires the `rxe.dnd.provider` component to wrap your app. The provider is automatically added when using `draggable` or `drop_target` components.
+
+For manual control:
+
+```python
+def app():
+    return rxe.dnd.provider(
+        # Your app content
+        your_app_content(),
+        backend="HTML5"  # or "Touch" for mobile
+    )
+```
+
+## Best Practices
+
+1. **Always use `@rx.memo`** on functions containing draggable components
+2. **Use descriptive type names** for better debugging
+3. **Handle edge cases** in drop handlers (invalid items, etc.)
+4. **Provide visual feedback** using collected parameters
+5. **Test on mobile devices** with touch backend
+6. **Keep item data lightweight** for better performance
+
+---
+
+[← Back to main documentation]({enterprise.overview.path})
+
+
+# Single Port Proxy
+
+Enable single-port deployment by proxying the backend to the frontend port.
+
+## Configuration
+
+```python
+import reflex_enterprise as rxe
+
+config = rxe.Config(
+    use_single_port=True,
+)
+```
+
+This allows your application to run on a single port, which is useful for deployment scenarios where you can only expose one port.
+
+---
+title: Reflex Enterprise
+---
+
+# Reflex Enterprise
+
+```python exec
+from pcweb.pages.docs import enterprise
+import reflex as rx
+try:
+    import reflex_enterprise as rxe
+    from reflex_enterprise.components.ag_grid.resource import RendererParams
+except ImportError:
+    rxe = None
+    RendererParams = None
+```
+
+Reflex Enterprise is a package containing paid features built on top of Reflex.
+
+```md alert info
+# Despite being an enterprise package, free users can use the components from this package. A badge "Built with Reflex" will be shown in the bottom right corner of the app.
+For more information on the badge, visit [Built with Reflex]({enterprise.built_with_reflex.path}).
+```
+
+## Installation
+
+`reflex-enterprise` must be installed alongside `reflex` to access the enterprise features.
+
+You can install it from pypi with the following command:
 
 ```bash
 pip install reflex-enterprise
+```
+
+## Features
+
+```python exec
+# Create master data organized by category
+categories_data = [
+    {
+        "category": "Configuration",
+        "description": "Core enterprise features for deployment and branding",
+        "count": 2,
+        "components": [
+            {
+                "feature": "show_built_with_reflex", 
+                "description": "Toggle the 'Built with Reflex' badge in your app", 
+                "cloud_tier": "Pro", 
+                "self_hosted_tier": "Team",
+                "link": "/docs/enterprise/built-with-reflex",
+            },
+            {
+                "feature": "use_single_port", 
+                "description": "Enable single-port deployment by proxying backend to frontend", 
+                "cloud_tier": "Free", 
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/single-port-proxy",
+            },
+        ]
+    },
+    {
+        "category": "AGGrid and AGChart",
+        "description": "Advanced data visualization and grid components",
+        "count": 2,
+        "components": [
+            {
+                "feature": "AgGrid",
+                "description": "Advanced data grid with enterprise features (sorting, filtering, grouping)",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/ag-grid",
+            },
+            {
+                "feature": "AGCharts",
+                "description": "Interactive charts and data visualization components",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/ag-chart",
+            },
+        ]
+    },    
+    {
+        "category": "Interactive Components",
+        "description": "Interactive UI features including drag-and-drop and mapping",
+        "count": 2,
+        "components": [
+            {
+                "feature": "Drag and Drop",
+                "description": "Drag and drop functionality for interactive UI elements",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/drag-and-drop",
+            },
+            {
+                "feature": "Mapping",
+                "description": "Interactive maps with markers, layers, and controls",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/map",
+            },
+        ]
+    },
+    {
+        "category": "Mantine",
+        "description": "Rich UI components from Mantine library",
+        "count": 15,
+        "components": [
+            {
+                "feature": "Autocomplete",
+                "description": "Auto-completing text input with dropdown suggestions",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/autocomplete",
+            },
+            {
+                "feature": "Combobox",
+                "description": "Searchable dropdown with custom options and filtering",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/combobox",
+            },
+            {
+                "feature": "Multi Select",
+                "description": "Multi-selection dropdown with tags and search",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/multi-select",
+            },
+            {
+                "feature": "Tags Input",
+                "description": "Input field for creating and managing tags",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/tags-input",
+            },
+            {
+                "feature": "Json Input",
+                "description": "JSON editor with syntax highlighting and validation",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/json-input",
+            },
+            {
+                "feature": "Pill",
+                "description": "Small rounded elements for tags, badges, and labels",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/pill",
+            },
+            {
+                "feature": "Tree",
+                "description": "Hierarchical tree view with expandable nodes",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/tree",
+            },
+            {
+                "feature": "Timeline",
+                "description": "Timeline component for displaying chronological events",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/timeline",
+            },
+            {
+                "feature": "Number Formatter",
+                "description": "Format and display numbers with customizable formatting",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/number-formatter",
+            },
+            {
+                "feature": "Ring Progress",
+                "description": "Circular progress indicator with customizable styling",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/ring-progress",
+            },
+            {
+                "feature": "Semi Circle Progress",
+                "description": "Semi-circular progress indicator for dashboards",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/semi-circle-progress",
+            },
+            {
+                "feature": "Loading Overlay",
+                "description": "Loading overlay with spinner for async operations",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/loading-overlay",
+            },
+            {
+                "feature": "Spoiler",
+                "description": "Collapsible content container with show/hide toggle",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/spoiler",
+            },
+            {
+                "feature": "Collapse",
+                "description": "Animated collapsible content with smooth transitions",
+                "cloud_tier": "Free",
+                "self_hosted_tier": "Free",
+                "link": "/docs/enterprise/mantine/collapse",
+            },
+        ]
+    },
+]
+
+if rxe is not None:
+    @rxe.arrow_func
+    def custom_link_renderer(params: RendererParams):
+        """Custom cell renderer for links in AG Grid."""
+        return rx.link(
+            params.value,
+            href=params.data.link,
+        )
+
+    grid = rxe.ag_grid(
+    column_defs=[
+        {
+            "field": "category", 
+            "header_name": "Category", 
+            "cell_renderer": "agGroupCellRenderer",
+            "suppress_menu": True,
+            "width": 220,
+        },
+        {
+            "field": "description",
+            "width": 500,
+        },
+        {
+            "field": "count",
+            "header_name": "Components",
+            "width": 150,
+        },
+    ],
+    row_data=categories_data,
+    master_detail=True,
+    detail_cell_renderer_params={
+        "detail_grid_options": {
+            "column_defs": [
+                {
+                    "field": "feature", 
+                    "header_name": "Component/Feature", 
+                    "cell_renderer": custom_link_renderer, 
+                    "width": 250
+                },
+                {"field": "description", "header_name": "Description", "width": 350},
+                {"field": "cloud_tier", "header_name": "Cloud Tier", "width": 120},
+                {"field": "self_hosted_tier", "header_name": "Self-hosted Tier", "width": 140},
+            ],
+            "suppress_context_menu": True,
+            "row_height": 35,
+        },
+        "get_detail_row_data": lambda params: rx.vars.function.FunctionStringVar(
+            "params.successCallback"
+        ).call(params.data.components),
+    },
+    id="features-grid",
+    width="100%",
+    detail_row_height=200,
+    detail_row_auto_height=True,
+    height="400px",
+    loading=False,
+)
+    grid.api.set_grid_option("suppressContextMenu", True)
+else:
+    grid = rx.text("Reflex Enterprise not available. Install with: pip install reflex-enterprise")
+```
+
+```python eval
+grid
 ```
 
 ## Usage of reflex_enterprise.
@@ -16446,7 +17060,7 @@ Using `rxe.App` as your `app` is required to use any of the components provided 
 Instead of the usual `rx.App()` to create your app, use the following:
 ```python
 import reflex_enterprise as rxe
-rxe.App()
+app = rxe.App()
 ```
 
 ### In rxconfig.py
@@ -16458,9 +17072,2492 @@ config = rxe.Config(
 )
 ```
 
-## Pricing
+# AG Chart
 
-Unlike the open source `reflex` package, the `reflex-enterprise` package is free to use for all users but requires a paid tier to remove [branding](https://enterprise.reflex.dev/built-with-reflex/).
+AG Chart is a powerful charting library that provides interactive charts and data visualization components for enterprise applications.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def basic_chart():
+    return rxe.ag_chart(
+        options={
+            "data": [
+                {"month": "Jan", "value": 10},
+                {"month": "Feb", "value": 20},
+                {"month": "Mar", "value": 15},
+            ],
+            "series": [
+                {
+                    "type": "line",
+                    "xKey": "month",
+                    "yKey": "value",
+                }
+            ],
+        },
+        width="100%",
+        height="400px",
+    )
+```
+
+For more detailed documentation, see the [AG Chart Documentation](https://charts.ag-grid.com/).
+
+# Built with Reflex Badge
+
+The "Built with Reflex" badge appears in the bottom right corner of apps using reflex-enterprise components.
+
+## Removing the Badge
+
+To remove the badge, you need a paid tier:
+- **Cloud**: Pro tier or higher
+- **Self-hosted**: Team tier or higher
+
+## Configuration
+
+```python
+import reflex_enterprise as rxe
+
+config = rxe.Config(
+    show_built_with_reflex=False,  # Requires paid tier
+)
+```
+
+---
+title: Interactive Maps
+---
+
+# Interactive Maps
+
+```python exec
+import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
+```
+
+The map components in Reflex Enterprise provide interactive mapping capabilities built on top of **Leaflet**, one of the most popular open-source JavaScript mapping libraries. These components enable you to create rich, interactive maps with markers, layers, controls, and event handling.
+
+```md alert info
+# All map components are built using Leaflet and react-leaflet, providing a familiar and powerful mapping experience.
+For advanced Leaflet features, refer to the [Leaflet documentation](https://leafletjs.com/reference.html).
+```
+
+🌍 **[View Live Demo](https://map.reflex.run)** - See the map components in action with interactive examples.
+
+## Installation & Setup
+
+Map components are included with `reflex-enterprise`. No additional installation is required.
+
+## Basic Usage
+
+Here's a simple example of creating a map with a marker:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class MapState(rx.State):
+    center: rxe.map.LatLng = rxe.map.latlng(lat=51.505, lng=-0.09)
+    zoom: float = 13.0
+
+def basic_map():
+    return rxe.map(
+        rxe.map.tile_layer(
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        ),
+        rxe.map.marker(
+            rxe.map.popup("Hello from London!"),
+            position=MapState.center,
+        ),
+        id="basic-map",
+        center=MapState.center,
+        zoom=MapState.zoom,
+        height="400px",
+        width="100%",
+    )
+```
+
+## Core Components
+
+### Map Container
+
+The `rxe.map()` component is the primary container that holds all other map elements:
+
+```python
+rxe.map(
+    # Child components (markers, layers, controls)
+    id="my-map",
+    center=rxe.map.latlng(lat=51.505, lng=-0.09),
+    zoom=13,
+    height="400px",
+    width="100%"
+)
+```
+
+**Key Properties:**
+- `center`: Initial map center coordinates
+- `zoom`: Initial zoom level (0-18+ depending on tile provider)
+- `bounds`: Alternative to center/zoom, fits map to bounds
+- `height`/`width`: Map container dimensions
+
+### Tile Layers
+
+Tile layers provide the base map imagery. The most common is OpenStreetMap:
+
+```python
+rxe.map.tile_layer(
+    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution='&copy; OpenStreetMap contributors'
+)
+```
+
+
+### Markers
+
+Add point markers to specific locations:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def markers_example():
+    return rxe.map(
+        rxe.map.tile_layer(
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            attribution='&copy; OpenStreetMap contributors'
+        ),
+        rxe.map.marker(
+            rxe.map.popup(
+                rx.vstack(
+                    rx.text("Big Ben", weight="bold"),
+                    rx.text("Famous clock tower in London"),
+                    spacing="2"
+                )
+            ),
+            position=rxe.map.latlng(lat=51.4994, lng=-0.1245),
+        ),
+        rxe.map.marker(
+            rxe.map.popup("London Eye"),
+            position=rxe.map.latlng(lat=51.5033, lng=-0.1196),
+        ),
+        id="markers-map",
+        center=rxe.map.latlng(lat=51.501, lng=-0.122),
+        zoom=14,
+        height="400px",
+        width="100%",
+    )
+```
+
+### Vector Layers
+
+Draw shapes and areas on the map:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def vectors_example():
+    return rxe.map(
+        rxe.map.tile_layer(
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            attribution='&copy; OpenStreetMap contributors'
+        ),
+        # Circle (radius in meters)
+        rxe.map.circle(
+            center=rxe.map.latlng(lat=51.505, lng=-0.09),
+            radius=500,
+            path_options=rxe.map.path_options(
+                color="#ff0000",
+                fill_color="#ff3333",
+                fill_opacity=0.3,
+                weight=2
+            )
+        ),
+        # Polygon
+        rxe.map.polygon(
+            positions=[
+                rxe.map.latlng(lat=51.515, lng=-0.08),
+                rxe.map.latlng(lat=51.515, lng=-0.07),
+                rxe.map.latlng(lat=51.520, lng=-0.07),
+                rxe.map.latlng(lat=51.520, lng=-0.08),
+            ],
+            path_options=rxe.map.path_options(
+                color="#0000ff",
+                fill_color="#3333ff",
+                fill_opacity=0.3
+            )
+        ),
+        # Polyline
+        rxe.map.polyline(
+            positions=[
+                rxe.map.latlng(lat=51.500, lng=-0.095),
+                rxe.map.latlng(lat=51.510, lng=-0.085),
+                rxe.map.latlng(lat=51.515, lng=-0.095),
+            ],
+            path_options=rxe.map.path_options(
+                color="#00ff00",
+                weight=4
+            )
+        ),
+        id="vectors-map",
+        center=rxe.map.latlng(lat=51.510, lng=-0.08),
+        zoom=13,
+        height="400px",
+        width="100%",
+    )
+```
+
+## Interactive Features
+
+### Event Handling
+
+Maps support comprehensive event handling for user interactions:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class InteractiveMapState(rx.State):
+    last_click: str = "No clicks yet"
+    current_zoom: float = 13.0
+    
+    def handle_map_click(self, event):
+        lat = event.get("latlng", {}).get("lat", 0)
+        lng = event.get("latlng", {}).get("lng", 0)
+        self.last_click = f"Clicked at: {lat:.4f}, {lng:.4f}"
+    
+    def handle_zoom_change(self, event):
+        self.current_zoom = float(event.get("target", {}).get("_zoom", 13.0))
+
+def interactive_example():
+    return rx.vstack(
+        rx.text(f"Last click: {InteractiveMapState.last_click}"),
+        rx.text(f"Current zoom: {InteractiveMapState.current_zoom}"),
+        rxe.map(
+            rxe.map.tile_layer(
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                attribution='&copy; OpenStreetMap contributors'
+            ),
+            id="interactive-map",
+            center=rxe.map.latlng(lat=51.505, lng=-0.09),
+            zoom=InteractiveMapState.current_zoom,
+            height="350px",
+            width="100%",
+            on_click=InteractiveMapState.handle_map_click,
+            on_zoom=InteractiveMapState.handle_zoom_change,
+        ),
+        spacing="3"
+    )
+```
+
+### Map Controls
+
+Add UI controls for enhanced user interaction:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def controls_example():
+    return rxe.map(
+        rxe.map.tile_layer(
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            attribution='&copy; OpenStreetMap contributors'
+        ),
+        rxe.map.zoom_control(position="topright"),
+        rxe.map.scale_control(position="bottomleft"),
+        rxe.map.attribution_control(position="bottomright"),
+        id="controls-map",
+        center=rxe.map.latlng(lat=51.505, lng=-0.09),
+        zoom=13,
+        height="400px",
+        width="100%",
+    )
+```
+
+## Helper Functions
+
+### Coordinate Creation
+
+```python
+# Create latitude/longitude coordinates
+center = rxe.map.latlng(lat=51.505, lng=-0.09, nround=4)
+
+# Create bounds
+bounds = rxe.map.latlng_bounds(
+    corner1_lat=51.49, corner1_lng=-0.11,
+    corner2_lat=51.52, corner2_lng=-0.07
+)
+```
+
+## Map API
+
+The Map API provides programmatic control over your maps, allowing you to manipulate the map programmatically from your Reflex state methods.
+
+### Getting the API Reference
+
+To access the Map API, you need to get a reference to your map using its ID:
+
+```python
+map_api = rxe.map.api("my-map-id")
+```
+
+### Interactive Demo
+
+Here are some commonly used API methods demonstrated in action:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+map_api = rxe.map.api("api-demo-map")
+
+class MapAPIState(rx.State):
+    current_location: str = "London"
+    
+    def fly_to_london(self):
+        yield map_api.fly_to([51.505, -0.09], 13)
+        self.current_location = "London"
+    
+    def fly_to_paris(self):
+        yield map_api.fly_to([48.8566, 2.3522], 13)
+        self.current_location = "Paris"
+
+def map_api_example():
+    return rx.vstack(
+        rx.text(f"Current location: {MapAPIState.current_location}"),
+        rx.hstack(
+            rx.button("Fly to London", on_click=MapAPIState.fly_to_london),
+            rx.button("Fly to Paris", on_click=MapAPIState.fly_to_paris),
+            rx.button("Zoom Out", on_click=map_api.set_zoom(8)),
+            rx.button("Log Center", on_click=map_api.get_center(callback=rx.console_log)),
+            spacing="2"
+        ),
+        rxe.map(
+            rxe.map.tile_layer(
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                attribution='&copy; OpenStreetMap contributors'
+            ),
+            id="api-demo-map",
+            center=rxe.map.latlng(lat=51.505, lng=-0.09),
+            zoom=13.0,
+            height="350px",
+            width="100%",
+        ),
+        spacing="3"
+    )
+```
+
+### Common API Methods
+
+**View Control:**
+- `fly_to(latlng, zoom, options)` - Smooth animated movement to location
+- `set_view(latlng, zoom, options)` - Instant movement to location
+- `set_zoom(zoom)` - Change zoom level
+- `zoom_in()` / `zoom_out()` - Zoom by one level
+- `fit_bounds(bounds, options)` - Fit map to specific bounds
+
+**Location Services:**
+- `locate(options)` - Get user's current location
+- `stop_locate()` - Stop location tracking
+
+**Information Retrieval:**
+- `get_center(callback)` - Get current map center
+- `get_zoom(callback)` - Get current zoom level
+- `get_bounds(callback)` - Get current map bounds
+- `get_size(callback)` - Get map container size
+
+**Layer Management:**
+- `add_layer(layer)` - Add a layer to the map
+- `remove_layer(layer)` - Remove a layer from the map
+- `has_layer(layer)` - Check if layer exists on map
+
+### Full Leaflet API Access
+
+```md alert info
+# The Map API provides access to the complete Leaflet map API. Any method available on a Leaflet map instance can be called through the MapAPI instance.
+Function names are automatically converted from snake_case (Python) to camelCase (JavaScript).
+```
+
+This means you can use any method from the [Leaflet Map documentation](https://leafletjs.com/reference.html#map). For example:
+
+**Python (snake_case) → JavaScript (camelCase):**
+- `map_api.pan_to(latlng)` → `map.panTo(latlng)`
+- `map_api.set_max_bounds(bounds)` → `map.setMaxBounds(bounds)`
+- `map_api.get_pixel_bounds()` → `map.getPixelBounds()`
+- `map_api.container_point_to_lat_lng(point)` → `map.containerPointToLatLng(point)`
+
+### Advanced Example
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class AdvancedMapState(rx.State):
+    constraints_applied: bool = False
+    location_tracking: bool = False
+    location_status: str = "Location tracking disabled"
+    
+    def setup_map_constraints(self):
+        map_api = rxe.map.api("advanced-demo-map")
+        
+        # Set maximum bounds (restrict panning to London area)
+        max_bounds = rxe.map.latlng_bounds(
+            corner1_lat=51.4, corner1_lng=-0.3,
+            corner2_lat=51.6, corner2_lng=0.1
+        )
+        yield map_api.set_max_bounds(max_bounds)
+        
+        # Set min/max zoom levels
+        yield map_api.set_min_zoom(10)
+        yield map_api.set_max_zoom(16)
+        
+        # Disable scroll wheel zoom
+        yield map_api.scroll_wheel_zoom(False)
+        
+        self.constraints_applied = True
+    
+    def remove_constraints(self):
+        map_api = rxe.map.api("advanced-demo-map")
+        
+        # Remove bounds restriction
+        yield map_api.set_max_bounds(None)
+        
+        # Reset zoom limits
+        yield map_api.set_min_zoom(1)
+        yield map_api.set_max_zoom(18)
+        
+        # Re-enable scroll wheel zoom
+        yield map_api.scroll_wheel_zoom(True)
+        
+        self.constraints_applied = False
+    
+    def toggle_location_tracking(self):
+        map_api = rxe.map.api("advanced-demo-map")
+        
+        if self.location_tracking == False:
+            # Start location tracking
+            locate_options = rxe.map.locate_options(
+                set_view=True,
+                max_zoom=16,
+                timeout=10000,
+                enable_high_accuracy=True,
+                watch=False  # Single location request
+            )
+            yield map_api.locate(locate_options)
+            self.location_tracking = True
+            self.location_status = "Requesting location..."
+        else:
+            # Stop location tracking
+            yield map_api.stop_locate()
+            self.location_tracking = False
+            self.location_status = "Location tracking disabled"
+
+def advanced_example():
+    return rx.vstack(
+        rx.hstack(
+            rx.button(
+                rx.cond(AdvancedMapState.constraints_applied, "Remove Constraints", "Apply Constraints"),
+                on_click=rx.cond(AdvancedMapState.constraints_applied, AdvancedMapState.remove_constraints, AdvancedMapState.setup_map_constraints),
+                color_scheme="blue"
+            ),
+            rx.button(
+                rx.cond(AdvancedMapState.location_tracking, "Disable Location", "Enable Location"),
+                on_click=AdvancedMapState.toggle_location_tracking,
+                color_scheme="green"
+            ),
+            spacing="3"
+        ),
+        rx.text(f"Status: {AdvancedMapState.location_status}"),
+        rx.text(
+            rx.cond(
+                AdvancedMapState.constraints_applied,
+                "Constraints: Applied (restricted to London area, zoom 10-16, no scroll wheel)",
+                "Constraints: None"
+            )
+        ),
+        rxe.map(
+            rxe.map.tile_layer(
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                attribution='&copy; OpenStreetMap contributors'
+            ),
+            rxe.map.marker(
+                rxe.map.popup("Try panning and zooming when constraints are applied!"),
+                position=rxe.map.latlng(lat=51.505, lng=-0.09),
+            ),
+            id="advanced-demo-map",
+            center=rxe.map.latlng(lat=51.505, lng=-0.09),
+            zoom=12.0,
+            height="400px",
+            width="100%",
+            on_locationfound=lambda e: AdvancedMapState.setvar("location_status", "Location found!"),
+            on_locationerror=lambda e: AdvancedMapState.setvar("location_status", "Location error - permission denied or unavailable"),
+        ),
+        spacing="3"
+    )
+```
+
+### Callback Handling
+
+Many API methods that retrieve information require callbacks to handle the results:
+
+```python
+class CallbackMapState(rx.State):
+    map_info: str = ""
+    
+    def handle_center_result(self, result):
+        lat = result.get("lat", 0)
+        lng = result.get("lng", 0)
+        self.map_info = f"Center: {lat:.4f}, {lng:.4f}"
+    
+    def handle_bounds_result(self, result):
+        # result will contain bounds information
+        self.map_info = f"Bounds: {result}"
+    
+    def get_map_info(self):
+        map_api = rxe.map.api("info-map")
+        yield map_api.get_center(self.handle_center_result)
+        # or
+        yield map_api.get_bounds(self.handle_bounds_result)
+```
+
+## Available Events
+
+The map components support a comprehensive set of events:
+
+**Map Events:**
+- `on_click`, `on_dblclick` - Mouse click events
+- `on_zoom`, `on_zoom_start`, `on_zoom_end` - Zoom events
+- `on_move`, `on_move_start`, `on_move_end` - Pan events
+- `on_resize` - Map container resize
+- `on_load`, `on_unload` - Map lifecycle
+
+**Location Events:**
+- `on_locationfound`, `on_locationerror` - Geolocation
+
+**Layer Events:**
+- `on_layeradd`, `on_layerremove` - Layer management
+
+**Popup Events:**
+- `on_popupopen`, `on_popupclose` - Popup lifecycle
+- `on_tooltipopen`, `on_tooltipclose` - Tooltip lifecycle
+
+## Common Patterns
+
+### Dynamic Markers
+
+```python
+class DynamicMapState(rx.State):
+    markers: list[dict] = [
+        {"lat": 51.505, "lng": -0.09, "title": "London"},
+        {"lat": 48.8566, "lng": 2.3522, "title": "Paris"},
+        {"lat": 52.5200, "lng": 13.4050, "title": "Berlin"},
+    ]
+
+def dynamic_markers():
+    return rxe.map(
+        rxe.map.tile_layer(url="..."),
+        rx.foreach(
+            DynamicMapState.markers,
+            lambda marker: rxe.map.marker(
+                rxe.map.popup(marker["title"]),
+                position=rxe.map.latlng(
+                    lat=marker["lat"], 
+                    lng=marker["lng"]
+                )
+            )
+        ),
+        # ... map configuration
+    )
+```
+
+
+## Best Practices
+
+1. **Always include attribution** for tile providers
+2. **Set reasonable zoom levels** (typically 1-18)
+3. **Use bounds for multiple markers** instead of arbitrary center/zoom
+4. **Handle loading states** for dynamic map content
+5. **Optimize marker rendering** for large datasets using clustering
+6. **Test on mobile devices** for touch interactions
+
+---
+
+[← Back to main documentation]({enterprise.overview.path})
+
+---
+title: Collapse
+---
+
+# Collapse component
+
+`rxe.mantine.collapse` is a component that allows you to create collapsible sections in your application. It is useful for hiding or showing content based on user interaction, such as clicking a button or a link.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class CollapseState(rx.State):
+    is_open: bool = False
+
+    @rx.event
+    def toggle_collapse(self):
+        self.is_open = not self.is_open
+
+def collapse_example():
+    return rx.vstack(
+        rxe.mantine.collapse(
+            rx.text(
+                "This is a collapsible section. Click the button to toggle the collapse.",
+                font_size="lg",
+            ),
+            in_=CollapseState.is_open,
+            label="Collapsible Section",
+            description="Click the button to toggle the collapse.",
+        ),
+        rx.button(
+            "Toggle Collapse", 
+            on_click=lambda: CollapseState.toggle_collapse,
+        ),
+    )
+```
+
+---
+title: Tree
+---
+
+# Tree component
+
+`rxe.mantine.tree` is a component for displaying hierarchical data in a tree structure. It allows users to expand and collapse nodes, making it easy to navigate through large datasets.
+
+```md alert warning
+# Due to some technical limitations(pydantic), the tree component only supports 5 levels of depths for the `data` props.
+```
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def tree_example():
+    # return rx.text("Placeholder for tree example")
+    return rxe.mantine.tree(
+        data=[
+            {
+                "value": "0",
+                "label": "Root",
+                "children": [
+                    {"value": "0-1", "label": "Child 1"},
+                    {"value": "0-2", "label": "Child 2"},
+                ],
+            }
+        ],
+    )
+```
+
+---
+title: Number Formatter
+---
+
+# Number Formatter component
+`rxe.mantine.number_formatter` is a component for formatting numbers in a user-friendly way. It allows you to specify the format, precision, and other options for displaying numbers.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def number_formatter_example():
+    return rx.vstack(
+        rxe.mantine.number_formatter(
+            value=100,
+            prefix="$",
+        ),
+        rxe.mantine.number_formatter(
+            value=100,
+            suffix="€",
+        ),
+        rxe.mantine.number_formatter(
+            value=1234567.89,
+            thousand_separator=True,
+        ),
+    )
+```
+
+---
+title: Ring Progress
+---
+
+# Ring Progress component
+
+`rxe.mantine.ring_progress` is a component for displaying progress in a circular format. It is useful for visualizing completion percentages or other metrics in a compact and visually appealing way.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import random
+
+class RingProgressState(rx.State):
+    value: int = 50
+
+    @rx.event
+    def random(self):
+        self.value = random.randint(0, 100)
+
+def ring_progress_example():
+    return rx.vstack(
+        rxe.mantine.ring_progress(
+            size=100,
+            sections=[
+                {"value": RingProgressState.value, "color": "blue"},
+            ],
+        ),
+        rx.button("Randomize", on_click=RingProgressState.random),
+    )
+```
+
+---
+title: Timeline
+---
+
+# Timeline component
+`rxe.mantine.timeline` is a component for displaying a sequence of events or milestones in a linear format. It is useful for visualizing progress, history, or any sequential information.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def timeline_example():
+    return rx.vstack(
+        rxe.mantine.timeline(
+            rxe.mantine.timeline.item(
+                title="Step 1",
+                bullet="•",
+            ),
+            rxe.mantine.timeline.item(
+                title="Step 2",
+                bullet="•",
+            ),
+            rxe.mantine.timeline.item(
+                title="Step 3",
+                bullet="•",
+            ),
+            active=1,
+            bullet_size=24,
+            line_width=2,
+            color="blue",
+            
+        )
+    )
+```
+
+---
+title: TagsInput
+---
+
+# TagsInput
+
+`rxe.mantine.tags_input` is a wrapping of the mantine component [TagsInput](https://mantine.dev/core/tags-input/). It is an utility component that can be used to display a list of tags or labels. It can be used in various contexts, such as in a form or as a standalone component.
+
+```md alert info
+# You can use the props mentioned in the Mantine documentation, but they need to be passed in snake_case.
+```
+
+## Basic Example
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def tags_input_simple_page():
+    """TagsInput demo."""
+    return rxe.mantine.tags_input(
+        placeholder="Enter tags",
+        label="Press Enter to ad a tag",
+    )
+```
+
+## State Example
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class TagsInputState(rx.State):
+    """State for the TagsInput component."""
+
+    tags: list[str] = ["Tag1", "Tag2"]
+
+    @rx.event
+    def update_tags(self, tags: list[str]):
+        """Add a tag to the list of tags."""
+        self.tags = tags
+
+def tags_input_page():
+    """TagsInput demo."""
+    return rxe.mantine.tags_input(
+        value=TagsInputState.tags,
+        on_change=TagsInputState.update_tags,
+        placeholder="Enter tags",
+        label="TagsInput",
+        description="This is a TagsInput component",
+        error="",
+        size="md",
+        radius="xl",
+    )
+```
+
+---
+title: Combobox
+---
+
+```python exec
+import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
+```
+
+# Combobox
+
+`rxe.mantine.combobox` is a wrapping of the mantine component [Combobox](https://mantine.dev/core/combobox/). It is a simple component that can be used to display a list of options, and allows the user to select one or more options from the list. It can be used in various contexts, such as in a form or as a standalone component.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+
+def combobox_page():
+    """Combobox demo."""
+    return rxe.mantine.combobox(
+        rxe.mantine.combobox.target(
+            rx.input(type="button"),
+        ),
+        rxe.mantine.combobox.dropdown(
+            rxe.mantine.combobox.options(
+                rxe.mantine.combobox.option("Option 1"),
+                rxe.mantine.combobox.option("Option 2"),
+                rxe.mantine.combobox.option("Option 3"),
+            ),
+        ),
+        label="Combobox",
+        placeholder="Select a value",
+    )
+```
+
+
+
+---
+title: Loading Overlay
+---
+
+# Loading Overlay component
+`rxe.mantine.loading_overlay` is a component that displays a loading overlay on top of its children. It is useful for indicating that a process is ongoing and prevents user interaction with the underlying content.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class LoadingOverlayState(rx.State):
+    loading: bool = False
+
+    @rx.event
+    def toggle_loading(self):
+        self.loading = not self.loading
+
+def loading_overlay_example():
+    return rx.container(
+        rxe.mantine.loading_overlay(
+            rx.text(
+                "Loading Overlay Example",
+                height="200px",
+                width="100px",
+            ),
+            overlay_props={"radius": "sm", "blur": 2},
+            visible=LoadingOverlayState.loading,
+            z_index=1000,
+        ),
+    ),rx.button("Toggle Loading", on_click=LoadingOverlayState.toggle_loading),
+```
+
+---
+title: MultiSelect
+---
+
+# MultiSelect component
+
+`rxe.mantine.multi_select` is a component for selecting multiple options from a list. It allows users to choose one or more items, making it suitable for scenarios where multiple selections are required.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class MultiSelectState(rx.State):
+    selected_fruits: list = []
+
+
+def multi_select_example():
+    return rx.vstack(
+        rxe.mantine.multi_select(
+            label="Select fruits",
+            placeholder="Pick all that you like",
+            data=["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+            value=MultiSelectState.selected_fruits,
+            on_change=lambda value: MultiSelectState.setvar("selected_fruits", value),
+        )
+    )
+```
+
+---
+title: Semi Circle Progress
+---
+
+# Semi Circle Progress component
+`rxe.mantine.semi_circle_progress` is a component for displaying progress in a semi-circular format. It is useful for visualizing completion percentages or other metrics in a compact and visually appealing way.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import random
+
+class SemiCircleProgressState(rx.State):
+    value: int = 50
+
+    @rx.event
+    def random(self):
+        self.value = random.randint(0, 100)
+
+def semi_circle_progress_example():
+    return rx.vstack(
+        rxe.mantine.semi_circle_progress(
+            size=100,
+            value=SemiCircleProgressState.value,
+        ),
+        rx.button("Randomize", on_click=SemiCircleProgressState.random),
+    )
+```
+
+---
+title: JSON Input
+---
+
+# JSON Input
+
+`rxe.mantine.json_input` is a component that allows you to input JSON data in a user-friendly way. It provides validation and formatting features to ensure that the JSON data is correctly structured.
+
+## Example
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class JsonInputState(rx.State):
+    json_data: str = ''
+
+def json_input_example():
+    return rxe.mantine.json_input(
+        id="json-input",
+        value=JsonInputState.json_data,
+        placeholder="Enter JSON data",
+        label="JSON Input",
+        description="Please enter valid JSON data.",
+        required=True,
+        size="md",
+        format_on_blur=True,
+        on_change=lambda value: JsonInputState.setvar("json_data", value),
+        width="300px",
+    )
+```
+
+---
+title: Pill
+---
+
+```python exec
+import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
+```
+
+# Pill
+
+`rxe.mantine.pill` is a wrapping of the mantine component [Pill](https://mantine.dev/core/pill/). It is a simple component that can be used to display a small piece of information, such as a tag or a label. It can be used in various contexts, such as in a list of tags or labels, or as a standalone component.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def pill_page():
+    """Pill demo."""
+    return rxe.mantine.pill(
+        "Pill",
+        color="blue",
+        size="md",
+        variant="outline",
+        radius="xl",
+        with_remove_button=True,
+        on_remove=lambda: rx.toast("Pill on_remove triggered"),
+    )
+```
+
+## Pill Group
+`rxe.mantine.pill.group` allows grouping multiple `rxe.mantine.pill` components together, with a predefined layout.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def pill_group_page():
+    """Pill demo."""
+    return rxe.mantine.pill.group(
+        rxe.mantine.pill("Pill 1"),
+        rxe.mantine.pill("Pill 2"),
+    )
+```
+
+
+# PillsInput
+
+`rxe.mantine.pills_input` is a wrapping of the mantine component [PillsInput](https://mantine.dev/core/pills-input/). It is an utility component that can be used to display a list of tags or labels. It can be used in various contexts, such as in a form or as a standalone component.
+By itself it does not include any logic, it only renders given children.
+
+```md alert info
+# For a fully functional out-of-the-box component, consider using [`rxe.mantine.tags_input`]({docs.mantine.tags_input.route}) instead.
+```
+
+## Example
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+class PillInputState(rx.State):
+    """State for the PillsInput demo."""
+
+    tags: set[str] = {"Foo", "Bar"}
+
+    @rx.event
+    def add_tag(self, tag: str):
+        """Add a tag to the list of tags."""
+        self.tags.add(tag)
+
+    @rx.event
+    def remove_tag(self, tag: str):
+        """Remove a tag from the list of tags."""
+        self.tags.remove(tag)
+
+def pills_input_page():
+    """PillsInput demo."""
+    return rxe.mantine.pills_input(
+        rxe.mantine.pill.group(
+            rx.foreach(
+                PillInputState.tags, lambda tag: rxe.mantine.pill(tag, with_remove_button=True, on_remove=PillInputState.remove_tag(tag))
+            ),
+            rxe.mantine.pills_input.field(
+                placeholder="Enter tags",
+                # on_blur=PillInputState.add_tag,
+            ),
+        ),
+        label="PillsInput",
+        id="pills-input",
+        value=["tag1", "tag2"],
+    )
+```
+
+
+---
+title: Mantine
+order: 4
+---
+
+# Mantine
+
+Mantine is a React component library that provides a set of high-quality components and hooks for building modern web applications. It is designed to be flexible, customizable, and easy to use, making it a popular choice among developers.
+
+Some of those components have been integrated into Reflex Enterprise, allowing you to use them in your Reflex applications. The following components are available:
+- JsonInput
+- Autocomplete
+- ComboBox
+- Multiselect
+- Pill
+- PillsInput
+- TagsInput
+- Tree
+- RingProgress
+- SemiCircleProgress
+- LoadingOverlay
+- NumberFormatter
+- Spoiler
+- Timeline
+- Collapse
+
+
+
+---
+title: Autocomplete
+---
+
+# Autocomplete component
+
+`rxe.mantine.autocomplete` is a component for providing suggestions as the user types. It is useful for enhancing user experience by offering relevant options based on input.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def autocomplete_example():
+    return rx.vstack(
+        rxe.mantine.autocomplete(
+            data=["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+            placeholder="Type a fruit",
+            label="Fruit Autocomplete",
+            description="Select a fruit from the list",
+        ),
+    )
+```
+
+---
+title: Spoiler
+---
+
+# Spoiler component
+
+`rxe.mantine.spoiler` is a component that allows you to hide or reveal content. It is useful for displaying additional information or details that may not be immediately relevant to the user.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+
+def spoiler_example():
+    return rx.vstack(
+        rxe.mantine.spoiler(
+            "This is a spoiler zone where lorem ipsum text dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+            max_height=50,
+            show_label="Show more",
+            hide_label="Show less",
+        ),
+    )
+```
+
+```python exec
+import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
+```
+
+# Pivot Mode
+
+Pivot mode allows you to visualize your data in a different way than how they are originally structured in the data source. When pivoting on a column, the values in that column will be used as column headers. This allows you to see the data in a more compact way, and can be useful when you have a lot of data to display.
+
+To enable pivot mode, set the `pivot_mode` property to `True` in the grid props. Once pivot mode is enabled, you can define which column to pivot on by setting the `pivot` property in a column definition. In addition to the pivot column, at least one column definition must have `row_group` property set to `True` to define the row grouping.
+
+You can also define how rows are aggregated by passing the `agg_func` property in the column definition. The `agg_func` property should be set to a string that represents the aggregation function to use. The built-in aggregation functions are `sum`, `min`, `max`, `count`, `avg`, `first`, and `last`.
+
+You can find a live example here: [Pivot Mode Example](https://aggrid.reflex.run/pivot).
+
+```python demo exec toggle
+import pandas as pd
+import reflex as rx
+
+import reflex_enterprise as rxe
+
+df = pd.read_json("https://www.ag-grid.com/example-assets/olympic-winners.json")
+
+def pivot_page():
+    return rxe.ag_grid(
+        id="sandbox_grid",
+        column_defs=[
+            {"field": "country", "row_group": True},
+            {"field": "sport", "pivot": True},
+            {"field": "year", "pivot": True},
+            {"field": "gold", "aggFunc": "sum"},
+        ],
+        loading=False,
+        row_data=df.to_dict("records"),
+        default_col_def={
+            "flex": 1,
+            "min_width": 130,
+            "enable_value": True,
+            "enable_row_group": True,
+            "enable_pivot": True,
+        },
+        auto_group_column_def={
+            "minWidth": 200,
+            "pinned": "left",
+        },
+        pivot_mode=True,
+        side_bar="columns",
+        pivot_panel_show="always",
+        width="100%",
+        height="500px",
+        ),
+```
+
+# Pivot using State
+
+```python demo exec toggle
+import pandas as pd
+import reflex as rx
+
+import reflex_enterprise as rxe
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/plotly/datasets/master/wind_dataset.csv"
+)
+
+
+class PivotState(rx.State):
+    """State for the sandbox page."""
+
+    pivot = False
+    row_grouping = False
+
+    @rx.event
+    def toggle_pivot(self):
+        """Toggle the pivot."""
+        self.pivot = not self.pivot
+
+    @rx.event
+    def toggle_row_grouping(self):
+        """Toggle the row grouping."""
+        self.row_grouping = not self.row_grouping
+
+
+def sandbox_page():
+    """Sandbox page."""
+    return rx.vstack(
+        rx.hstack(
+            rx.text("Toggle Pivot"),
+            rx.switch(
+                on_click=PivotState.toggle_pivot,
+                name="pivot",
+                checked=PivotState.pivot,
+            ),
+            rx.text("Toggle Row Grouping"),
+            rx.switch(
+                on_click=PivotState.toggle_row_grouping,
+                name="row_grouping",
+                checked=PivotState.row_grouping,
+            )
+        ),
+        rxe.ag_grid(
+            id="sandbox_grid",
+            column_defs=[
+                rxe.ag_grid.column_def(
+                    field="direction",
+                    pivot=True,
+                ),
+                rxe.ag_grid.column_def(
+                    field="strength",
+                ),
+                rxe.ag_grid.column_def(
+                    field="frequency",
+                    agg_func="count",
+                    row_group=PivotState.row_grouping,
+                ),
+            ],
+            row_data=df.to_dict("records"),
+            pivot_mode=PivotState.pivot,
+            pivot_panel_show="onlyWhenPivoting",
+            width="100%",
+            height="500px",
+        ),
+        width="100%",
+    )
+
+```
+
+
+
+
+---
+order: 3
+---
+
+```python exec
+import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
+```
+
+# Themes
+
+```md alert warning
+# Only the old theme API of AG Grid is currently supported. The new theme API is not supported yet.
+```
+
+You can style your grid with a theme. AG Grid includes the following themes:
+
+1. `quartz`
+2. `alpine`
+3. `balham`
+4. `material`
+
+The grid uses `quartz` by default. To use any other theme, set it using the `theme` prop, i.e. `theme="alpine"`.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+class AGGridThemeState(rx.State):
+    """The app state."""
+
+    theme: str = "quartz"
+    themes: list[str] = ["quartz", "balham", "alpine", "material"]
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+column_defs = [
+    {"field": "country"},
+    {"field": "pop", "headerName": "Population"},
+    {"field": "lifeExp", "headerName": "Life Expectancy"},
+]
+
+def ag_grid_simple_themes():
+    return rx.vstack(
+        rx.hstack(
+            rx.text("Theme:"),
+            rx.select(AGGridThemeState.themes, value=AGGridThemeState.theme, on_change=AGGridThemeState.set_theme),
+        ),
+        rxe.ag_grid(
+            id="ag_grid_basic_themes",
+            row_data=df.to_dict("records"),
+            column_defs=column_defs,
+            theme=AGGridThemeState.theme,
+            width="100%",
+            height="40vh",
+        ),
+        width="100%",
+    )
+```
+
+[AG Grid]({docs.ag_grid.index.route})
+
+---
+order: 2
+---
+
+```python exec
+import reflex as rx
+import reflex_enterprise as rxe
+from pcweb.pages.docs import enterprise
+```
+
+# Value Transformers
+
+AgGrid allow you to apply transformers based on the column of your grid. This allow you to perform operations on the data before displaying it on the grid, without having to pre-process the data on the backend, reducing the load on your application.
+
+TOC:
+- [Value Getter](#value-getter)
+- [Value Formatter](#value-formatter)
+
+## Value Getter
+
+`value_getter` is a property of the column definition that allows you to define a function that will be called to get the value of the cell. This function will receive the row data as a parameter and should return the value to be displayed on the cell.
+
+If you have two columns `col_a` and `col_b` and you want to display the sum of these two columns in a third column `sum`, you can define the `value_getter` of `sum` as follows:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.DataFrame({"col_a": [1, 2, 3, 4, 5], "col_b": [10, 20, 30, 40, 50]})
+
+column_defs = [
+    {"field": "col_a", "header_name": "Column A"},
+    {"field": "col_b", "header_name": "Column B"},
+    {"field": "sum", "header_name": "Sum", "value_getter": "params.data.col_a + params.data.col_b"},
+    rxe.ag_grid.column_def(field="diff", header_name="Difference", value_getter="params.data.col_b - params.data.col_a"),
+]
+
+def ag_grid_value_getter():
+    return rxe.ag_grid(
+        id="ag_grid_value_getter",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        width="100%",
+    )
+```
+
+## Value Formatter
+
+`value_formatter` is a property of the column definition that allows you to define a function that will be called to format the value of the cell. This function will receive the value of the cell as a parameter and should return the formatted value to be displayed on the cell.
+
+If you have a column `price` and you want to display the price with a currency symbol, you can define the `value_formatter` of `price` as follows:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+df = pd.DataFrame({"product_name":["Product A", "Product B", "Product C", "Product D", "Product E"], "price": [100, 200, 300, 400, 500]})
+column_defs = [
+    {"field": "product_name", "header_name": "Product Name"},
+    {"field": "price", "header_name": "Price ($)", "value_formatter": "'$' + params.value"},
+    rxe.ag_grid.column_def(col_id="price_eur", header_name="Price (€)", value_formatter="params.data.price + ' €'"),
+]
+
+def ag_grid_value_formatter():
+    return rxe.ag_grid(
+        id="ag_grid_value_formatter",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        width="100%",
+    )
+```
+
+
+
+
+# AGGrid Undocumented Features Documentation Guideline
+
+## Overview
+
+This document outlines the comprehensive list of undocumented AGGrid features in reflex-enterprise that should be documented to provide users with complete coverage of available functionality. The current documentation covers approximately 20% of available features.
+
+## Priority Levels
+
+- **🔴 HIGH**: Core enterprise features that provide significant business value
+- **🟡 MEDIUM**: Advanced features that enhance functionality 
+- **🟢 LOW**: Specialized features for specific use cases
+
+---
+
+## 🔴 HIGH PRIORITY Features
+
+### 1. Model Wrapper System
+**Files**: `wrapper.py`, `handlers.py`, `datasource.py`
+
+The ModelWrapper system provides ORM-like integration with databases:
+- **ModelWrapper**: Basic wrapper for SQLModel integration
+- **ModelWrapperSSRM**: Server-side row model with advanced features
+- **Authorization**: Row-level security with `_is_authorized`
+- **CRUD Operations**: Built-in dialogs for add/edit/delete
+- **Auto Column Generation**: Automatic column definitions from model fields
+
+**Documentation Needed**:
+- Complete ModelWrapper guide with examples
+- Authorization system documentation
+- Database integration patterns
+- CRUD operation configuration
+
+### 2. Server-Side Row Model (SSRM)
+**Files**: `datasource.py`, demo files with SSRM
+
+Enterprise-grade server-side data handling:
+- **Custom Datasource**: Backend data integration
+- **Filtering**: Server-side filter application
+- **Sorting**: Database-level sorting
+- **Pagination**: Efficient large dataset handling
+- **Caching**: Performance optimization
+
+**Documentation Needed**:
+- Complete SSRM setup guide
+- Backend integration examples
+- Performance optimization tips
+- Troubleshooting common issues
+
+### 3. Master Detail Views
+**Files**: `master_detail.py` demo, grid configuration
+
+Hierarchical data display with nested grids:
+- **Configuration**: `master_detail=True` setup
+- **Detail Renderers**: Custom detail cell renderers
+- **Data Structure**: Parent-child relationships
+- **Events**: Master-detail interaction events
+
+**Documentation Needed**:
+- Master-detail setup guide
+- Data structure requirements
+- Custom detail renderer examples
+- Performance considerations
+
+### 4. Enterprise Charts Integration
+**Files**: `integrated_charts.py` demo
+
+Built-in charting capabilities:
+- **Chart Types**: Bar, line, pie, etc.
+- **Configuration**: Chart themes and customization
+- **Events**: Chart creation and interaction
+- **Data Binding**: Automatic chart data from grid
+
+**Documentation Needed**:
+- Chart integration guide
+- Available chart types
+- Customization options
+- Chart event handling
+
+---
+
+## 🟡 MEDIUM PRIORITY Features
+
+### 5. Advanced Filtering System
+**Files**: `handlers.py`, filter implementations
+
+Server-side and client-side filtering:
+- **Filter Types**: Text, number, date, set filters
+- **Custom Filters**: User-defined filter logic
+- **Filter Events**: Filter change handling
+- **Filter State**: Save/restore filter configurations
+
+### 6. Cell Selection & Range Selection
+**Files**: Grid configuration, selection demos
+
+Advanced selection capabilities:
+- **Cell Selection**: Individual cell selection
+- **Range Selection**: Multi-cell range selection
+- **Selection Events**: Selection change callbacks
+- **Selection API**: Programmatic selection control
+
+### 7. Advanced Column Features
+**Files**: Column definitions, spanning examples
+
+Enhanced column functionality:
+- **Column Spanning**: Merged cells across columns/rows
+- **Column Grouping**: Nested column headers
+- **Column Types**: Reusable column definitions
+- **Column State**: Save/restore column configurations
+
+### 8. Pivot Mode
+**Files**: `pivot.py` demo
+
+Dynamic data pivoting:
+- **Pivot Configuration**: Row/column grouping
+- **Aggregation**: Data summarization
+- **Dynamic Columns**: Runtime column generation
+- **Pivot Events**: Pivot state changes
+
+### 9. Tree Data & Hierarchical Display
+**Files**: `tree.py` demo
+
+Tree-like data structures:
+- **Tree Configuration**: Hierarchy setup
+- **Grouping**: Data grouping options
+- **Expand/Collapse**: Tree node interaction
+- **Tree Events**: Node state changes
+
+---
+
+## 🟢 LOW PRIORITY Features
+
+### 10. Advanced Export/Import
+- **Excel Export**: Advanced export configurations
+- **CSV Export**: Custom formatting options
+- **Clipboard Operations**: Copy/paste enhancements
+- **Data Processing**: Import/export data transformation
+
+### 11. Accessibility Features
+- **Screen Reader Support**: ARIA attributes
+- **Keyboard Navigation**: Custom navigation handling
+- **High Contrast**: Accessibility-friendly themes
+- **Touch Support**: Mobile interaction optimization
+
+### 12. Performance Optimizations
+- **Virtualization**: Row/column virtualization controls
+- **Caching**: Row caching strategies
+- **Debouncing**: Scroll and load debouncing
+- **Memory Management**: Large dataset handling
+
+### 13. Advanced UI Features
+- **Custom Renderers**: Cell renderer gallery
+- **Loading States**: Custom loading indicators
+- **Status Panels**: Grid status components
+- **Tooltips**: Advanced tooltip configuration
+
+### 14. State Management
+- **Grid State**: Complete state serialization
+- **Persistence**: State save/restore
+- **Initial State**: Default configurations
+- **State Events**: State change notifications
+
+---
+
+## Documentation Structure Recommendations
+
+### For Each Feature Category:
+
+1. **Overview**: What the feature does and when to use it
+2. **Basic Setup**: Minimal configuration example
+3. **Configuration Options**: Complete property reference
+4. **Advanced Examples**: Real-world use cases
+5. **Best Practices**: Performance and usability tips
+6. **Troubleshooting**: Common issues and solutions
+7. **API Reference**: Methods and events
+8. **Related Features**: Cross-references to related functionality
+
+### Code Examples Should Include:
+
+- **Minimal Example**: Basic feature usage
+- **Complete Example**: Production-ready implementation
+- **Integration Example**: How it works with other features
+- **Backend Integration**: Server-side code where applicable
+
+### Documentation Files Needed:
+
+1. `server-side-row-model.md` - Complete SSRM guide
+2. `model-wrapper.md` - Enhanced model wrapper documentation
+3. `master-detail.md` - Master-detail implementation guide
+4. `charts-integration.md` - Chart features documentation
+5. `advanced-filtering.md` - Filtering system guide
+6. `selection-modes.md` - Selection capabilities
+7. `pivot-mode.md` - Enhanced pivot documentation
+8. `tree-data.md` - Tree data structures
+9. `performance-optimization.md` - Performance best practices
+10. `enterprise-features.md` - Complete enterprise feature overview
+
+---
+
+## Implementation Notes
+
+- **Current Gap**: ~80% of features are undocumented
+- **Demo Coverage**: Many features have demo implementations but lack documentation
+- **Enterprise Focus**: Most undocumented features are enterprise-grade capabilities
+- **Integration Complexity**: Features often work together and need cross-references
+- **Backend Requirements**: Many features require server-side implementation examples
+
+---
+
+## Next Steps
+
+1. **Prioritize** documentation based on user needs and feature complexity
+2. **Create** comprehensive guides for HIGH priority features first
+3. **Enhance** existing documentation with missing configuration options
+4. **Add** cross-references between related features
+5. **Validate** all examples with working demo implementations
+6. **Review** with users to ensure documentation meets real-world needs
+
+This guideline provides a roadmap for creating comprehensive AGGrid documentation that matches the full scope of implementation in reflex-enterprise.
+
+---
+title: Aligned Grids
+---
+
+AgGrid provides a way to align multiple grids together. This is useful when you want to display related data in a synchronized manner.
+
+You can do so through the `aligned_grids` prop. This prop takes a list of grid IDs that you want to align. 
+
+```python demo exec toggle
+import pandas as pd
+
+import reflex_enterprise as rxe
+
+df = pd.read_json("https://www.ag-grid.com/example-assets/olympic-winners.json")
+
+row_data = df.to_dict("records")
+
+column_defs = [
+    {"field": "athlete"},
+    {"field": "age"},
+    {"field": "country"},
+    {"field": "year"},
+    {"field": "sport"},
+    {
+        "header_name": "Medals",
+        "children": [
+            {
+                "field": "total",
+                "column_group_show": "closed",
+                "col_id": "total",
+                "value_getter": "params.data.gold + params.data.silver + params.data.bronze",
+                "width": 100,
+            },
+            {"field": "gold", "column_group_show": "open", "width": 100},
+            {"field": "silver", "column_group_show": "open", "width": 100},
+            {"field": "bronze", "column_group_show": "open", "width": 100},
+        ],
+    },
+]
+
+def aligned_grids_page():
+    """Aligned grids demo."""
+    return rxe.ag_grid(
+        id="grid1",
+        column_defs=column_defs,
+        row_data=row_data,
+        aligned_grids=["grid2"],
+        width="100%",
+    ), rxe.ag_grid(
+        id="grid2",
+        column_defs=column_defs,
+        row_data=row_data,
+        aligned_grids=["grid1"],
+        width="100%",
+    )
+
+```
+
+```md alert warning
+# The pivot functionality does not work with aligned grids. This is because pivoting data changes the columns, which would make the aligned grids incompatible, as they are no longer sharing the same set of columns.
+```
+
+---
+title: "AgGrid Overview"
+order: 3
+---
+
+```python exec
+from pcweb.pages.docs import enterprise
+```
+
+# AG Grid
+
+## AG Grid Features
+
+```md alert warning
+#Turning off turbopack via `REFLEX_USE_TURBOPACK=False` might break the enterprise features of AgGrid.
+```
+
+## Your First Reflex AG Grid
+
+A basic Reflex AG Grid contains column definitions `column_defs`, which define the columns to be displayed in the grid, and `row_data`, which contains the data to be displayed in the grid.
+
+Each grid also requires a unique `id`, which is needed to uniquely identify the Ag-Grid instance on the page. If you have multiple grids on the same page, each grid must have a unique `id` so that it can be correctly rendered and managed.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/wind_dataset.csv")
+
+column_defs = [
+    {"field": "direction"},
+    {"field": "strength"},
+    {"field": "frequency"},
+]
+
+def ag_grid_simple():
+    return rxe.ag_grid(
+        id="ag_grid_basic_1",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        width="100%",
+    )
+```
+
+The format of the data passed to the `row_data` prop is a list of dictionaries. Each dictionary represents a row in the grid as seen below.
+
+```python
+[
+   \{"direction": "N", "strength": "0-1", "frequency": 0.5\},
+   \{"direction": "NNE", "strength": "0-1", "frequency": 0.6\},
+   \{"direction": "NE", "strength": "0-1", "frequency": 0.5\},
+]
+```
+
+The previous example showed the `column_defs` written out in full. You can also extract the required information from the dataframe's column names:
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/wind_dataset.csv")
+
+
+def ag_grid_simple_2():
+    return rxe.ag_grid(
+        id="ag_grid_basic_2",
+        row_data=df.to_dict("records"),
+        column_defs=[{"field": i} for i in df.columns],
+        width="100%",
+        height="40vh",
+    )
+```
+
+## Headers
+
+In the above example, the first letter of the field names provided are capitalized when displaying the header name. You can customize the header names by providing a `header_name` key in the column definition. In this example, the `header_name` is customized for the second and third columns.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+column_defs = [
+    {"field": "country"},
+    {"field": "pop", "headerName": "Population"},
+    {"field": "lifeExp", "headerName": "Life Expectancy"},
+]
+
+def ag_grid_simple_headers():
+    return rxe.ag_grid(
+            id="ag_grid_basic_headers",
+            row_data=df.to_dict("records"),
+            column_defs=column_defs,
+            width="100%",
+            height="40vh",
+        )
+```
+
+## Column Filtering
+
+Allow a user to filter a column by setting the `filter` key to `True` in the column definition. In this example we enable filtering for the first and last columns.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+column_defs =  [
+    {"field": "country", "headerName": "Country", "filter": True},
+    {"field": "pop", "headerName": "Population"},
+    {"field": "lifeExp", "headerName": "Life Expectancy", "filter": True},
+]
+
+def ag_grid_simple_column_filtering():
+    return rxe.ag_grid(
+        id="ag_grid_basic_column_filtering",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        width="100%",
+        height="40vh",
+    )
+```
+
+### Filter Types
+
+You can set `filter=True` to enable the default filter for a column.
+
+You can also set the filter type using the `filter` key. The following filter types are available: `ag_grid.filters.date`, `ag_grid.filters.number` and `ag_grid.filters.text`. These ensure that the input you enter to the filter is of the correct type.
+
+(`ag_grid.filters.set` and `ag_grid.filters.multi` are available with AG Grid Enterprise)
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/GanttChart-updated.csv")
+
+column_defs =  [
+    {"field": "Task", "filter": True},
+    {"field": "Start", "filter": rxe.ag_grid.filters.date},
+    {"field": "Duration", "filter": rxe.ag_grid.filters.number},
+    {"field": "Resource", "filter": rxe.ag_grid.filters.text},
+]
+
+def ag_grid_simple_column_filtering():
+    return rxe.ag_grid(
+        id="ag_grid_basic_column_filtering",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        width="100%",
+        height="40vh",
+    )
+```
+
+## Row Sorting
+
+By default, the rows can be sorted by any column by clicking on the column header. You can disable sorting of the rows for a column by setting the `sortable` key to `False` in the column definition.
+
+In this example, we disable sorting for the first column.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+column_defs =  [
+    {"field": "country", "sortable": False},
+    {"field": "pop", "headerName": "Population"},
+    {"field": "lifeExp", "headerName": "Life Expectancy"},
+]
+
+def ag_grid_simple_row_sorting():
+    return rxe.ag_grid(
+        id="ag_grid_basic_row_sorting",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        width="100%",
+        height="40vh",
+    )
+```
+
+## Row Selection
+
+Row Selection is enabled using the `row_selection` attribute. Setting it to `multiple` allows users to select multiple rows at a time. You can use the `checkbox_selection` column definition attribute to render checkboxes for selection.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+column_defs = [
+    {"field": "country", "checkboxSelection": True},
+    {"field": "pop", "headerName": "Population"},
+    {"field": "continent"},
+]
+
+def ag_grid_simple_row_selection():
+    return rxe.ag_grid(
+        id="ag_grid_basic_row_selection",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        row_selection={"mode":"multiple"},
+        width="100%",
+        height="40vh",
+    )
+```
+
+## Editing
+
+Enable Editing by setting the `editable` attribute to `True`. The cell editor is inferred from the cell data type. Set the cell editor type using the `cell_editor` attribute.
+
+There are 7 provided cell editors in AG Grid:
+
+1. `ag_grid.editors.text`
+2. `ag_grid.editors.large_text`
+3. `ag_grid.editors.select`
+4. `ag_grid.editors.rich_select`
+5. `ag_grid.editors.number`
+6. `ag_grid.editors.date`
+7. `ag_grid.editors.checkbox`
+
+In this example, we enable editing for the second and third columns. The second column uses the `number` cell editor, and the third column uses the `select` cell editor.
+
+The `on_cell_value_changed` event trigger is linked to the `cell_value_changed` event handler in the state. This event handler is called whenever a cell value is changed and changes the value of the backend var `_data_df` and the state var `data`.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+class AGGridEditingState(rx.State):
+    data: list[dict] = []
+    _data_df: pd.DataFrame
+
+    @rx.event
+    def load_data(self):
+        self._data_df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+        self.data = self._data_df.to_dict("records")
+
+    @rx.event
+    def cell_value_changed(self, row, col_field, new_value):
+        self._data_df.at[row, col_field] = new_value
+        self.data = self._data_df.to_dict("records")
+        yield rx.toast(f"Cell value changed, Row: {row}, Column: {col_field}, New Value: {new_value}")
+
+
+column_defs = [
+    \{"field": "country"\},
+    \{"field": "pop", "headerName": "Population", "editable": True, "cellEditor": rxe.ag_grid.editors.number\},
+    \{"field": "continent", "editable": True, "cellEditor": rxe.ag_grid.editors.select, "cellEditorParams": \{"values": ['Asia', 'Europe', 'Africa', 'Americas', 'Oceania']\}\},
+]
+
+def ag_grid_simple_editing():
+    return rxe.ag_grid(
+        id="ag_grid_basic_editing",
+        row_data=AGGridEditingState.data,
+        column_defs=column_defs,
+        on_cell_value_changed=AGGridEditingState.cell_value_changed,
+        on_mount=AGGridEditingState.load_data,
+        width="100%",
+        height="40vh",
+    )
+```
+
+## Pagination
+
+By default, the grid uses a vertical scroll. You can reduce the amount of scrolling required by adding pagination. To add pagination, set `pagination=True`. You can set the `pagination_page_size` to the number of rows per page and `pagination_page_size_selector` to a list of options for the user to select from.
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+column_defs = [
+    {"field": "country"},
+    {"field": "pop", "headerName": "Population"},
+    {"field": "lifeExp", "headerName": "Life Expectancy"},
+]
+
+def ag_grid_simple_pagination():
+    return rxe.ag_grid(
+        id="ag_grid_basic_pagination",
+        row_data=df.to_dict("records"),
+        column_defs=column_defs,
+        pagination=True,
+        pagination_page_size=10,
+        pagination_page_size_selector=[10, 40, 100],
+        width="100%",
+        height="40vh",
+    )
+```
+
+## AG Grid with State
+
+### Putting Data in State
+
+Assuming you want to make any edit to your data, you can put the data in State. This allows you to update the grid based on user input. Whenever the `data` var is updated, the grid will be re-rendered with the new data.
+
+```python
+from typing import Any
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+class AGGridState2(rx.State):
+    data: list[dict] = []
+
+    @rx.event
+    def load_data(self):
+        _df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+        self.data = _df.to_dict("records")
+
+column_defs = [
+    \{"field": "country"\},
+    \{"field": "pop", "headerName": "Population"\},
+    \{"field": "continent"\},
+]
+
+def ag_grid_state_2():
+    return rxe.ag_grid(
+        id="ag_grid_state_2",
+        row_data=AGGridState2.data,
+        column_defs=column_defs,
+        on_mount=AGGridState2.load_data,
+        width="100%",
+        height="40vh",
+    )
+```
+
+### Updating the Grid with State
+
+You can use State to update the grid based on a users input. In this example, we update the `column_defs` of the grid when a user clicks a button.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+class AgGridState(rx.State):
+    """The app state."""
+    all_columns: list = []
+
+    two_columns: list = []
+    column_defs: list = all_columns
+    n_clicks = 0
+
+    @rx.event
+    def init_columns(self):
+        self.all_columns = [
+            \{"field": "country"\},
+            \{"field": "pop"\},
+            \{"field": "continent"\},
+            \{"field": "lifeExp"\},
+            \{"field": "gdpPercap"\},
+        ]
+        self.two_columns = [
+            \{"field": "country"\},
+            \{"field": "pop"\},
+        ]
+        self.column_defs = self.all_columns
+
+    @rx.event
+    def update_columns(self):
+        self.n_clicks += 1
+        if self.n_clicks % 2 != 0:
+            self.column_defs = self.two_columns
+        else:
+            self.column_defs = self.all_columns
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+
+
+def ag_grid_simple_with_state():
+    return rx.box(
+        rx.button("Toggle Columns", on_click=AgGridState.update_columns),
+        rxe.ag_grid(
+            id="ag_grid_basic_with_state",
+            row_data=df.to_dict("records"),
+            column_defs=AgGridState.column_defs,
+            on_mount=AgGridState.init_columns,
+            width="100%",
+            height="40vh",
+        ),
+        width="100%",
+    )
+```
+
+## AG Grid with Data from a Database
+
+In this example, we will use a database to store the data. The data is loaded from a csv file and inserted into the database when the page is loaded using the `insert_dataframe_to_db` event handler.
+
+The data is then fetched from the database and displayed in the grid using the `data` computed var.
+
+When a cell value is changed, the data is updated in the database using the `cell_value_changed` event handler.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+from sqlmodel import select
+
+class Country(rx.Model, table=True):
+    country: str
+    population: int
+    continent: str
+
+
+class AGGridDatabaseState(rx.State):
+
+    countries: list[Country]
+
+    # Insert data from a csv loaded dataframe to the database (Do this on the page load)
+    @rx.event
+    def insert_dataframe_to_db(self):
+        data = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
+        with rx.session() as session:
+            for _, row in data.iterrows():
+                db_record = Country(
+                    country=row['country'],
+                    population=row['pop'],
+                    continent=row['continent'],
+                )
+                session.add(db_record)
+            session.commit()
+
+    # Fetch data from the database using a computed variable
+    @rx.var
+    def data(self) -> list[dict]:
+        with rx.session() as session:
+            results = session.exec(select(Country)).all()
+            self.countries = [result.dict() for result in results]
+        return self.countries
+
+    # Update the database when a cell value is changed
+    @rx.event
+    def cell_value_changed(self, row, col_field, new_value):
+        self.countries[row][col_field] = new_value
+        with rx.session() as session:
+            country = Country(**self.countries[row])
+            session.merge(country)
+            session.commit()
+        yield rx.toast(f"Cell value changed, Row: \{row}, Column: \{col_field}, New Value: \{new_value}")
+
+
+column_defs = [
+    \{"field": "country"\},
+    \{"field": "population", "headerName": "Population", "editable": True, "cellEditor": rxe.ag_grid.editors.number\},
+    \{"field": "continent", "editable": True, "cellEditor": rxe.ag_grid.editors.select, "cellEditorParams": \{"values": ['Asia', 'Europe', 'Africa', 'Americas', 'Oceania']\}\},
+]
+
+def index():
+    return rxe.ag_grid(
+        id="ag_grid_basic_editing",
+        row_data=AGGridDatabaseState.data,
+        column_defs=column_defs,
+        on_cell_value_changed=AGGridDatabaseState.cell_value_changed,
+        width="100%",
+        height="40vh",
+    )
+
+# Add state and page to the app.
+app = rx.App()
+app.add_page(index, on_load=AGGridDatabaseState.insert_dataframe_to_db)
+```
+
+## Using AG Grid Enterprise
+
+AG Grid offers both community and enterprise versions. See the [AG Grid docs](https://www.ag-grid.com/archive/31.2.0/react-data-grid/licensing/) for details on purchasing a license key.
+
+To use an AG Grid Enterprise license key with Reflex AG Grid set the environment variable `AG_GRID_LICENSE_KEY`:
+
+```bash
+export AG_GRID_LICENSE_KEY="your_license_key"
+```
+
+## column_def props
+
+The following props are available for `column_defs` as well as many others that can be found here: [AG Grid Column Def Docs](https://www.ag-grid.com/react-data-grid/column-properties/). (it is necessary to use snake_case for the keys in Reflex, unlike in the AG Grid docs where camelCase is used)
+
+- `field`: `str`: The field of the row object to get the cell's data from.
+- `col_id`: `str | None`: The unique ID to give the column. This is optional. If missing, the ID will default to the field.
+- `type`: `str | None`: The type of the column.
+- `cell_data_type`: `bool | str | None`: The data type of the cell values for this column. Can either infer the data type from the row data (true - the default behaviour), define a specific data type (string), or have no data type (false).
+- `hide`: `bool`: Set to true for this column to be hidden.
+- `editable`: `bool | None`: Set to true if this column is editable, otherwise false.
+- `filter`: `AGFilters | str | None`: Filter component to use for this column. Set to true to use the default filter. Set to the name of a provided filter to use that filter. (Check out the Filter Types section of this page for more information)
+- `floating_filter`: `bool`: Whether to display a floating filter for this column.
+- `header_name`: `str | None`: The name to render in the column header. If not specified and field is specified, the field name will be used as the header name.
+- `header_tooltip`: `str | None`: Tooltip for the column header.
+- `checkbox_selection`: `bool | None`: Set to true to render a checkbox for row selection.
+- `cell_editor`: `AGEditors | str | None`: Provide your own cell editor component for this column's cells. (Check out the Editing section of this page for more information)
+- `cell_editor_params`: `dict[str, list[Any]] | None`: Params to be passed to the cellEditor component.
+
+
+
+## Functionality you need is not available/working in Reflex
+
+All AGGrid options found in this [documentation](https://www.ag-grid.com/react-data-grid/reference/) are mapped in rxe.ag_grid, but some features might not have been fully tested, due to the sheer number of existing features in the underlying AG Grid library.
+
+If one of the ag_grid props does not import the expected module, you can pass it manually via the props `community_modules` or `enterprise_modules`, which expect a `set[str]` of the module names. You will get a warning in the browser console if a module is missing, so you can check there if a feature is not working as expected.
+
+You can also report the missing module on our discord or GitHub issues page of the main Reflex repository.
+
+Best practice is to create a single instance of `ag_grid.api()` with the same `id` as the `id` of the `ag_grid` component that is to be referenced, `"ag_grid_basic_row_selection"` in this first example.
+
+The example below uses the `select_all()` and `deselect_all()` methods of the AG Grid API to select and deselect all rows in the grid. This method is not available in Reflex directly. Check out this [documentation](https://www.ag-grid.com/react-data-grid/grid-api/#reference-selection-selectAll) to see what the methods look like in the AG Grid docs.
+
+```md alert info
+# Ensure that the docs are set to React tab in AG Grid
+```
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
+)
+
+column_defs = [
+    {"field": "country", "checkboxSelection": True},
+    {"field": "pop"},
+    {"field": "continent"},
+]
+
+def ag_grid_api_simple():
+    my_api = rxe.ag_grid.api(id="ag_grid_basic_row_selection")
+    return rx.vstack(
+            rxe.ag_grid(
+            id="ag_grid_basic_row_selection",
+            row_data=df.to_dict("records"),
+            column_defs=column_defs,
+            row_selection="single",
+            width="100%",
+            height="40vh",
+        ),
+        rx.button("Select All", on_click=my_api.select_all()),
+        rx.button("Deselect All", on_click=my_api.deselect_all()),
+        spacing="4",
+        width="100%",
+    )
+```
+
+
+The react code for the `select_all()` event handler is `selectAll = (source?: SelectionEventSourceType) => void;`. 
+
+To use this in Reflex as you can see, it should be called in snake case rather than camel case. The `void` means it doesn't return anything. The `source?` indicates that it takes an optional `source` argument.
+
+
+```md alert info
+# Another way to use the AG Grid API
+It is also possible to use the AG Grid API directly with the event trigger (`on_click`) of the component. This removes the need to create a variable `my_api`. This is shown in the example below. It is necessary to use the `id` of the `ag_grid` component that is to be referenced.
+
+```python
+rx.button("Select all", on_click=rxe.ag_grid.api(id="ag_grid_basic_row_selection").select_all()),
+```
+
+### More examples
+
+The following example lets a user [export the data as a csv](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-export-exportDataAsCsv) and [adjust the size of columns to fit the available horizontal space](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-columnSizing-sizeColumnsToFit). (Try resizing the screen and then clicking the resize columns button)
+
+
+```python demo exec toggle
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
+)
+
+column_defs = [
+    {"field": "country", "checkboxSelection": True},
+    {"field": "pop"},
+    {"field": "continent"},
+]
+
+def ag_grid_api_simple2():
+    my_api = rxe.ag_grid.api(id="ag_grid_export_and_resize")
+    return rx.vstack(
+            rxe.ag_grid(
+            id="ag_grid_export_and_resize",
+            row_data=df.to_dict("records"),
+            column_defs=column_defs,
+            width="100%",
+            height="40vh",
+        ),
+        rx.button("Export", on_click=my_api.export_data_as_csv()),
+        rx.button("Resize Columns", on_click=my_api.size_columns_to_fit()),
+        spacing="4",
+        width="100%",
+    )
+```
+
+The react code for both of these is shown below. The key point to see is that both of these functions return `void` and therefore does not return anything.
+
+`exportDataAsCsv = (params?: CsvExportParams) => void;`
+
+`sizeColumnsToFit = (paramsOrGridWidth?: ISizeColumnsToFitParams  |  number) => void;`
+
+
+### Example with a Return Value
+
+This example shows how to get the data from `ag_grid` as a [csv on the backend](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-export-getDataAsCsv). The data that was passed to the backend is then displayed as a toast with the data.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+import pandas as pd
+
+class AGGridStateAPI(rx.State):
+    def handle_get_data(self, data: str):
+        yield rx.toast(f"Got CSV data: {data}")
+
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
+)
+
+column_defs = [
+    \{"field": "country", "checkboxSelection": True\},
+    \{"field": "pop"\},
+    \{"field": "continent"\},
+]
+
+def ag_grid_api_argument():
+    my_api = rxe.ag_grid.api(id="ag_grid_get_data_as_csv")
+    return rx.vstack(
+        rxe.ag_grid(
+            id="ag_grid_get_data_as_csv",
+            row_data=df.to_dict("records"),
+            column_defs=column_defs,
+            width="100%",
+            height="40vh",
+        ),
+        rx.button("Get CSV data on backend", on_click=my_api.get_data_as_csv(callback=AGGridStateAPI.handle_get_data)),
+        spacing="4",
+        width="100%",
+    )
+```
+
+The react code for the `get_data_as_csv` method of the AG Grid API is `getDataAsCsv = (params?: CsvExportParams) => string  |  undefined;`. Here the function returns a `string` (or undefined). 
+
+In Reflex to handle this returned value it is necessary to pass a `callback` as an argument to the `get_data_as_csv` method that will get the returned value. In this example the `handle_get_data` event handler is passed as the callback. This event handler will be called with the returned value from the `get_data_as_csv` method. 
+
+
+
+
+---
+order: 1
+---
+
+```python exec
+from pcweb.pages.docs import enterprise
+```
+
+# Column Definitions
+
+## Basic Columns
+
+AgGrid allows you to define the columns of your grid, passed to the prop `column_defs`. Each dictionary represents a column.
+
+```md alert warning
+# If you are converting from other AG Grid implementation, we also support camelCase for the name of the properties.
+```
+
+Here we define a grid with 3 columns:
+```python
+column_defs = [
+    {"field": "direction"},
+    {"field": "strength"},
+    {"field": "frequency"},
+]
+```
+
+To set default properties for all your columns, you can define `default_col_def` in your grid:
+```python
+default_col_def = {
+    "sortable": True,
+    "filter": True,
+    "resizable": True,
+}
+```
+
+---
+order: 6
+---
+
+# Model Wrapper
+
+A model wrapper is an utility used to wrap a database model and provide a consistent interface over it. It allows automatically adding new rows to the database, updating existing rows, and deleting rows.
+
+## Default Model Wrapper
+
+You can use the basic functionality of the model wrapper by using the `rxe.model_wrapper` function. This function takes a database model and returns a wrapper object that can be used to interact with the model.
+
+```python
+import reflex_enterprise as rxe
+
+def index_page():
+    return rxe.model_wrapper(class_model=MyModel)
+```
+
+By default the model_wrapper use the infinite rows model from AgGrid.
+
+## Custom Model Wrapper
+
+If the default model wrapper does not fit your needs, you can create a custom model wrapper by subclassing the `rxe.ModelWrapper` class. This allows you to customize the behavior of the model wrapper to fit your specific use case.
+
+```python
+import reflex_enterprise as rxe
+
+class MyCustomWrapper(rxe.ModelWrapper[MyModel]):
+   pass
+```
+
+In the custom model wrapper, you can override the following methods:
+- `_get_columns_defs`
+- `_get_data`
+- `_row_count`
+- `on_value_setter`
+
+to modify how the model wrapper will behave.
+
+
+## SSRM Model Wrapper
+
+The SSRM model wrapper, used with `rxe.model_wrapper_ssrm`, is a version of the model wrapper that allows you to use the ServerSideRowModel of AgGrid.
+
+```python
+import reflex_enterprise as rxe
+
+def index_page():
+    return rxe.model_wrapper_ssrm(class_model=MyModel)
+```
+
+## SSRM Custom Model Wrapper
+
+In the same way you can extend the default model wrapper, you can extend the SSRM custom model wrapper by subclassing the `rxe.ModelWrapperSSRM` class. This allows you to customize the behavior of the model wrapper to fit your specific use case.
+
+```python
+import reflex_enterprise as rxe
+
+class MyCustomSSRMWrapper(rxe.ModelWrapperSSRM[MyModel]):
+   pass
+```
+
+The overridable methods are the same as the standard model wrapper.
 
 # Queries
 
@@ -24676,7 +27773,6 @@ components:
 
 Upload: |
   lambda **props: rx.center(rx.upload(id="my_upload", **props))
-  lambda **props: rx.center(rx.upload(id="my_upload", **props))
 ---
 
 ```python exec
@@ -24850,11 +27946,11 @@ def index():
     return rx.vstack(
         rx.upload(
             rx.vstack(
-                rx.button("Select File", color=color, bg="white", border=f"1px solid \{color}"),
+                rx.button("Select File", color=color, bg="white", border=f"1px solid {color}"),
                 rx.text("Drag and drop files here or click to select files"),
             ),
             id="upload1",
-            border=f"1px dotted \{color}",
+            border=f"1px dotted {color}",
             padding="5em",
         ),
         rx.hstack(rx.foreach(rx.selected_files("upload1"), rx.text)),
@@ -24927,7 +28023,7 @@ def index():
             ),
             id="upload1",
             max_files=1,
-            border=f"1px dotted \{color}",
+            border=f"1px dotted {color}",
             padding="5em",
         ),
         rx.text(rx.selected_files("upload1")),
@@ -24991,7 +28087,7 @@ def index():
     return rx.vstack(
         rx.upload(
             rx.vstack(
-                rx.button("Select File", color=color, bg="white", border=f"1px solid \{color}"),
+                rx.button("Select File", color=color, bg="white", border=f"1px solid {color}"),
                 rx.text("Drag and drop files here or click to select files"),
             ),
             id="upload2",
@@ -25008,7 +28104,7 @@ def index():
             disabled=False,
             no_keyboard=True,
             on_drop=State.handle_upload(rx.upload_files(upload_id="upload2")),
-            border=f"1px dotted \{color}",
+            border=f"1px dotted {color}",
             padding="5em",
         ),
         rx.grid(
@@ -29925,736 +33021,6 @@ rx.flex(
     spacing="2",
 )
 ```
-
----
-components:
-  - ag_grid
----
-
-```python exec
-from pcweb.pages.docs import library
-from pcweb.pages.docs import vars
-```
-
-# AG Grid
-
-Reflex AG Grid is a high-performance and highly customizable grid that wraps AG Grid.
-
-```bash
-pip install reflex-ag-grid
-```
-
-```md alert warning
-# Starting from reflex 0.7.1, the reflex-ag-grid package is not maintained anymore. Go to https://enterprise.reflex.dev/ to get the latest version of AG Grid maintained by the Reflex Team.
-```
-
-## Your First Reflex AG Grid
-
-A basic Reflex AG Grid contains column definitions `column_defs`, which define the columns to be displayed in the grid, and `row_data`, which contains the data to be displayed in the grid.
-
-Each grid also requires a unique `id`, which is needed to uniquely identify the Ag-Grid instance on the page. If you have multiple grids on the same page, each grid must have a unique `id` so that it can be correctly rendered and managed.
-
-```md alert info
-# Grid for Layout
-
-If you are looking for a grid for layout purposes, i.e. to layout Reflex components, consider using the [Grid component]({library.layout.grid.path}).
-```
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/wind_dataset.csv")
-
-column_defs = [
-    ag_grid.column_def(field="direction"),
-    ag_grid.column_def(field="strength"),
-    ag_grid.column_def(field="frequency"),
-
-]
-
-def ag_grid_simple():
-    return ag_grid(
-        id="ag_grid_basic_1",
-        row_data=df.to_dict("records"),
-        column_defs=column_defs,
-        width="100%",
-    )
-```
-
-The format of the data passed to the `row_data` prop is a list of dictionaries. Each dictionary represents a row in the grid as seen below.
-
-```python
-[
-   \{direction: "N", strength: "0-1", frequency: 0.5},
-   \{direction: "NNE", strength: "0-1", frequency: 0.6},
-   \{direction: "NE", strength: "0-1", frequency: 0.5},
-]
-```
-
-The previous example showed the `column_defs` written out in full. You can also extract the required information from the dataframe's column names:
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/wind_dataset.csv")
-
-
-def ag_grid_simple_2():
-    return ag_grid(
-        id="ag_grid_basic_2",
-        row_data=df.to_dict("records"),
-        column_defs=[{"field": i} for i in df.columns],
-        width="100%",
-        height="40vh",
-    )
-```
-
-## Headers
-
-In the above example, the first letter of the field names provided are capitalized when displaying the header name. You can customize the header names by providing a `header_name` key in the column definition. In this example, the `header_name` is customized for the second and third columns.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-column_defs = [
-    ag_grid.column_def(field="country"),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="lifeExp", header_name="Life Expectancy"),
-]
-
-def ag_grid_simple_headers():
-    return ag_grid(
-            id="ag_grid_basic_headers",
-            row_data=df.to_dict("records"),
-            column_defs=column_defs,
-            width="100%",
-            height="40vh",
-        )
-```
-
-## Column Filtering
-
-Allow a user to filter a column by setting the `filter` key to `True` in the column definition. In this example we enable filtering for the first and last columns.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-column_defs =  [
-    ag_grid.column_def(field="country", header_name="Country", filter=True),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="lifeExp", header_name="Life Expectancy", filter=True),
-]
-
-def ag_grid_simple_column_filtering():
-    return ag_grid(
-        id="ag_grid_basic_column_filtering",
-        row_data=df.to_dict("records"),
-        column_defs=column_defs,
-        width="100%",
-        height="40vh",
-    )
-```
-
-### Filter Types
-
-You can set `filter=True` to enable the default filter for a column.
-
-You can also set the filter type using the `filter` key. The following filter types are available: `ag_grid.filters.date`, `ag_grid.filters.number` and `ag_grid.filters.text`. These ensure that the input you enter to the filter is of the correct type.
-
-(`ag_grid.filters.set` and `ag_grid.filters.multi` are available with AG Grid Enterprise)
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/GanttChart-updated.csv")
-
-column_defs =  [
-    ag_grid.column_def(field="Task", filter=True),
-    ag_grid.column_def(field="Start", filter=ag_grid.filters.date),
-    ag_grid.column_def(field="Duration", filter=ag_grid.filters.number),
-    ag_grid.column_def(field="Resource", filter=ag_grid.filters.text),
-]
-
-def ag_grid_simple_column_filtering():
-    return ag_grid(
-        id="ag_grid_basic_column_filtering",
-        row_data=df.to_dict("records"),
-        column_defs=column_defs,
-        width="100%",
-        height="40vh",
-    )
-```
-
-## Row Sorting
-
-By default, the rows can be sorted by any column by clicking on the column header. You can disable sorting of the rows for a column by setting the `sortable` key to `False` in the column definition.
-
-In this example, we disable sorting for the first column.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-column_defs =  [
-    ag_grid.column_def(field="country", sortable=False),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="lifeExp", header_name="Life Expectancy"),
-]
-
-def ag_grid_simple_row_sorting():
-    return ag_grid(
-        id="ag_grid_basic_row_sorting",
-        row_data=df.to_dict("records"),
-        column_defs=column_defs,
-        width="100%",
-        height="40vh",
-    )
-```
-
-## Row Selection
-
-Row Selection is enabled using the `row_selection` attribute. Setting it to `multiple` allows users to select multiple rows at a time. You can use the `checkbox_selection` column definition attribute to render checkboxes for selection.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-column_defs = [
-    ag_grid.column_def(field="country", checkbox_selection=True),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="continent"),
-]
-
-def ag_grid_simple_row_selection():
-    return ag_grid(
-        id="ag_grid_basic_row_selection",
-        row_data=df.to_dict("records"),
-        column_defs=column_defs,
-        row_selection="multiple",
-        width="100%",
-        height="40vh",
-    )
-```
-
-## Editing
-
-Enable Editing by setting the `editable` attribute to `True`. The cell editor is inferred from the cell data type. Set the cell editor type using the `cell_editor` attribute.
-
-There are 7 provided cell editors in AG Grid:
-
-1. `ag_grid.editors.text`
-2. `ag_grid.editors.large_text`
-3. `ag_grid.editors.select`
-4. `ag_grid.editors.rich_select`
-5. `ag_grid.editors.number`
-6. `ag_grid.editors.date`
-7. `ag_grid.editors.checkbox`
-
-In this example, we enable editing for the second and third columns. The second column uses the `number` cell editor, and the third column uses the `select` cell editor.
-
-The `on_cell_value_changed` event trigger is linked to the `cell_value_changed` event handler in the state. This event handler is called whenever a cell value is changed and changes the value of the backend var `_data_df` and the state var `data`.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-class AGGridEditingState(rx.State):
-    data: list[dict] = []
-
-    @rx.event
-    def load_data(self):
-        _df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-        self.data = _df.to_dict("records")
-
-    @rx.event
-    def cell_value_changed(self, row, col_field, new_value):
-        self._data_df.at[row, col_field] = new_value
-        self.data = self._data_df.to_dict("records")
-        yield rx.toast(f"Cell value changed, Row: {row}, Column: {col_field}, New Value: {new_value}")
-
-
-column_defs = [
-    ag_grid.column_def(field="country"),
-    ag_grid.column_def(field="pop", header_name="Population", editable=True, cell_editor=ag_grid.editors.number),
-    ag_grid.column_def(field="continent", editable=True, cell_editor=ag_grid.editors.select, cell_editor_params={
-        "values": ['Asia', 'Europe', 'Africa', 'Americas', 'Oceania']
-        }
-    ),
-]
-
-def ag_grid_simple_editing():
-    return ag_grid(
-        id="ag_grid_basic_editing",
-        row_data=AGGridEditingState.data,
-        column_defs=column_defs,
-        on_cell_value_changed=AGGridEditingState.cell_value_changed,
-        on_mount=AGGridEditingState.load_data,
-        width="100%",
-        height="40vh",
-    )
-```
-
-## Pagination
-
-By default, the grid uses a vertical scroll. You can reduce the amount of scrolling required by adding pagination. To add pagination, set `pagination=True`. You can set the `pagination_page_size` to the number of rows per page and `pagination_page_size_selector` to a list of options for the user to select from.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-column_defs = [
-    ag_grid.column_def(field="country"),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="lifeExp", header_name="Life Expectancy"),
-]
-
-def ag_grid_simple_pagination():
-    return ag_grid(
-        id="ag_grid_basic_pagination",
-        row_data=df.to_dict("records"),
-        column_defs=column_defs,
-        pagination=True,
-        pagination_page_size=10,
-        pagination_page_size_selector=[10, 40, 100],
-        width="100%",
-        height="40vh",
-    )
-```
-
-## Themes
-
-You can style your grid with a theme. AG Grid includes the following themes:
-
-1. `quartz`
-2. `alpine`
-3. `balham`
-4. `material`
-
-The grid uses `quartz` by default. To use any other theme, set it using the `theme` prop, i.e. `theme="alpine"`.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-class AGGridThemeState(rx.State):
-    """The app state."""
-
-    theme: str = "quartz"
-    themes: list[str] = ["quartz", "balham", "alpine", "material"]
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-column_defs = [
-    ag_grid.column_def(field="country"),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="lifeExp", header_name="Life Expectancy"),
-]
-
-def ag_grid_simple_themes():
-    return rx.vstack(
-        rx.hstack(
-            rx.text("Theme:"),
-            rx.select(AGGridThemeState.themes, value=AGGridThemeState.theme, on_change=AGGridThemeState.set_theme),
-        ),
-        ag_grid(
-            id="ag_grid_basic_themes",
-            row_data=df.to_dict("records"),
-            column_defs=column_defs,
-            theme=AGGridThemeState.theme,
-            width="100%",
-            height="40vh",
-        ),
-        width="100%",
-    )
-```
-
-## AG Grid with State
-
-### Putting Data in State
-
-Assuming you want to make any edit to your data, you can put the data in State. This allows you to update the grid based on user input. Whenever the `data` var is updated, the grid will be re-rendered with the new data.
-
-```python demo exec
-from typing import Any
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-class AGGridState2(rx.State):
-    data: list[dict] = []
-
-    @rx.event
-    def load_data(self):
-        _df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-        self.data = _df.to_dict("records")
-
-column_defs = [
-    ag_grid.column_def(field="country"),
-    ag_grid.column_def(field="pop", header_name="Population"),
-    ag_grid.column_def(field="continent"),
-]
-
-def ag_grid_state_2():
-    return ag_grid(
-        id="ag_grid_state_2",
-        row_data=AGGridState2.data,
-        column_defs=column_defs,
-        on_mount=AGGridState2.load_data,
-        width="100%",
-        height="40vh",
-    )
-```
-
-### Updating the Grid with State
-
-You can use State to update the grid based on a users input. In this example, we update the `column_defs` of the grid when a user clicks a button.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-class AgGridState(rx.State):
-    """The app state."""
-    all_columns: list = []
-
-    two_columns: list = []
-    column_defs: list = all_columns
-    n_clicks = 0
-
-    @rx.event
-    def init_columns(self):
-        self.all_columns = [
-            ag_grid.column_def(field="country"),
-            ag_grid.column_def(field="pop"),
-            ag_grid.column_def(field="continent"),
-            ag_grid.column_def(field="lifeExp"),
-            ag_grid.column_def(field="gdpPercap"),
-        ]
-        self.two_columns = [
-            ag_grid.column_def(field="country"),
-            ag_grid.column_def(field="pop"),
-        ]
-        self.column_defs = self.all_columns
-
-    @rx.event
-    def update_columns(self):
-        self.n_clicks += 1
-        if self.n_clicks % 2 != 0:
-            self.column_defs = self.two_columns
-        else:
-            self.column_defs = self.all_columns
-
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-
-
-def ag_grid_simple_with_state():
-    return rx.box(
-        rx.button("Toggle Columns", on_click=AgGridState.update_columns),
-        ag_grid(
-            id="ag_grid_basic_with_state",
-            row_data=df.to_dict("records"),
-            column_defs=AgGridState.column_defs,
-            on_mount=AgGridState.init_columns,
-            width="100%",
-            height="40vh",
-        ),
-        width="100%",
-    )
-```
-
-## AG Grid with Data from a Database
-
-In this example, we will use a database to store the data. The data is loaded from a csv file and inserted into the database when the page is loaded using the `insert_dataframe_to_db` event handler.
-
-The data is then fetched from the database and displayed in the grid using the `data` [computed var]({vars.computed_vars.path}).
-
-When a cell value is changed, the data is updated in the database using the `cell_value_changed` event handler.
-
-```python
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-from sqlmodel import select
-
-class Country(rx.Model, table=True):
-    country: str
-    population: int
-    continent: str
-
-
-class AGGridDatabaseState(rx.State):
-
-    countries: list[Country]
-
-    # Insert data from a csv loaded dataframe to the database (Do this on the page load)
-    @rx.event
-    def insert_dataframe_to_db(self):
-        data = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv")
-        with rx.session() as session:
-            for _, row in data.iterrows():
-                db_record = Country(
-                    country=row['country'],
-                    population=row['pop'],
-                    continent=row['continent'],
-                )
-                session.add(db_record)
-            session.commit()
-
-    # Fetch data from the database using a computed variable
-    @rx.var
-    def data(self) -> list[dict]:
-        with rx.session() as session:
-            results = session.exec(select(Country)).all()
-            self.countries = [result.dict() for result in results]
-        return self.countries
-
-    # Update the database when a cell value is changed
-    @rx.event
-    def cell_value_changed(self, row, col_field, new_value):
-        self.countries[row][col_field] = new_value
-        with rx.session() as session:
-            country = Country(**self.countries[row])
-            session.merge(country)
-            session.commit()
-        yield rx.toast(f"Cell value changed, Row: \{row}, Column: \{col_field}, New Value: \{new_value}")
-
-
-column_defs = [
-    ag_grid.column_def(field="country"),
-    ag_grid.column_def(field="population", header_name="Population", editable=True, cell_editor=ag_grid.editors.number),
-    ag_grid.column_def(field="continent", editable=True, cell_editor=ag_grid.editors.select, cell_editor_params={
-        "values": ['Asia', 'Europe', 'Africa', 'Americas', 'Oceania']
-        }
-    ),
-]
-
-def index():
-    return ag_grid(
-        id="ag_grid_basic_editing",
-        row_data=AGGridDatabaseState.data,
-        column_defs=column_defs,
-        on_cell_value_changed=AGGridDatabaseState.cell_value_changed,
-        width="100%",
-        height="40vh",
-    )
-
-# Add state and page to the app.
-app = rx.App()
-app.add_page(index, on_load=AGGridDatabaseState.insert_dataframe_to_db)
-```
-
-## Using AG Grid Enterprise
-
-AG Grid offers both community and enterprise versions. See the [AG Grid docs](https://www.ag-grid.com/archive/31.2.0/react-data-grid/licensing/) for details on purchasing a license key.
-
-To use an AG Grid Enterprise license key with Reflex AG Grid set the environment variable `AG_GRID_LICENSE_KEY`:
-
-```bash
-export AG_GRID_LICENSE_KEY="your_license_key"
-```
-
-## column_def props
-
-The following props are available for `column_defs` as well as many others that can be found here: [AG Grid Column Def Docs](https://www.ag-grid.com/react-data-grid/column-properties/). (it is necessary to use snake_case for the keys in Reflex, unlike in the AG Grid docs where camelCase is used)
-
-- `field`: `str`: The field of the row object to get the cell's data from.
-- `col_id`: `str | None`: The unique ID to give the column. This is optional. If missing, the ID will default to the field.
-- `type`: `str | None`: The type of the column.
-- `cell_data_type`: `bool | str | None`: The data type of the cell values for this column. Can either infer the data type from the row data (true - the default behaviour), define a specific data type (string), or have no data type (false).
-- `hide`: `bool`: Set to true for this column to be hidden.
-- `editable`: `bool | None`: Set to true if this column is editable, otherwise false.
-- `filter`: `AGFilters | str | None`: Filter component to use for this column. Set to true to use the default filter. Set to the name of a provided filter to use that filter. (Check out the Filter Types section of this page for more information)
-- `floating_filter`: `bool`: Whether to display a floating filter for this column.
-- `header_name`: `str | None`: The name to render in the column header. If not specified and field is specified, the field name will be used as the header name.
-- `header_tooltip`: `str | None`: Tooltip for the column header.
-- `checkbox_selection`: `bool | None`: Set to true to render a checkbox for row selection.
-- `cell_editor`: `AGEditors | str | None`: Provide your own cell editor component for this column's cells. (Check out the Editing section of this page for more information)
-- `cell_editor_params`: `dict[str, list[Any]] | None`: Params to be passed to the cellEditor component.
-
-
-
-## Functionality you need is not available in Reflex
-
-Since Reflex AG Grid is wrapping the underlying AG Grid library, there is much more functionality available that is currently not exposed in Reflex. Check out this [documentation](https://www.ag-grid.com/react-data-grid/reference/) for more information on what is available in AG Grid.
-
-As Reflex does not expose all the functionality of AG Grid, you can use `ag_grid.api()`, which is hanging off the `ag_grid` namespace, to access the underlying AG Grid API. This allows you to access the full functionality of AG Grid.
-
-Best practice is to create a single instance of `ag_grid.api()` with the same `id` as the `id` of the `ag_grid` component that is to be referenced, `"ag_grid_basic_row_selection"` in this first example.
-
-The example below uses the `select_all()` and `deselect_all()` methods of the AG Grid API to select and deselect all rows in the grid. This method is not available in Reflex directly. Check out this [documentation](https://www.ag-grid.com/react-data-grid/grid-api/#reference-selection-selectAll) to see what the methods look like in the AG Grid docs.
-
-```md alert info
-# Ensure that the docs are set to React tab in AG Grid
-```
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
-)
-
-column_defs = [
-    ag_grid.column_def(field="country", checkbox_selection=True),
-    ag_grid.column_def(field="pop"),
-    ag_grid.column_def(field="continent"),
-]
-
-def ag_grid_api_simple():
-    my_api = ag_grid.api(id="ag_grid_basic_row_selection")
-    return rx.vstack(
-            ag_grid(
-            id="ag_grid_basic_row_selection",
-            row_data=df.to_dict("records"),
-            column_defs=column_defs,
-            width="100%",
-            height="40vh",
-        ),
-        rx.button("Select All", on_click=my_api.select_all()),
-        rx.button("Deselect All", on_click=my_api.deselect_all()),
-        spacing="4",
-        width="100%",
-    )
-```
-
-
-The react code for the `select_all()` event handler is `selectAll = (source?: SelectionEventSourceType) => void;`. 
-
-To use this in Reflex as you can see, it should be called in snake case rather than camel case. The `void` means it doesn't return anything. The `source?` indicates that it takes an optional `source` argument.
-
-
-
-```md alert info
-# Another way to use the AG Grid API
-It is also possible to use the AG Grid API directly with the event trigger (`on_click`) of the component. This removes the need to create a variable `my_api`. This is shown in the example below. It is necessary to use the `id` of the `ag_grid` component that is to be referenced.
-```python
-rx.button("Select all", on_click=ag_grid.api(id="ag_grid_basic_row_selection").select_all()),
-```
-
-
-### More examples
-
-The following example lets a user [export the data as a csv](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-export-exportDataAsCsv) and [adjust the size of columns to fit the available horizontal space](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-columnSizing-sizeColumnsToFit). (Try resizing the screen and then clicking the resize columns button)
-
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
-)
-
-column_defs = [
-    ag_grid.column_def(field="country", checkbox_selection=True),
-    ag_grid.column_def(field="pop"),
-    ag_grid.column_def(field="continent"),
-]
-
-def ag_grid_api_simple2():
-    my_api = ag_grid.api(id="ag_grid_export_and_resize")
-    return rx.vstack(
-            ag_grid(
-            id="ag_grid_export_and_resize",
-            row_data=df.to_dict("records"),
-            column_defs=column_defs,
-            width="100%",
-            height="40vh",
-        ),
-        rx.button("Export", on_click=my_api.export_data_as_csv()),
-        rx.button("Resize Columns", on_click=my_api.size_columns_to_fit()),
-        spacing="4",
-        width="100%",
-    )
-```
-
-The react code for both of these is shown below. The key point to see is that both of these functions return `void` and therefore does not return anything.
-
-`exportDataAsCsv = (params?: CsvExportParams) => void;`
-
-`sizeColumnsToFit = (paramsOrGridWidth?: ISizeColumnsToFitParams  |  number) => void;`
-
-
-### Example with a Return Value
-
-This example shows how to get the data from `ag_grid` as a [csv on the backend](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-export-getDataAsCsv). The data that was passed to the backend is then displayed as a toast with the data.
-
-```python demo exec
-import reflex as rx
-from reflex_ag_grid import ag_grid
-import pandas as pd
-
-class AGGridStateAPI(rx.State):
-    def handle_get_data(self, data: str):
-        yield rx.toast(f"Got CSV data: {data}")
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
-)
-
-column_defs = [
-    ag_grid.column_def(field="country", checkbox_selection=True),
-    ag_grid.column_def(field="pop"),
-    ag_grid.column_def(field="continent"),
-]
-
-def ag_grid_api_argument():
-    my_api = ag_grid.api(id="ag_grid_get_data_as_csv")
-    return rx.vstack(
-            ag_grid(
-            id="ag_grid_get_data_as_csv",
-            row_data=df.to_dict("records"),
-            column_defs=column_defs,
-            width="100%",
-            height="40vh",
-        ),
-        rx.button("Get CSV data on backend", on_click=my_api.get_data_as_csv(callback=AGGridStateAPI.handle_get_data)),
-        spacing="4",
-        width="100%",
-    )
-```
-
-The react code for the `get_data_as_csv` method of the AG Grid API is `getDataAsCsv = (params?: CsvExportParams) => string  |  undefined;`. Here the function returns a `string` (or undefined). 
-
-In Reflex to handle this returned value it is necessary to pass a `callback` as an argument to the `get_data_as_csv` method that will get the returned value. In this example the `handle_get_data` event handler is passed as the callback. This event handler will be called with the returned value from the `get_data_as_csv` method. 
-
 
 ---
 components:
