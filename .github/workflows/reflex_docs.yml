@@ -1,131 +1,258 @@
-name: Reflex Docs Automation
+name: Reflex Documentation Automation
 
 on:
   schedule:
     - cron: '0 */2 * * *' # Runs every 2 hours
   workflow_dispatch: # Allows manual triggering of the workflow
+  push:
+    branches: [main]
+    paths: ['haupt.py', 'requirements.txt', '.github/workflows/**']
 
 env:
+  PYTHON_VERSION: '3.12.10'
   PYTHON_EXEC: /home/ubuntu/.pyenv/versions/3.12.10/bin/python
+  TZ: 'Europe/Berlin'
 
 jobs:
-  update-docs:
+  setup-and-validate:
+    name: Setup Environment & Validate
     runs-on: self-hosted
+    outputs:
+      python-cache-key: ${{ steps.cache-key.outputs.key }}
+      requirements-hash: ${{ steps.hash.outputs.hash }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          echo "key=python-deps-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt') }}" >> $GITHUB_OUTPUT
+
+      - name: Hash requirements
+        id: hash
+        run: |
+          echo "hash=${{ hashFiles('requirements.txt') }}" >> $GITHUB_OUTPUT
 
       - name: Configure Git
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config --global init.defaultBranch main
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12.10'
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
 
-      - name: Install dependencies
+      - name: Validate Python environment
         run: |
-          ${{ env.PYTHON_EXEC }} -m pip install --upgrade pip
+          echo "Python version: $(${{ env.PYTHON_EXEC }} --version)"
+          echo "Pip version: $(${{ env.PYTHON_EXEC }} -m pip --version)"
+
+      - name: Install Python dependencies
+        run: |
+          ${{ env.PYTHON_EXEC }} -m pip install --upgrade pip setuptools wheel
           ${{ env.PYTHON_EXEC }} -m pip install -r requirements.txt
-          ${{ env.PYTHON_EXEC }} -m playwright install
 
-      - name: Run automation script
-        run: ${{ env.PYTHON_EXEC }} haupt.py
-
-      - name: Update README with last checked time
+      - name: Install Playwright browsers
         run: |
-          echo "Attempting to update Last checked time in README.md"
-          current_time_str="$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')"
+          ${{ env.PYTHON_EXEC }} -m playwright install --with-deps
+          ${{ env.PYTHON_EXEC }} -m playwright install-deps
+
+      - name: Validate automation script
+        run: |
+          if [[ ! -f "haupt.py" ]]; then
+            echo "::error::haupt.py not found"
+            exit 1
+          fi
+          ${{ env.PYTHON_EXEC }} -m py_compile haupt.py
+
+  generate-docs:
+    name: Generate Documentation
+    runs-on: self-hosted
+    needs: setup-and-validate
+    outputs:
+      docs-generated: ${{ steps.run-script.outputs.success }}
+      changes-detected: ${{ steps.detect-changes.outputs.changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python (cached)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Restore dependencies
+        run: ${{ env.PYTHON_EXEC }} -m pip install -r requirements.txt
+
+      - name: Run documentation automation
+        id: run-script
+        run: |
+          echo "Starting documentation generation..."
+          if ${{ env.PYTHON_EXEC }} haupt.py; then
+            echo "success=true" >> $GITHUB_OUTPUT
+            echo "Documentation generation completed successfully"
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+            echo "::error::Documentation generation failed"
+            exit 1
+          fi
+
+      - name: Detect changes
+        id: detect-changes
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in documentation"
+          fi
+
+      - name: Upload generated docs as artifact
+        if: steps.detect-changes.outputs.changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-docs-${{ github.run_number }}
+          path: |
+            reflex_docs.txt
+            *.md
+          retention-days: 7
+
+  update-timestamps:
+    name: Update Timestamps
+    runs-on: self-hosted
+    needs: [setup-and-validate, generate-docs]
+    if: always() && needs.setup-and-validate.result == 'success'
+    outputs:
+      timestamp-updated: ${{ steps.update-checked.outputs.updated }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update last checked timestamp
+        id: update-checked
+        run: |
+          current_time_str="$(date '+%Y-%m-%d %H:%M:%S %Z')"
           NEW_TIME_STRING="- Last checked: \`$current_time_str\`"
           
-          # Apply sed to README.md
-          sed -i "s|^- Last checked: <!-- LAST_CHECKED_PLACEHOLDER -->|${NEW_TIME_STRING}|g" README.md
-          sed -i "s|^- Last checked: \`.*\`|${NEW_TIME_STRING}|g" README.md
-          echo "Sed commands for 'Last checked' executed."
-
-          # Stage ONLY README.md for this specific commit
-          git add README.md
-          echo "Staged potential changes in README.md"
-
-          # Check if README.md has staged changes to be committed
-          if ! git diff --cached --quiet README.md; then
-            echo "README.md has staged changes for 'Last checked'. Committing it."
-            git commit -m "Update last checked time in README" README.md 
-            
-            echo "Pulling with rebase before pushing 'Last checked' time update..."
-            # At this point, if reflex_docs.txt was modified by haupt.py, it's an unstaged
-            # working directory change. --autostash will handle this.
-            if ! git pull --rebase --autostash origin main; then
-              echo "::error::git pull --rebase --autostash failed for 'Last checked' time update. Please check runner state or resolve conflicts if any."
-              exit 1
-            fi
-            
-            echo "Pushing 'Last checked' time update..."
-            git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
-            if [ $? -ne 0 ]; then
-              echo "::error::Failed to push 'Last checked' time update. Please check PAT permissions and branch protection rules."
-              exit 1
-            fi
-            echo "'Last checked' time update pushed successfully."
+          echo "Updating last checked timestamp: $current_time_str"
+          
+          if sed -i "s|^- Last checked: <!-- LAST_CHECKED_PLACEHOLDER -->|${NEW_TIME_STRING}|g; s|^- Last checked: \`.*\`|${NEW_TIME_STRING}|g" README.md; then
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "Timestamp updated successfully"
           else
-            echo "No new changes to commit for 'Last checked' time in README.md (already up-to-date or no changes made by sed)."
+            echo "updated=false" >> $GITHUB_OUTPUT
+            echo "::warning::Failed to update timestamp"
           fi
-          # Changes to reflex_docs.txt (if any from haupt.py) remain as working directory
-          # modifications. They will be detected by the 'Check for changes' step (which uses
-          # 'git diff --exit-code') and then staged and committed by the
-          # 'Commit and push changes' step.
 
-      - name: Check for changes
-        id: check_changes
+      - name: Commit timestamp update
+        if: steps.update-checked.outputs.updated == 'true'
         run: |
-          if ! git diff --exit-code; then
-            echo "Changes found."
-            echo "changes=true" >> $GITHUB_OUTPUT
+          git add README.md
+          
+          if git diff --cached --quiet; then
+            echo "No timestamp changes to commit"
           else
-            echo "No changes found."
-            echo "changes=false" >> $GITHUB_OUTPUT
+            git commit -m "ci: update last checked timestamp [skip ci]"
+            echo "Timestamp changes committed"
+          fi
+
+  publish-changes:
+    name: Publish Documentation Updates
+    runs-on: self-hosted
+    needs: [generate-docs, update-timestamps]
+    if: needs.generate-docs.outputs.changes-detected == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download generated docs
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-docs-${{ github.run_number }}
+
+      - name: Update last updated timestamp
+        run: |
+          current_time_str="$(date '+%Y-%m-%d %H:%M:%S %Z')"
+          NEW_UPDATED_TIME_STRING="- Last updated: \`$current_time_str\`"
+          
+          echo "Updating last updated timestamp: $current_time_str"
+          sed -i "s|^- Last updated: <!-- LAST_UPDATED_PLACEHOLDER -->|${NEW_UPDATED_TIME_STRING}|g; s|^- Last updated: \`.*\`|${NEW_UPDATED_TIME_STRING}|g" README.md
+
+      - name: Stage all changes
+        run: |
+          git add .
+          echo "All changes staged for commit"
+
+      - name: Commit documentation updates
+        run: |
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
             exit 0
           fi
+          
+          git commit -m "docs: update Reflex documentation and timestamps
+          
+          - Updated documentation content
+          - Refreshed last updated timestamp
+          - Generated on $(date '+%Y-%m-%d %H:%M:%S %Z')
+          
+          [automated commit]"
 
-      - name: Commit and push changes
-        if: steps.check_changes.outputs.changes == 'true'
+      - name: Pull latest changes
+        run: |
+          echo "Syncing with remote repository..."
+          git pull --rebase --autostash origin main || {
+            echo "::error::Failed to sync with remote repository"
+            exit 1
+          }
+
+      - name: Push documentation updates
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
-          echo "Attempting to update Last updated time in README.md"
-          NEW_UPDATED_TIME_STRING="- Last updated: \`$(TZ='Europe/Berlin' date '+%Y-%m-%d %H:%M:%S %Z')\`"
+          echo "Publishing documentation updates..."
+          git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main || {
+            echo "::error::Failed to push documentation updates"
+            exit 1
+          }
+          echo "✅ Documentation updates published successfully"
 
-          # First, try to replace the placeholder specifically
-          sed -i "s|^- Last updated: <!-- LAST_UPDATED_PLACEHOLDER -->|${NEW_UPDATED_TIME_STRING}|g" README.md
+  cleanup:
+    name: Cleanup & Notifications
+    runs-on: self-hosted
+    needs: [setup-and-validate, generate-docs, update-timestamps, publish-changes]
+    if: always()
+    steps:
+      - name: Workflow summary
+        run: |
+          echo "## 📊 Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Setup & Validate | ${{ needs.setup-and-validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Generate Docs | ${{ needs.generate-docs.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Update Timestamps | ${{ needs.update-timestamps.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Publish Changes | ${{ needs.publish-changes.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Execution Time:** $(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_STEP_SUMMARY
           
-          # Then, try to replace an existing backticked timestamp
-          sed -i "s|^- Last updated: \`.*\`|${NEW_UPDATED_TIME_STRING}|g" README.md
-          
-          echo "Sed commands for 'Last updated' executed."
-          
-          echo "Staging all changes including README.md and reflex_docs.txt..."
-          git add . # This adds reflex_docs.txt (if changed) and the updated README.md
-
-          if ! git diff --cached --quiet; then
-            echo "Changes staged. Committing..."
-            git commit -m "Update merged Reflex documentation and README timestamps"
-            
-            echo "Pulling with rebase before pushing all changes..."
-            # Working directory should be clean here after the commit, but --autostash is safe.
-            if ! git pull --rebase --autostash origin main; then
-              echo "::error::git pull --rebase --autostash failed for final commit. Please check runner state or resolve conflicts if any."
-              exit 1
-            fi
-
-            echo "Pushing all changes..."
-            git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main
-            if [ $? -ne 0 ]; then
-              echo "::error::Failed to push 'Update merged Reflex documentation'. Please check PAT permissions and branch protection rules."
-              exit 1
-            fi
-            echo "All changes pushed successfully."
+          if [[ "${{ needs.generate-docs.outputs.changes-detected }}" == "true" ]]; then
+            echo "📝 **Documentation changes detected and published**" >> $GITHUB_STEP_SUMMARY
           else
-            echo "No new changes were staged for commit."
+            echo "✅ **No documentation changes required**" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Cleanup artifacts
+        if: always()
+        run: |
+          echo "Performing cleanup tasks..."
+          # Cleanup any temporary files if needed
+          echo "Cleanup completed"
