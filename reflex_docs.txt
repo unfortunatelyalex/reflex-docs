@@ -5160,21 +5160,14 @@ You can also share your components with the rest of the community at our website
 
 # Command Reference
 
-```python exec
-import reflex as rx
-from pcweb.pages.docs import wrapping_react
-from pcweb.pages.gallery import gallery
-from pcweb.pages.docs import custom_components
-from pcweb.templates.docpage import doccmdoutput
-from pcweb.styles.fonts import code
-```
-
 The custom component commands are under `reflex component` subcommand. To see the list of available commands, run `reflex component --help`. To see the manual on a specific command, run `reflex component <command> --help`, for example, `reflex component init --help`.
 
-```python eval
-doccmdoutput(
-    command="reflex component --help",
-    output="""Usage: reflex component [OPTIONS] COMMAND [ARGS]...
+```bash
+reflex component --help
+```
+
+```text
+Usage: reflex component [OPTIONS] COMMAND [ARGS]...
 
   Subcommands for creating and publishing Custom Components.
 
@@ -5184,17 +5177,19 @@ Options:
 Commands:
   init     Initialize a custom component.
   build    Build a custom component.
-  share    Collect more details on the published package for gallery.""")
+  share    Collect more details on the published package for gallery.
 ```
 
 ## reflex component init
 
 Below is an example of running the `init` command.
 
-```python eval
-doccmdoutput(
-    command="reflex component init",
-    output="""reflex component init
+```bash
+reflex component init
+```
+
+```text
+reflex component init
 ─────────────────────────────────────── Initializing reflex-google-auth project ───────────────────────────────────────
 Info: Populating pyproject.toml with package name: reflex-google-auth
 Info: Initializing the component directory: custom_components/reflex_google_auth
@@ -5211,16 +5206,13 @@ Custom component initialized successfully!
 [ pyproject.toml ]: Project configuration file. Please fill in details such as your name, email, homepage URL.
 [ custom_components/ ]: Custom component code template. Start by editing it with your component implementation.
 [ google_auth_demo/ ]: Demo App. Add more code to this app and test.
-""",
-)
 ```
 
 The `init` command uses the current enclosing folder name to construct a python package name, typically in the kebab case. For example, if running init in folder `google_auth`, the package name will be `reflex-google-auth`. The added prefix reduces the chance of name collision on PyPI (the Python Package Index), and it indicates that the package is a Reflex custom component. The user can override the package name by providing the `--package-name` option.
 
 The `init` command creates a set of files and folders prefilled with the package name and other details. During the init, the `custom_component` folder is installed locally in editable mode, so a developer can incrementally develop and test with ease. The changes in component implementation is automatically reflected where it is used. Below is the folder structure after the `init` command.
 
-```python eval
-rx._x.code_block("""
+```text
 google_auth/
 ├── pyproject.toml
 ├── README.md
@@ -5233,17 +5225,6 @@ google_auth/
         google_auth_demo/
         requirements.txt
         rxconfig.py
-""",
-  language="bash",
-  style={
-    "border-radius": "12px",
-    "border": "1px solid var(--c-slate-4)",
-    "background": "var(--c-slate-2)",
-    "color": "var(--c-slate-12)",
-    "font-family": "Source Code Pro",
-    **code
-  }
-)
 ```
 
 ### pyproject.toml
@@ -5270,10 +5251,12 @@ A demo app is generated inside `google_auth_demo` folder with import statements 
 
 The help manual is shown when adding the `--help` option to the command.
 
-```python eval
-doccmdoutput(
-    command="reflex component init --help",
-    output="""Usage: reflex component init [OPTIONS]
+```bash
+reflex component init --help
+```
+
+```text
+Usage: reflex component init [OPTIONS]
 
   Initialize a custom component.
 
@@ -5294,7 +5277,6 @@ Options:
                                   The log level to use.  [default:
                                   LogLevel.INFO]
   --help                          Show this message and exit.
-""")
 ```
 
 ## reflex component publish
@@ -5309,10 +5291,11 @@ It is not required to run the `build` command separately before publishing. The 
 
 The `build` command generates the `.tar.gz` and `.whl` distribution files to be uploaded to the desired package index, for example, PyPI. This command must be run at the top level of the project where the `pyproject.toml` file is. As a result of a successful build, there is a new `dist` folder with the distribution files.
 
-```python eval
-doccmdoutput(
-    command="reflex component build --help",
-    output="""reflex component build --help
+```bash
+reflex component build --help
+```
+
+```text
 Usage: reflex component build [OPTIONS]
 
   Build a custom component. Must be run from the project root directory where
@@ -5327,8 +5310,8 @@ Options:
                                   The log level to use.  [default:
                                   LogLevel.INFO]
   --help                          Show this message and exit.
-""")
 ```
+
 
 ```python exec
 from pcweb.pages.docs import vars
@@ -11576,8 +11559,15 @@ via `rx.call_script`.
 rx.vstack(
     rx.script(
         src="https://cdn.jsdelivr.net/gh/scottschiller/snowstorm@snowstorm_20131208/snowstorm-min.js",
-        on_ready=rx.call_script("snowStorm.autoStart = false; snowStorm.snowColor = '#111'"),
     ),
+    rx.script("""
+        window.addEventListener('load', function() {
+            if (typeof snowStorm !== 'undefined') {
+                snowStorm.autoStart = false;
+                snowStorm.snowColor = '#111';
+            }
+        });
+    """),
     rx.button("Start Duststorm", on_click=rx.call_script("snowStorm.start()")),
     rx.button("Toggle Duststorm", on_click=rx.call_script("snowStorm.toggleSnow()")),
 )
@@ -16029,7 +16019,7 @@ class PropCondState(rx.State):
     value: int
     
     @rx.event
-    def set_end(self, value: list[int]):
+    def set_end(self, value: list[int | float]):
         self.value = value[0]
 
 
@@ -17078,6 +17068,126 @@ config = rxe.Config(
     app_name="MyApp",
     ... # you can pass all rx.Config arguments as well as the one specific to rxe.Config
 )
+```
+
+---
+title: Enterprise Components
+---
+
+```python exec
+import reflex as rx
+from pcweb.pages.docs import enterprise
+from pcweb.templates.docpage import h1_comp, text_comp_2
+from pcweb.components.icons import get_icon
+
+def enterprise_component_grid():
+    sections = [
+        {
+            "title": "AG Grid",
+            "description": "Advanced data grid with sorting, filtering, editing, and pagination",
+            "link": enterprise.ag_grid.index.path,
+            "components": [
+                ("Overview", enterprise.ag_grid.index.path),
+                ("Column Definitions", enterprise.ag_grid.column_defs.path),
+                ("Aligned Grids", enterprise.ag_grid.aligned_grids.path),
+                ("Model Wrapper", enterprise.ag_grid.model_wrapper.path),
+                ("Pivot Mode", enterprise.ag_grid.pivot_mode.path),
+                ("Theme", enterprise.ag_grid.theme.path),
+                ("Value Transformers", enterprise.ag_grid.value_transformers.path),
+            ]
+        },
+        {
+            "title": "AG Chart", 
+            "description": "Interactive charts and data visualization",
+            "link": enterprise.ag_chart.path,
+            "components": [
+                ("Overview", enterprise.ag_chart.path),
+            ]
+        },
+        {
+            "title": "Interactive Components",
+            "description": "Drag-and-drop and mapping functionality", 
+            "link": enterprise.drag_and_drop.path,
+            "components": [
+                ("Drag and Drop", enterprise.drag_and_drop.path),
+                ("Mapping", enterprise.map.index.path),
+            ]
+        },
+        {
+            "title": "Mantine",
+            "description": "Rich UI components from Mantine library",
+            "link": enterprise.mantine.index.path,
+            "components": [
+                ("Overview", enterprise.mantine.index.path),
+                ("Autocomplete", enterprise.mantine.autocomplete.path),
+                ("Collapse", enterprise.mantine.collapse.path),
+                ("Combobox", enterprise.mantine.combobox.path),
+                ("JSON Input", enterprise.mantine.json_input.path),
+                ("Loading Overlay", enterprise.mantine.loading_overlay.path),
+                ("Multi Select", enterprise.mantine.multi_select.path),
+                ("Number Formatter", enterprise.mantine.number_formatter.path),
+                ("Pill", enterprise.mantine.pill.path),
+                ("Ring Progress", enterprise.mantine.ring_progress.path),
+                ("Semi Circle Progress", enterprise.mantine.semi_circle_progress.path),
+                ("Spoiler", enterprise.mantine.spoiler.path),
+                ("Tags Input", enterprise.mantine.tags_input.path),
+                ("Timeline", enterprise.mantine.timeline.path),
+                ("Tree", enterprise.mantine.tree.path),
+            ]
+        }
+    ]
+    
+    cards = []
+    for section in sections:
+        cards.append(
+            rx.box(
+                rx.link(
+                    rx.el.h1(
+                        section["title"],
+                        class_name="font-large text-slate-12",
+                    ),
+                    get_icon("new_tab", class_name="text-slate-11 [&>svg]:size-4"),
+                    href=section["link"],
+                    underline="none",
+                    class_name="px-4 py-2 bg-slate-1 hover:bg-slate-3 transition-bg flex flex-row justify-between items-center !text-slate-12",
+                ),
+                rx.text(
+                    section["description"],
+                    class_name="px-4 py-2 font-small text-slate-9 border-t border-slate-5",
+                ),
+                rx.box(
+                    *[
+                        rx.link(
+                            comp[0],
+                            href=comp[1],
+                            class_name="font-small text-slate-11 hover:!text-violet-9 transition-color w-fit",
+                        )
+                        for comp in section["components"]
+                    ],
+                    class_name="flex flex-col gap-2.5 px-4 py-2 border-t border-slate-5",
+                ),
+                class_name="flex flex-col border border-slate-5 rounded-xl bg-slate-2 shadow-large overflow-hidden",
+            )
+        )
+    
+    return rx.box(
+        *cards,
+        class_name="grid grid-cols-1 lg:grid-cols-2 gap-6",
+    )
+
+component_grid = enterprise_component_grid()
+```
+
+```python eval
+h1_comp(text="Enterprise Components")
+```
+
+```python eval
+text_comp_2(text="Advanced UI components and features to enhance your Reflex applications. Available for free with the 'Built with Reflex' badge, or without the badge with an enterprise license.")
+```
+
+```python eval
+component_grid
 ```
 
 # AG Chart
@@ -25673,6 +25783,23 @@ def cond_example():
 The second component is optional and can be omitted.
 If it is omitted, nothing is rendered if the condition is `False`.
 
+```python demo exec
+class CondOptionalState(rx.State):
+    show_optional: bool = True
+
+    @rx.event
+    def toggle_optional(self):
+        self.show_optional = not (self.show_optional)
+
+
+def cond_optional_example():
+    return rx.vstack(
+        rx.button("Toggle", on_click=CondOptionalState.toggle_optional),
+        rx.cond(CondOptionalState.show_optional, rx.text("This text appears when condition is True", color="green")),
+        rx.text("This text is always visible", color="gray"),
+    )
+```
+
 ```md video https://youtube.com/embed/ITOZkzjtjUA?start=6040&end=6463
 # Video: Conditional Rendering
 ```
@@ -26493,6 +26620,10 @@ affects the computed  sizes of the flex items based on the props that are set.
 ```python demo exec
 class FlexGrowShrinkState(rx.State):
     width_pct: list[int] = [100]
+    
+    @rx.event
+    def set_width_pct(self, value: list[int | float]):
+        self.width_pct = [int(value[0])]
     
     
 def border_box(*children, **props):
@@ -29876,7 +30007,7 @@ class SliderState(rx.State):
     value: int = 50
 
     @rx.event
-    def set_end(self, value: list[int]):
+    def set_end(self, value: list[int | float]):
         self.value = value[0]
 
 def slider_intro():
@@ -29897,7 +30028,7 @@ class RangeSliderState(rx.State):
     value_end: int = 75
 
     @rx.event
-    def set_end(self, value: list[int]):
+    def set_end(self, value: list[int | float]):
         self.value_start = value[0]
         self.value_end = value[1]
 
@@ -29929,7 +30060,7 @@ class LiveSliderState(rx.State):
     value: int = 50
 
     @rx.event
-    def set_end(self, value: list[int]):
+    def set_end(self, value: list[int | float]):
         self.value = value[0]
 
 def live_slider_intro():
@@ -37310,8 +37441,8 @@ class PyplotState(rx.State):
         self.plot_data = tuple(np.random.rand(2, self.num_points) for _ in range(3))
         self.scale = [random.uniform(0, 100) for _ in range(self.num_points)]
 
-    def set_num_points(self, num_points: list[int]):
-        self.num_points = num_points[0]
+    def set_num_points(self, num_points: list[int | float]):
+        self.num_points = int(num_points[0])
         self.randomize()
     
     @rx.var
@@ -37636,7 +37767,7 @@ class DebounceState(rx.State):
     settled_value: int = 50
 
     @rx.event
-    def update_value(self, value: list[int]):
+    def update_value(self, value: list[int | float]):
         self.settled_value = value[0]
 
 
@@ -37754,7 +37885,7 @@ class EventArgStateSlider(rx.State):
     value: int = 50
 
     @rx.event
-    def set_end(self, value: list[int]):
+    def set_end(self, value: list[int | float]):
         self.value = value[0]
 
 
@@ -38027,11 +38158,11 @@ Here's a comparison between traditional event handlers defined within state clas
 # Traditional event handler within a state class
 class TraditionalState(rx.State):
     count: int = 0
-    
+
     @rx.event
     def increment(self, amount: int = 1):
         self.count += amount
-    
+
 # Usage in components
 rx.button("Increment", on_click=TraditionalState.increment(5))
 
