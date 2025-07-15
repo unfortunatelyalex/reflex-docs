@@ -168,7 +168,7 @@ jobs:
     name: Publish Documentation Updates
     runs-on: self-hosted
     needs: [generate-docs, update-timestamps]
-    if: needs.generate-docs.outputs.changes-detected == 'true'
+    if: always()
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -182,7 +182,6 @@ jobs:
         run: |
           current_time_str="$(date '+%Y-%m-%d %H:%M:%S %Z')"
           NEW_UPDATED_TIME_STRING="- Last updated: \`$current_time_str\`"
-          
           echo "Updating last updated timestamp: $current_time_str"
           sed -i "s|^- Last updated: <!-- LAST_UPDATED_PLACEHOLDER -->|${NEW_UPDATED_TIME_STRING}|g; s|^- Last updated: \`.*\`|${NEW_UPDATED_TIME_STRING}|g" README.md
 
@@ -197,13 +196,10 @@ jobs:
             echo "No changes to commit"
             exit 0
           fi
-          
           git commit -m "docs: update Reflex documentation and timestamps
-          
           - Updated documentation content
           - Refreshed last updated timestamp
           - Generated on $(date '+%Y-%m-%d %H:%M:%S %Z')
-          
           [automated commit]"
 
       - name: Pull latest changes
