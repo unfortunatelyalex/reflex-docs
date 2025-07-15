@@ -177,6 +177,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: generated-docs-${{ github.run_number }}
+        continue-on-error: true
 
       - name: Update last updated timestamp
         run: |
