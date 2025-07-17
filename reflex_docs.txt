@@ -16748,7 +16748,7 @@ Reflex Enterprise provides comprehensive drag and drop functionality for creatin
 
 Here's a basic example showing how to create a draggable item and drop target:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -16803,7 +16803,7 @@ def basic_drag_drop():
 
 Create a draggable item that can be moved between multiple drop targets:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -16871,7 +16871,7 @@ def multi_position_example():
 
 Access drag and drop state information using collected parameters:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -16930,7 +16930,7 @@ def state_tracking_example():
 
 Create dynamic draggable lists using `rx.foreach`:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -17727,7 +17727,7 @@ component_grid
 
 AG Chart is a powerful charting library that provides interactive charts and data visualization components for enterprise applications.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -17753,6 +17753,7 @@ def basic_chart():
 ```
 
 For more detailed documentation, see the [AG Chart Documentation](https://charts.ag-grid.com/).
+
 
 # Built with Reflex Badge
 
@@ -17803,7 +17804,7 @@ Map components are included with `reflex-enterprise`. No additional installation
 
 Here's a simple example of creating a map with a marker:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -17868,7 +17869,7 @@ rxe.map.tile_layer(
 
 Add point markers to specific locations:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -17904,7 +17905,7 @@ def markers_example():
 
 Draw shapes and areas on the map:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -17965,7 +17966,7 @@ def vectors_example():
 
 Maps support comprehensive event handling for user interactions:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18006,7 +18007,7 @@ def interactive_example():
 
 Add UI controls for enhanced user interaction:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18058,7 +18059,7 @@ map_api = rxe.map.api("my-map-id")
 
 Here are some commonly used API methods demonstrated in action:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18141,7 +18142,7 @@ This means you can use any method from the [Leaflet Map documentation](https://l
 
 ### Advanced Example
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18337,6 +18338,7 @@ def dynamic_markers():
 
 [← Back to main documentation]({enterprise.overview.path})
 
+
 ---
 title: Collapse
 ---
@@ -18345,7 +18347,7 @@ title: Collapse
 
 `rxe.mantine.collapse` is a component that allows you to create collapsible sections in your application. It is useful for hiding or showing content based on user interaction, such as clicking a button or a link.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18374,6 +18376,7 @@ def collapse_example():
     )
 ```
 
+
 ---
 title: Tree
 ---
@@ -18386,7 +18389,7 @@ title: Tree
 # Due to some technical limitations(pydantic), the tree component only supports 5 levels of depths for the `data` props.
 ```
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18406,6 +18409,7 @@ def tree_example():
     )
 ```
 
+
 ---
 title: Number Formatter
 ---
@@ -18413,7 +18417,7 @@ title: Number Formatter
 # Number Formatter component
 `rxe.mantine.number_formatter` is a component for formatting numbers in a user-friendly way. It allows you to specify the format, precision, and other options for displaying numbers.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18434,6 +18438,7 @@ def number_formatter_example():
     )
 ```
 
+
 ---
 title: Ring Progress
 ---
@@ -18442,7 +18447,7 @@ title: Ring Progress
 
 `rxe.mantine.ring_progress` is a component for displaying progress in a circular format. It is useful for visualizing completion percentages or other metrics in a compact and visually appealing way.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import random
@@ -18466,6 +18471,7 @@ def ring_progress_example():
     )
 ```
 
+
 ---
 title: Timeline
 ---
@@ -18473,7 +18479,7 @@ title: Timeline
 # Timeline component
 `rxe.mantine.timeline` is a component for displaying a sequence of events or milestones in a linear format. It is useful for visualizing progress, history, or any sequential information.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18501,6 +18507,7 @@ def timeline_example():
     )
 ```
 
+
 ---
 title: TagsInput
 ---
@@ -18515,7 +18522,7 @@ title: TagsInput
 
 ## Basic Example
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18529,7 +18536,7 @@ def tags_input_simple_page():
 
 ## State Example
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18556,6 +18563,7 @@ def tags_input_page():
         radius="xl",
     )
 ```
+
 
 ---
 title: Combobox
@@ -18602,7 +18610,7 @@ title: Loading Overlay
 # Loading Overlay component
 `rxe.mantine.loading_overlay` is a component that displays a loading overlay on top of its children. It is useful for indicating that a process is ongoing and prevents user interaction with the underlying content.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18628,6 +18636,7 @@ def loading_overlay_example():
     ),rx.button("Toggle Loading", on_click=LoadingOverlayState.toggle_loading),
 ```
 
+
 ---
 title: MultiSelect
 ---
@@ -18636,7 +18645,7 @@ title: MultiSelect
 
 `rxe.mantine.multi_select` is a component for selecting multiple options from a list. It allows users to choose one or more items, making it suitable for scenarios where multiple selections are required.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18656,6 +18665,7 @@ def multi_select_example():
     )
 ```
 
+
 ---
 title: Semi Circle Progress
 ---
@@ -18663,7 +18673,7 @@ title: Semi Circle Progress
 # Semi Circle Progress component
 `rxe.mantine.semi_circle_progress` is a component for displaying progress in a semi-circular format. It is useful for visualizing completion percentages or other metrics in a compact and visually appealing way.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import random
@@ -18685,6 +18695,7 @@ def semi_circle_progress_example():
     )
 ```
 
+
 ---
 title: JSON Input
 ---
@@ -18695,7 +18706,7 @@ title: JSON Input
 
 ## Example
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18717,6 +18728,7 @@ def json_input_example():
     )
 ```
 
+
 ---
 title: Pill
 ---
@@ -18731,7 +18743,7 @@ from pcweb.pages.docs import enterprise
 
 `rxe.mantine.pill` is a wrapping of the mantine component [Pill](https://mantine.dev/core/pill/). It is a simple component that can be used to display a small piece of information, such as a tag or a label. It can be used in various contexts, such as in a list of tags or labels, or as a standalone component.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18751,7 +18763,7 @@ def pill_page():
 ## Pill Group
 `rxe.mantine.pill.group` allows grouping multiple `rxe.mantine.pill` components together, with a predefined layout.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18775,7 +18787,7 @@ By itself it does not include any logic, it only renders given children.
 
 ## Example
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18849,7 +18861,7 @@ title: Autocomplete
 
 `rxe.mantine.autocomplete` is a component for providing suggestions as the user types. It is useful for enhancing user experience by offering relevant options based on input.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18864,6 +18876,7 @@ def autocomplete_example():
     )
 ```
 
+
 ---
 title: Spoiler
 ---
@@ -18872,7 +18885,7 @@ title: Spoiler
 
 `rxe.mantine.spoiler` is a component that allows you to hide or reveal content. It is useful for displaying additional information or details that may not be immediately relevant to the user.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 
@@ -18886,6 +18899,7 @@ def spoiler_example():
         ),
     )
 ```
+
 
 ```python exec
 import reflex as rx
@@ -18903,7 +18917,7 @@ You can also define how rows are aggregated by passing the `agg_func` property i
 
 You can find a live example here: [Pivot Mode Example](https://aggrid.reflex.run/pivot).
 
-```python demo exec toggle
+```python demo exec
 import pandas as pd
 import reflex as rx
 
@@ -18943,7 +18957,7 @@ def pivot_page():
 
 # Pivot using State
 
-```python demo exec toggle
+```python demo exec
 import pandas as pd
 import reflex as rx
 
@@ -19106,7 +19120,7 @@ TOC:
 
 If you have two columns `col_a` and `col_b` and you want to display the sum of these two columns in a third column `sum`, you can define the `value_getter` of `sum` as follows:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19136,7 +19150,7 @@ def ag_grid_value_getter():
 
 If you have a column `price` and you want to display the price with a currency symbol, you can define the `value_formatter` of `price` as follows:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19168,7 +19182,7 @@ AgGrid provides a way to align multiple grids together. This is useful when you 
 
 You can do so through the `aligned_grids` prop. This prop takes a list of grid IDs that you want to align. 
 
-```python demo exec toggle
+```python demo exec
 import pandas as pd
 
 import reflex_enterprise as rxe
@@ -19222,6 +19236,7 @@ def aligned_grids_page():
 # The pivot functionality does not work with aligned grids. This is because pivoting data changes the columns, which would make the aligned grids incompatible, as they are no longer sharing the same set of columns.
 ```
 
+
 ---
 title: "AgGrid Overview"
 order: 3
@@ -19245,7 +19260,7 @@ A basic Reflex AG Grid contains column definitions `column_defs`, which define t
 
 Each grid also requires a unique `id`, which is needed to uniquely identify the Ag-Grid instance on the page. If you have multiple grids on the same page, each grid must have a unique `id` so that it can be correctly rendered and managed.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19280,7 +19295,7 @@ The format of the data passed to the `row_data` prop is a list of dictionaries. 
 
 The previous example showed the `column_defs` written out in full. You can also extract the required information from the dataframe's column names:
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19302,7 +19317,7 @@ def ag_grid_simple_2():
 
 In the above example, the first letter of the field names provided are capitalized when displaying the header name. You can customize the header names by providing a `header_name` key in the column definition. In this example, the `header_name` is customized for the second and third columns.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19330,7 +19345,7 @@ def ag_grid_simple_headers():
 
 Allow a user to filter a column by setting the `filter` key to `True` in the column definition. In this example we enable filtering for the first and last columns.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19362,7 +19377,7 @@ You can also set the filter type using the `filter` key. The following filter ty
 
 (`ag_grid.filters.set` and `ag_grid.filters.multi` are available with AG Grid Enterprise)
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19393,7 +19408,7 @@ By default, the rows can be sorted by any column by clicking on the column heade
 
 In this example, we disable sorting for the first column.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19421,7 +19436,7 @@ def ag_grid_simple_row_sorting():
 
 Row Selection is enabled using the `row_selection` attribute. Setting it to `multiple` allows users to select multiple rows at a time. You can use the `checkbox_selection` column definition attribute to render checkboxes for selection.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19507,7 +19522,7 @@ def ag_grid_simple_editing():
 
 By default, the grid uses a vertical scroll. You can reduce the amount of scrolling required by adding pagination. To add pagination, set `pagination=True`. You can set the `pagination_page_size` to the number of rows per page and `pagination_page_size_selector` to a list of options for the user to select from.
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19753,7 +19768,7 @@ The example below uses the `select_all()` and `deselect_all()` methods of the AG
 # Ensure that the docs are set to React tab in AG Grid
 ```
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19805,7 +19820,7 @@ rx.button("Select all", on_click=rxe.ag_grid.api(id="ag_grid_basic_row_selection
 The following example lets a user [export the data as a csv](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-export-exportDataAsCsv) and [adjust the size of columns to fit the available horizontal space](https://www.ag-grid.com/javascript-data-grid/grid-api/#reference-columnSizing-sizeColumnsToFit). (Try resizing the screen and then clicking the resize columns button)
 
 
-```python demo exec toggle
+```python demo exec
 import reflex as rx
 import reflex_enterprise as rxe
 import pandas as pd
@@ -19885,7 +19900,7 @@ def ag_grid_api_argument():
 
 The react code for the `get_data_as_csv` method of the AG Grid API is `getDataAsCsv = (params?: CsvExportParams) => string  |  undefined;`. Here the function returns a `string` (or undefined). 
 
-In Reflex to handle this returned value it is necessary to pass a `callback` as an argument to the `get_data_as_csv` method that will get the returned value. In this example the `handle_get_data` event handler is passed as the callback. This event handler will be called with the returned value from the `get_data_as_csv` method. 
+In Reflex to handle this returned value it is necessary to pass a `callback` as an argument to the `get_data_as_csv` method that will get the returned value. In this example the `handle_get_data` event handler is passed as the callback. This event handler will be called with the returned value from the `get_data_as_csv` method.  
 
 
 
@@ -22354,6 +22369,328 @@ Avoid defining computed vars inside a state that contains a large amount of data
 states with computed vars are always loaded to ensure the values are recalculated.
 When using computed vars, it better to define them in a state that directly inherits from `rx.State` and
 does not have other states inheriting from it, to avoid loading unnecessary data.
+
+```python exec
+import reflex as rx
+from pcweb.templates.docpage import definition
+```
+
+# State Mixins
+
+State mixins allow you to define shared functionality that can be reused across multiple State classes. This is useful for creating reusable components, shared business logic, or common state patterns.
+
+## What are State Mixins?
+
+A state mixin is a State class marked with `mixin=True` that cannot be instantiated directly but can be inherited by other State classes. Mixins provide a way to share:
+
+- Base variables
+- Computed variables  
+- Event handlers
+- Backend variables
+
+## Basic Mixin Definition
+
+To create a state mixin, inherit from `rx.State` and pass `mixin=True`:
+
+```python demo exec
+class CounterMixin(rx.State, mixin=True):
+    count: int = 0
+
+    @rx.var
+    def count_display(self) -> str:
+        return f"Count: {self.count}"
+
+    @rx.event
+    def increment(self):
+        self.count += 1
+
+class MyState(CounterMixin, rx.State):
+    name: str = "App"
+
+def counter_example():
+    return rx.vstack(
+        rx.heading(MyState.name),
+        rx.text(MyState.count_display),
+        rx.button("Increment", on_click=MyState.increment),
+        spacing="4",
+        align="center",
+    )
+```
+
+In this example, `MyState` automatically inherits the `count` variable, `count_display` computed variable, and `increment` event handler from `CounterMixin`.
+
+## Multiple Mixin Inheritance
+
+You can inherit from multiple mixins to combine different pieces of functionality:
+
+```python demo exec
+class TimestampMixin(rx.State, mixin=True):
+    last_updated: str = ""
+
+    @rx.event
+    def update_timestamp(self):
+        import datetime
+        self.last_updated = datetime.datetime.now().strftime("%H:%M:%S")
+
+class LoggingMixin(rx.State, mixin=True):
+    log_messages: list[str] = []
+
+    @rx.event
+    def log_message(self, message: str):
+        self.log_messages.append(message)
+
+class CombinedState(CounterMixin, TimestampMixin, LoggingMixin, rx.State):
+    app_name: str = "Multi-Mixin App"
+
+    @rx.event
+    def increment_with_log(self):
+        self.increment()
+        self.update_timestamp()
+        self.log_message(f"Count incremented to {self.count}")
+
+def multi_mixin_example():
+    return rx.vstack(
+        rx.heading(CombinedState.app_name),
+        rx.text(CombinedState.count_display),
+        rx.text(f"Last updated: {CombinedState.last_updated}"),
+        rx.button("Increment & Log", on_click=CombinedState.increment_with_log),
+        rx.cond(
+            CombinedState.log_messages.length() > 0,
+            rx.vstack(
+                rx.foreach(
+                    CombinedState.log_messages[-3:],
+                    rx.text
+                ),
+                spacing="1"
+            ),
+            rx.text("No logs yet")
+        ),
+        spacing="4",
+        align="center",
+    )
+```
+
+## Backend Variables in Mixins
+
+Mixins can also include backend variables (prefixed with `_`) that are not sent to the client:
+
+```python demo exec
+class DatabaseMixin(rx.State, mixin=True):
+    _db_connection: dict = {}  # Backend only
+    user_count: int = 0        # Sent to client
+
+    @rx.event
+    def fetch_user_count(self):
+        # Simulate database query
+        self.user_count = len(self._db_connection.get("users", []))
+
+class AppState(DatabaseMixin, rx.State):
+    app_title: str = "User Management"
+
+def database_example():
+    return rx.vstack(
+        rx.heading(AppState.app_title),
+        rx.text(f"User count: {AppState.user_count}"),
+        rx.button("Fetch Users", on_click=AppState.fetch_user_count),
+        spacing="4",
+        align="center",
+    )
+```
+
+Backend variables are useful for storing sensitive data, database connections, or other server-side state that shouldn't be exposed to the client.
+
+## Computed Variables in Mixins
+
+Computed variables in mixins work the same as in regular State classes:
+
+```python demo exec
+class FormattingMixin(rx.State, mixin=True):
+    value: float = 0.0
+
+    @rx.var
+    def formatted_value(self) -> str:
+        return f"${self.value:.2f}"
+
+    @rx.var
+    def is_positive(self) -> bool:
+        return self.value > 0
+
+class PriceState(FormattingMixin, rx.State):
+    product_name: str = "Widget"
+
+    @rx.event
+    def set_price(self, price: str):
+        try:
+            self.value = float(price)
+        except ValueError:
+            self.value = 0.0
+
+def formatting_example():
+    return rx.vstack(
+        rx.heading(f"Product: {PriceState.product_name}"),
+        rx.text(f"Price: {PriceState.formatted_value}"),
+        rx.text(f"Positive: {PriceState.is_positive}"),
+        rx.input(
+            placeholder="Enter price",
+            on_blur=PriceState.set_price,
+        ),
+        spacing="4",
+        align="center",
+    )
+```
+
+## Nested Mixin Inheritance
+
+Mixins can inherit from other mixins to create hierarchical functionality:
+
+```python demo exec
+class BaseMixin(rx.State, mixin=True):
+    base_value: str = "base"
+
+class ExtendedMixin(BaseMixin, mixin=True):
+    extended_value: str = "extended"
+
+    @rx.var
+    def combined_value(self) -> str:
+        return f"{self.base_value}-{self.extended_value}"
+
+class FinalState(ExtendedMixin, rx.State):
+    final_value: str = "final"
+
+def nested_mixin_example():
+    return rx.vstack(
+        rx.text(f"Base: {FinalState.base_value}"),
+        rx.text(f"Extended: {FinalState.extended_value}"),
+        rx.text(f"Combined: {FinalState.combined_value}"),
+        rx.text(f"Final: {FinalState.final_value}"),
+        spacing="4",
+        align="center",
+    )
+```
+
+This pattern allows you to build complex functionality by composing simpler mixins.
+
+## Best Practices
+
+```md alert info
+# Mixin Design Guidelines
+
+- **Single Responsibility**: Each mixin should have a focused purpose
+- **Avoid Deep Inheritance**: Keep mixin hierarchies shallow for clarity  
+- **Document Dependencies**: If mixins depend on specific variables, document them
+- **Test Mixins**: Create test cases for mixin functionality
+- **Naming Convention**: Use descriptive names ending with "Mixin"
+```
+
+## Limitations
+
+```md alert warning
+# Important Limitations
+
+- Mixins cannot be instantiated directly - they must be inherited by concrete State classes
+- Variable name conflicts between mixins are resolved by method resolution order (MRO)
+- Mixins cannot override methods from the base State class
+- The `mixin=True` parameter is required when defining a mixin
+```
+
+## Common Use Cases
+
+State mixins are particularly useful for:
+
+- **Form Validation**: Shared validation logic across forms
+- **UI State Management**: Common modal, loading, or notification patterns
+- **Logging**: Centralized logging and debugging
+- **API Integration**: Shared HTTP client functionality
+- **Data Formatting**: Consistent data presentation across components
+
+```python demo exec
+class ValidationMixin(rx.State, mixin=True):
+    errors: dict[str, str] = {}
+    is_loading: bool = False
+
+    @rx.event
+    def validate_email(self, email: str) -> bool:
+        if "@" not in email or "." not in email:
+            self.errors["email"] = "Invalid email format"
+            return False
+        self.errors.pop("email", None)
+        return True
+
+    @rx.event
+    def validate_required(self, field: str, value: str) -> bool:
+        if not value.strip():
+            self.errors[field] = f"{field.title()} is required"
+            return False
+        self.errors.pop(field, None)
+        return True
+
+    @rx.event
+    def clear_errors(self):
+        self.errors = {}
+
+class ContactFormState(ValidationMixin, rx.State):
+    name: str = ""
+    email: str = ""
+    message: str = ""
+
+    @rx.event
+    def submit_form(self):
+        self.clear_errors()
+        valid_name = self.validate_required("name", self.name)
+        valid_email = self.validate_email(self.email)
+        valid_message = self.validate_required("message", self.message)
+        
+        if valid_name and valid_email and valid_message:
+            self.is_loading = True
+            yield rx.sleep(1)
+            self.is_loading = False
+            self.name = ""
+            self.email = ""
+            self.message = ""
+
+def validation_example():
+    return rx.vstack(
+        rx.heading("Contact Form"),
+        rx.input(
+            placeholder="Name",
+            value=ContactFormState.name,
+            on_change=ContactFormState.set_name,
+        ),
+        rx.cond(
+            ContactFormState.errors.contains("name"),
+            rx.text(ContactFormState.errors["name"], color="red"),
+        ),
+        rx.input(
+            placeholder="Email",
+            value=ContactFormState.email,
+            on_change=ContactFormState.set_email,
+        ),
+        rx.cond(
+            ContactFormState.errors.contains("email"),
+            rx.text(ContactFormState.errors["email"], color="red"),
+        ),
+        rx.text_area(
+            placeholder="Message",
+            value=ContactFormState.message,
+            on_change=ContactFormState.set_message,
+        ),
+        rx.cond(
+            ContactFormState.errors.contains("message"),
+            rx.text(ContactFormState.errors["message"], color="red"),
+        ),
+        rx.button(
+            "Submit",
+            on_click=ContactFormState.submit_form,
+            loading=ContactFormState.is_loading,
+        ),
+        spacing="4",
+        align="center",
+        width="300px",
+    )
+```
+
+By using state mixins, you can create modular, reusable state logic that keeps your application organized and reduces code duplication.
+
 
 ---
 components:
