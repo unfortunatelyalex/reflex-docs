@@ -10160,87 +10160,369 @@ def signup_multiple_thirdparty() -> rx.Component:
 
 ## Overview
 
-# Environment Variables (Secrets)
+# Integrations Shortcut
+
+Reflex Build supports powerful integrations like databases, OpenAI, and Databricks, allowing you to connect external services to your app without complex setup. These integrations help you add advanced functionality—like AI-powered features, data analytics, or persistent storage—while speeding up development.
+
+The **@** feature makes it easy to reference integrations directly while chatting with the AI Builder. By typing **@**, you can quickly insert integrations into your prompts without needing to configure them manually first.
 
 ```python exec
 import reflex as rx
+from reflex_image_zoom import image_zoom
 ```
 
-It is possible to add environment variables to your app. This is useful for storing secrets such as API keys, and other sensitive information.
-
-## Adding Environment Variables
-
-You can add environment variables to your app by clicking the `Secrets` button at the bottom of the chat input box, as seen below:
-
 ```python eval
-rx.image(
-    src="/ai_builder/secrets_and_custom_packages.gif",
-    height="auto",
-    padding_bottom="2rem",
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/features/shortcut_light.png",
+                "/ai_builder/features/shortcut_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
 )
 ```
 
-After you add the environment variables the AI now has context of these and you can prompt it to use them in your code.
+## How to Use
 
-You can also add environment variables after your app is built, by again clicking the `Secrets` button at the bottom of the chat input box on the generation page.
+1. In the AI Builder chat, type **@**.
+2. A **popover list** of available integrations will appear (e.g. Database, Databricks, OpenAI).
+3. Select an integration from the list.
+4. The integration will be inserted into your message as **@IntegrationName**.
+5. Continue typing your request, and the AI Builder will use that integration context when generating.
 
-# Deploy your App
+## What It Does
+
+- **Quick Access** – No need to remember integration names.
+- **Context-Aware** – The AI Builder understands that `@Database` or `@OpenAI` refers to the actual integration.
+- **Faster Building** – Jump directly into using integrations in your prompts.
+
+## Common Use Cases
+
+- **Query Data**
+  "Show me the top 10 users from **@Database** ordered by signup date."
+
+- **Generate with AI**
+  "Use **@OpenAI** to summarize the user feedback table."
+
+
+# Knowledge
+
+The **Knowledge** feature lets you add context or rules that the AI Builder can reference when generating apps. This ensures your apps follow your guidelines, standards, or specific business logic.
 
 ```python exec
 import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/features/knowledge_light.png",
+                    "/ai_builder/features/knowledge_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
 ```
-
-It is easy to deploy your app into production from Reflex Build to Reflex Cloud. 
-
-Simply click the `Deploy` button in the bottom right corner of Reflex Build, as shown below:
-
 
 ```python eval
-rx.image(
-    src="/ai_builder/deploy_app.gif",
-    height="auto",
-    padding_bottom="2rem",
-)
+
+rx.el.div(render_image())
+
 ```
 
-When deploying you can set the following options:
-- **App Name**: The name of your app
-- **Hostname**: Set your url by setting your hostname, i.e. if you set `myapp` as your hostname, your app will be available at `myapp.reflex.run`
-- **Region**: The regions where your app will be deployed
-- **VM Size**: The size of the VM where your app will be deployed
-- **Secrets**: The environment variables that will be set for your app, you can load the variables currently being used by your app by clicking the `Load from settings` button
+## How to Add Knowledge
 
-# Download your App
+1. In the AI Builder workspace, go to the **Knowledge** section by clicking the **`@`** symbol in the bottom-left corner inside the chat area, and selecting the **Knowledge** tab. If you haven't submitted a prompt yet, you can click the **`@ Integrations`** button in the prompt area.
+2. Enter your rule, guideline, or context description.
+3. Save the entry. The AI Builder will automatically use it when generating apps.
+
+## How It Works
+
+- The AI Builder references your knowledge entries as rules or guidelines.
+- Rules can define naming conventions, component usage, layout preferences, or other custom logic.
+- Multiple rules can be added to cover different aspects of app generation.
+
+## Common Use Cases
+
+- **Maintain Consistency**
+  Ensure all generated apps follow your company’s design or naming standards.
+
+- **Enforce Business Logic**
+  Guide the AI Builder to follow specific workflows, validations, or feature requirements.
+
+- **Quickly Adapt AI Behavior**
+  Add or update rules to influence new app generations without manual edits.
+
+
+# Interaction Modes
+
+Reflex Build gives you two ways to interact with the AI while creating your application: **Agent mode** and **Chat mode**.
+You can switch between these modes from the dropdown at the bottom of the workspace.
 
 ```python exec
 import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def interaction_mode_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/features/interaction_modes_light.png",
+                    "/ai_builder/features/interaction_modes_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
 ```
 
-It is easy to download your app to work on locally or self-host. (It is recommended to use the GitHub integration, but if this is not possible, you can download your app to work on locally.) 
+```python eval
 
-Simply click the `Download` button in the bottom right corner of Reflex Build, as shown below:
+rx.el.div(interaction_mode_image())
 
+```
+
+## Agent Mode
+
+In **Agent mode**, the AI acts as a proactive builder:
+
+- **Plans ahead**: It breaks down your request into steps and explains its approach before making changes.
+- **Applies changes directly**: Generates and edits files in your project automatically.
+- **Optimized for workflows**: Best for building features, scaffolding components, or setting up integrations.
+
+Use Agent mode when you want the AI to **take initiative** and help build out your app.
+
+
+## Chat Mode
+
+In **Chat mode**, the AI behaves more like a traditional conversational assistant:
+
+- **Answers questions**: Provides explanations, references, and guidance without editing code.
+- **Lightweight**: Great for quick clarifications, debugging help, or brainstorming ideas.
+- **Safer experimentation**: No automatic file changes — you stay in full control.
+
+Use Chat mode when you want to **ask questions** or get **advice without altering your codebase**.
+
+
+## When to Use Each
+
+- **Build a new feature or component** → Use **Agent**
+- **Set up integrations (DB, API, etc.)** → Use **Agent**
+- **Understand Reflex concepts** → Use **Chat**
+- **Debug an error in your code** → Start with **Chat**, then switch to **Agent**
+- **Explore ideas or best practices** → Use **Chat**
+
+
+## Switching Modes
+
+1. Look for the **mode selector** at the bottom of the workspace.
+2. Choose **Agent** or **Chat** depending on your current task.
+3. You can switch modes at any time without losing context.
+
+
+## Best Practices
+
+- **Start in Chat** to clarify your goal → **switch to Agent** to implement.
+- Review the AI’s suggested changes before committing.
+- If Agent output feels too heavy, fall back to Chat for lighter interaction.
+
+
+# Secrets
+
+The **Secrets** feature allows you to securely store environment-specific values that your app can use, such as API keys, tokens, or other sensitive information.
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/features/secrets_light.png",
+                    "/ai_builder/features/secrets_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
 
 ```python eval
-rx.image(
-    src="/ai_builder/download_app.gif",
-    height="auto",
-    padding_bottom="2rem",
+
+rx.el.div(render_image())
+
+```
+
+## Adding Secrets
+
+### 1. Add Individually
+- **Description:** Set a single secret by providing a key and value.
+- **Example:**
+  - Key: `OPENAI_API_KEY`
+  - Value: `sk-xxxxxx`
+- **Behavior:** The secret is encrypted and accessible to your app at runtime.
+
+### 2. Add in Bulk (Raw Editor)
+- **Description:** Upload multiple secrets at once using a simple `VAR=VALUE` format.
+- **Example:**
+
+```text
+DATABASE_URL=postgresql://user:pass@host:5432/db
+STRIPE_SECRET_KEY=sk_test_xxxxx
+OPENAI_API_KEY=sk-xxxxxx
+```
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/features/secret_bulk_light.png",
+                "/ai_builder/features/secret_bulk_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
 )
 ```
 
-# Reflex Build's IDE
 
-Reflex Build includes a powerful, in-browser IDE designed to streamline the entire development process—from writing code
-to deploying your app. With an intuitive layout, real-time editing, and seamless integration with the rest of the
-platform, the IDE empowers users to stay focused and productive without ever leaving the browser.
+- **Behavior:** Each secret is securely stored and immediately available in the app environment.
 
+
+# Editor Modes
+
+The AI Builder includes a powerful dual-mode editor that lets you view and edit your application code while tracking changes made by the AI. You can seamlessly switch between **Editor Mode** for manual code editing and **Diff Mode** for reviewing AI-generated changes.
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/features/diff_light.png",
+                    "/ai_builder/features/diff_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
+
+```python eval
+
+rx.el.div(render_image())
+
+```
+## Modes: Editor vs Diff
+
+### Editor Mode
+The standard code editor where you can:
+- **Write and modify code** directly in the interface
+- **Navigate through files** using the file tree
+- **Make manual changes** to your application
+- **Save your modifications** which persist across sessions
+
+### Diff Mode
+A specialized view that highlights changes from the last AI prompt:
+- **Green highlights** show code additions made by the AI
+- **Red highlights** show code deletions made by the AI
+- **Side-by-side comparison** of what changed
+- **Line-by-line tracking** of modifications
+
+## Switching Between Modes
+
+### Toggle Controls
+Located in the editor toolbar, you'll find:
+- **Editor** button - Switch to normal editing mode
+- **Diff** button - Switch to change tracking mode
+
+### When to Use Each Mode
+- **Use Editor Mode when:**
+  - Making manual code changes
+  - Writing new functionality
+  - Debugging or fixing issues
+  - General code development
+
+- **Use Diff Mode when:**
+  - Reviewing what the AI changed after a prompt
+  - Understanding modifications before accepting them
+  - Tracking the impact of AI suggestions
+  - Learning from AI-generated code patterns
+
+## Understanding Diff Visualizations
+
+### Code Highlighting
+**Additions (Green):**
+- New code lines added by the AI
+- New functions, components, or logic
+- Enhanced features and improvements
+
+**Deletions (Red):**
+- Code removed by the AI
+- Replaced or refactored sections
+- Deprecated functionality
+
+### File Tree Indicators
+The file tree shows change statistics for each modified file:
+
+**Change Indicators:**
+- **`+5`** - 5 lines added to this file
+- **`-3`** - 3 lines removed from this file
+- **`+12 -8`** - 12 lines added, 8 lines removed
+- **No indicator** - File unchanged
+
+**Visual Cues:**
+- **Green `+` symbol** indicates files with additions
+- **Red `-` symbol** indicates files with deletions
+
+
+# Reflex Build IDE
+
+Reflex Build includes a **powerful, in-browser IDE** built on **Monaco Editor**, designed to make coding fast, efficient, and enjoyable—all without leaving your browser.
 
 <div class="p-1 my-4 rounded-lg bg-slate-5">
   <iframe
     width="100%"
     height="400"
-    src="https://www.youtube.com/embed/aW0ZefEC3SU "
+    src="https://www.youtube.com/embed/aW0ZefEC3SU"
     title="Reflex Build - IDE"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -10249,53 +10531,23 @@ platform, the IDE empowers users to stay focused and productive without ever lea
 </div>
 
 
-## IDE Features
-
+## Features
 
 ### Real-Time Editing
+Edit your code and see changes reflected immediately in your project. No manual saves or rebuilds—stay focused and iterate faster.
 
-Changes you make in the editor are immediately reflected across your project—no manual saves or rebuilds required. Stay in flow and iterate faster.
+### Syntax Highlighting & Error Detection
+Write code confidently with **syntax highlighting**, **inline error alerts**, and **linting**. Catch issues as you type, reducing bugs and speeding up development.
 
-### File & Folder Management
+### Code Snippets & Autocomplete
+Speed up development with **autocomplete** for functions, variables, and imports, as well as reusable **code snippets** for common patterns.
 
-Easily create, rename, or delete files and folders directly in the workspace. The file tree gives you full visibility into your application structure at all times.
+### Integrated Preview
+Quickly preview your changes directly in the editor without switching contexts, ensuring your app behaves as expected as you code.
 
-### Drag-and-Drop File Upload
+### Built-In Terminal for Debugging
+Use the integrated terminal to run commands, debug issues, and inspect logs—all within the IDE. No need to switch tools or tabs.
 
-Seamlessly import files into your project by dragging them straight into the editor. Whether you're adding assets, scripts, or config files, it's fast and intuitive—no extra clicks required.
-
-### Context-Aware Code Editor
-
-The built-in code editor supports syntax highlighting, inline error detection, and AI-assisted suggestions to help you write clean, efficient code with confidence.
-
-### One-Click Deployment
-
-From the IDE, you can deploy your app with a single click. No terminal, no external tools—just build and ship straight from your browser.
-
-
-# Templates
-
-```python exec
-import reflex as rx
-```
-
-Reflex has many certified templates, seen on the `Trending` tab of the Reflex Build, that can be used to kickstart your app. You can also use any app created by the community as a template. 
-
-## Using a Template
-
-To use a template, simply click the template and then in the bottom right corner of the app click the `Fork` button. This will create a copy of the template in your own account. You can then edit the app as you like with further prompting.
-
-Below is an example of how to use a template:
-
-```python eval
-rx.image(
-    src="/ai_builder/using_templates.gif",
-    height="auto",
-    padding_bottom="2rem",
-)
-```
-
-Templates are great to get started if they have similar UI to what you are looking to build. You can then add your own data to the app.
 
 # Installing External Packages
 
@@ -10360,127 +10612,250 @@ The advised prompt to use is:
 
 `Build an app from a reference image`
 
-# Connecting to a Database
+# Restore Checkpoint
+
+The **Restore Checkpoint** feature allows you to roll back your app to any previous state during your AI Builder conversation. This is useful when you want to undo recent changes and return to an earlier version of your app.
 
 ```python exec
 import reflex as rx
+from reflex_image_zoom import image_zoom
 ```
 
-Connecting to a database is critical to give your app access to real data. This section will cover how to connect to a database using the AI Builder. 
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/features/restore_light.png",
+                "/ai_builder/features/restore_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-To connect to a database you will need a `DB_URI`. Reflex.build currently supports `postgresql` and `mysql` databases.
+## How It Works
 
-This is what it looks like for a Postgres database:
+Every time the AI agent makes changes to your app, a checkpoint is automatically created. You can restore to any of these checkpoints at any time, effectively undoing all changes made after that point.
 
-```bash
+## Using Restore Checkpoint
+
+1. **Locate the Restore Icon**: At the end of each AI agent message that made changes to your app, you'll see a circular arrow icon (↻).
+
+2. **Click to Restore**: Click the circular arrow icon next to the message you want to restore to.
+
+3. **Confirm the Action**: The app will restore to the exact state it was in after that specific message was processed.
+
+4. **Continue Building**: After restoring, you can continue the conversation and make new changes from that point.
+
+## When to Use Restore Checkpoint
+
+- **Undo Unwanted Changes**: When the AI made changes you don't like
+- **Try Different Approaches**: Restore and ask the AI to implement a feature differently
+- **Fix Broken Functionality**: Roll back when new changes break existing features
+- **Experiment Safely**: Test different solutions knowing you can always restore to a checkpoint
+
+## Important Notes
+
+- Restoring will **permanently delete** all changes made after the selected message
+- You cannot undo a restore operation - choose your restore point carefully
+- The conversation history remains intact, but code changes after the restore point are lost
+- Restore checkpoint only affects your current building session
+
+> **Tip:** Before making major changes, note which message represents your last stable checkpoint so you can easily restore if needed.
+
+
+# File Tree
+
+The **File Tree** in Reflex Build lets you **view, organize, and manage all files and folders** in your project directly from the browser. It’s your central hub for navigating your app’s structure.
+
+## Key Features
+
+### Creating Folders
+- Click the **New Folder** button to create a folder inside the currently selected directory.
+- Enter a name and press **Enter** to confirm.
+- Folders can be nested to organize your project hierarchically.
+
+### Creating Files
+- Click the **New File** button to create a file inside the current folder.
+- Enter a file name and extension (e.g., `main.py`) and press **Enter**.
+- Files are immediately visible in the tree and ready for editing in the code editor.
+
+### Renaming Files or Folders
+- Right-click on a file or folder and select **Rename**.
+- Type the new name and press **Enter** to confirm.
+- Renaming automatically updates references in your project where applicable.
+
+### Deleting Files or Folders
+- Right-click on a file or folder and select **Delete**.
+- Deleted items are permanently removed, so be careful when deleting important files.
+
+### Drag-and-Drop from System
+- Drag files or folders from your computer directly into the File Tree.
+- The editor will automatically import them into the selected folder.
+- This works for individual files or entire folder structures, making adding assets or scripts quick and easy.
+
+
+# Databricks Integration
+
+The **Databricks Integration** allows your app to connect to a Databricks workspace, query data from warehouses, and use catalogs and schemas directly in your app. This integration supports secure authentication via tokens and can be configured per environment.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/integrations/databricks_light.png",
+                "/ai_builder/integrations/databricks_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Step 1: Gather Your Credentials
+
+Before connecting, make sure you have the following information:
+
+- **Hostname**: `https://adb-1234567890123456.7.azuredatabricks.net`
+  *The URL of your Databricks workspace*
+
+- **Personal Access Token**: `dapi1234567890abcdef1234567890abcd`
+  *Used for secure authentication*
+
+- **Warehouse / SQL Endpoint ID**: `wh-9876543210`
+  *The warehouse ID you want to query*
+
+- **Catalog**: `databricks_catalog_demo`
+  *The catalog containing your databases*
+
+- **Schema**: `demo_schema`
+  *The schema inside the catalog to query*
+
+> **Note:** Use environment-specific credentials for development, staging, and production.
+
+## Step 2: Configure the Integration
+
+1. Go to the **Integrations** section in your app settings by clicking **`@`** and then clicking the **Integrations** tab at the top.
+2. Click **Add Databricks Integration**.
+3. Fill in the fields using your credentials
+4. Save the integration. Your app can now access Databricks data securely.
+
+
+# Database Integration
+
+The Database Integration allows you to connect your AI-generated applications to real databases, automatically generating schemas and enabling data-driven functionality.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/integrations/database_light.png",
+                "/ai_builder/integrations/database_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Supported Databases
+
+- **PostgreSQL** - Recommended for production applications
+- **MySQL** - Popular open-source database
+- **SQLite** - Lightweight database, perfect for development and small applications
+
+## Getting Started
+
+### Opening the Database Integration
+
+1. Navigate to your app in the AI Builder
+2. Open the **Settings drawer** (gear icon)
+3. Click on the **Integrations** tab
+4. Find and enable the **Database** integration
+
+### Connection Methods
+
+The Database Integration offers two convenient ways to connect:
+
+#### 1. Connection Details (Recommended)
+
+This user-friendly form breaks down your database connection into individual fields:
+
+**For PostgreSQL and MySQL:**
+- **Database Type**: Select from dropdown (PostgreSQL/MySQL)
+- **Hostname**: Your database server address (e.g., `localhost`, `db.company.com`)
+- **Port**: Automatically filled (PostgreSQL: 5432, MySQL: 3306) or specify custom port
+- **Username**: Your database username
+- **Password**: Your database password (securely handled)
+- **Database Name**: The specific database to connect to
+
+**For SQLite:**
+- **Database Type**: Select "SQLite" from dropdown
+- **SQLite Download URL**: Either a local file path or HTTP URL to download the database file
+
+#### 2. Database URI
+
+For advanced users who prefer the traditional connection string format:
+
+**PostgreSQL:**
+```
 postgresql://username:password@hostname:port/database_name
 ```
 
-```bash
-postgresql://admin:secret123@db.mycompany.com:5432/mydatabase
+**MySQL:**
 ```
-
-```python eval
-rx.box(height="1rem")
-```
-
-```python eval
-rx.accordion.root(
-    rx.accordion.item(
-        header="DB URI (More Details)",
-        content=rx.table.root(
-            rx.table.header(
-                rx.table.row(
-                    rx.table.column_header_cell("Component"),
-                    rx.table.column_header_cell("Example"),
-                    rx.table.column_header_cell("Description"),
-                ),
-            ),
-            rx.table.body(
-                rx.table.row(
-                    rx.table.row_header_cell(rx.code("postgresql://")),
-                    rx.table.cell(rx.code("postgresql://")),
-                    rx.table.cell("The database ", rx.el.span("dialect", font_weight="bold"), " or driver (can also be ", 
-                                rx.code("mysql://"), ", ", rx.code("sqlite:///"), ", etc.)"),
-                ),
-                rx.table.row(
-                    rx.table.row_header_cell(rx.code("username")),
-                    rx.table.cell(rx.code("admin")),
-                    rx.table.cell("The ", rx.el.span("username", font_weight="bold"), " used to authenticate with the database"),
-                ),
-                rx.table.row(
-                    rx.table.row_header_cell(rx.code("password")),
-                    rx.table.cell(rx.code("secret123")),
-                    rx.table.cell("The ", rx.el.span("password", font_weight="bold"), " for the database user (insecure to expose this in plain text)"),
-                ),
-                rx.table.row(
-                    rx.table.row_header_cell(rx.code("hostname")),
-                    rx.table.cell(rx.code("db.mycompany.com")),
-                    rx.table.cell("The ", rx.el.span("host", font_weight="bold"), " where the database server is running"),
-                ),
-                rx.table.row(
-                    rx.table.row_header_cell(rx.code("port")),
-                    rx.table.cell(rx.code("5432")),
-                    rx.table.cell("The ", rx.el.span("port", font_weight="bold"), " the database server is listening on (default for PostgreSQL)"),
-                ),
-                rx.table.row(
-                    rx.table.row_header_cell(rx.code("database_name")),
-                    rx.table.cell(rx.code("mydatabase")),
-                    rx.table.cell("The ", rx.el.span("name", font_weight="bold"), " of the database to connect to"),
-                ),
-            ),
-            width="100%",
-        ),
-    ),
-    variant="surface",
-)
-```
-
-```python eval
-rx.box(height="1rem")
-```
-
-You can also use a MySQL database. The connection string looks like this:
-
-```bash
 mysql://username:password@hostname:port/database_name
 ```
 
-
-
-## Connecting your Database before the app is generated
-
-You can add your `Database URI` at the start of your generation as shown below. 
-
-```python eval
-rx.image(
-    src="/ai_builder/add_db_before_app.gif",
-    height="auto",
-    padding_bottom="2rem",
-)
+**SQLite:**
+```
+sqlite:///path/to/database.sqlite
+sqlite+https://example.com/database.sqlite
 ```
 
-Here if you wanted to build a dashboard for example we recommend a prompt as follows: 
+## Database URI Components
 
-`Build a dashboard around my database data`
+Protocol (postgresql://) - Database type identifier
+Username (admin) - Database user credentials
+Password (secret123) - User password (kept secure)
+Hostname (db.company.com) - Server address
+Port (5432) - Connection port
+Database (mydatabase) - Target database name
 
+## Connection Process
 
+1. **Choose your method**: Use either Connection Details form or Database URI
+2. **Fill in credentials**: Provide your database connection information
+3. **Click Connect**: The system will validate and test your connection
+4. **Schema Generation**: Upon successful connection, the system automatically:
+   - Connects to your database
+   - Analyzes the database structure
+   - Generates SQLAlchemy models
+   - Makes schema available to the AI for queries
 
-## Connecting your Database after the app is generated
-
-You can add your `Database URI` after you've already generated an app or directly from a template that you have forked as shown below.
-
-```python eval
-rx.image(
-    src="/ai_builder/add_db_in_app.gif",
-    height="auto",
-    padding_bottom="2rem",
-)
-```
-
-Here if you wanted to hook up your data correctly we recommend a prompt as follows: 
-
-`Use the database I added to rewrite the dashboard to display my expense reporting data, keep the existing layout charts and structure the same`
 
 # Installation
 
@@ -10553,6 +10928,123 @@ env = { "MCP_PROXY_URL" = "https://mcp.reflex.dev/mcp" }
 Note: Codex requires MCP servers to communicate over stdio. The `@modelcontextprotocol/server-proxy` adapter bridges the connection to the HTTP-based Reflex MCP server.
 
 
+# Azure Auth Manager Integration
+
+The **Azure Auth Manager Integration** allows your app to authenticate users through Microsoft Azure Active Directory (Azure AD). This integration provides secure OAuth 2.0 authentication and supports multi-tenant applications with customizable tenant access.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/integrations/azure_auth_light.png",
+                "/ai_builder/integrations/azure_auth_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Step 1: Set Up Azure App Registration
+
+Before connecting, you need to register your app in Azure Portal:
+
+1. Go to [Azure Portal](https://portal.azure.com) → **App Registrations**
+2. Click **New registration**
+3. Configure your app settings
+4. In **Authentication**, add the Web Redirect URI: `https://3a992b51-c34a-405a-b90c-4b3320eb3b6a.fly.dev/authorization-code/callback`
+
+## Step 2: Gather Your Credentials
+
+After registering your app, collect the following information:
+
+- **AZURE_CLIENT_ID**: `12345678-1234-1234-1234-123456789abc`
+  *Your application (client) ID from App Registration*
+
+- **AZURE_CLIENT_SECRET**: `abcdef123456~ABCdef123456-ABCdef123456`
+  *Client secret generated in Certificates & secrets*
+
+- **AZURE_VALID_TENANT_IDS**: `87654321-4321-4321-4321-210987654321`
+  *Comma-separated list of tenant IDs that can access your app*
+
+> **Note:** Keep your client secret secure and use different registrations for development, staging, and production environments.
+
+## Step 3: Configure the Integration
+
+1. Go to the **Integrations** section in your app settings by clicking **`@`** and then clicking the **Integrations** tab at the top.
+2. Click **Add** next to Azure Auth Manager.
+3. Fill in the credential fields:
+   - Enter your Azure Client ID
+   - Enter your Azure Client Secret
+   - Enter valid tenant IDs (comma-separated for multiple tenants)
+4. Click **Connect** to save the integration.
+
+Your app can now authenticate users through Azure AD with secure OAuth 2.0 flow.
+
+
+# Google Auth Integration
+
+The **Google Auth Integration** allows your app to authenticate users using their Google accounts. This provides a secure, familiar login experience and simplifies user management.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/integrations/google_light.png",
+                "/ai_builder/integrations/google_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Step 1: Create a Google OAuth Client
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Navigate to **APIs & Services → Credentials**.
+3. Click **Create Credentials → OAuth Client ID**.
+4. Select **Web Application** as the application type.
+5. Add the following **Authorized JavaScript Origin**:
+   - https://3a992b51-c34a-405a-b90c-4b3320eb3b6a.fly.dev
+   - The URL can be copied directly from the Google Auth integration panel.
+6. Set your authorized redirect URIs to match your app environment.
+7. Save the client and copy the following credentials:
+   - **Client ID**: `YOUR_GOOGLE_CLIENT_ID`
+   - **Client Secret**: `YOUR_GOOGLE_CLIENT_SECRET`
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Google Auth** in your app settings.
+2. Enter your **Google Client ID** and **Google Client Secret**.
+3. Save the integration. Your app is now configured to use Google Auth for login.
+
+## Step 3: Notes
+
+- The integration supports multiple environments (development, staging, production). Use environment-specific secrets for the client ID and secret.
+- Google Auth handles token refresh automatically when users log in via OAuth.
+- Users will see a standard Google login screen, ensuring familiarity and trust.
+- Ensure your app domain matches the authorized JavaScript origin and redirect URIs; otherwise, authentication will fail.
+
+
 # Overview
 
 ```python exec
@@ -10574,6 +11066,58 @@ The Reflex MCP server provides tools for accessing component documentation and R
 ## Enterprise Use
 
 For enterprise customers requiring on-premises deployment of the Reflex MCP server, please [book a demo](https://reflex.dev/pricing/) to discuss your requirements.
+
+
+# OpenAI Integration
+
+The **OpenAI Integration** allows your app to use OpenAI APIs for features such as text generation, embeddings, and other AI-powered functionality.
+
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/integrations/open_ai_light.png",
+                "/ai_builder/integrations/open_ai_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Step 1: Obtain an OpenAI API Key
+
+1. Go to the [OpenAI Platform](https://platform.openai.com/).
+2. Navigate to **API Keys** in your account settings.
+3. Click **Create new secret key**.
+4. Copy the generated key.
+   - Example: `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add OpenAI Integration** in your app settings.
+2. Enter your **OpenAI API Key** in the input field.
+3. Save the integration. Your app is now ready to make OpenAI API requests.
+
+---
+
+## Step 3: Notes
+
+- Keep your OpenAI key secure; do **not** hardcode it in public code repositories.
+- Use environment-specific secrets if you have separate development, staging, and production environments.
+- The key allows your app to interact with OpenAI endpoints securely and efficiently.
 
 
 # Connecting to Github
@@ -10609,10 +11153,6 @@ image_zoom(rx.image(src="/ai_builder/github_commit_history.png"))
 ```
 
 
-
-# FAQs
-
-Still to come!
 
 # Reflex Build: Best Practices
 
@@ -10807,32 +11347,167 @@ For complete setup instructions for Claude Desktop, Windsurf, Codex, and other M
 With these techniques, the AI Builder becomes a reliable extension of your creative and technical intent.
 
 
+# Your First Reflex Build App
+
+In this tutorial, you'll build a data dashboard application that displays employee information in both table and chart formats, with interactive features for filtering and adding new data. We'll also add a simple chatbot page to demonstrate multi-page navigation.
+
+## What You'll Build
+
+By the end of this tutorial, you'll have created:
+- A dashboard displaying employee data in a table and bar chart
+- Interactive filtering to search through your data
+- A modal form for adding new employees
+- A separate page with a simple chatbot interface
+
+This tutorial assumes you're starting with a new project in AI Builder.
+
+---
+
+## Creating Your Dashboard
+
+Let's start by building the core of our application - a dashboard that displays employee data.
+
+**Prompt:**
+```
+Create a dashboard page with a table showing sample employee data with columns: Name, Department, and Salary. Below the table, add a bar chart that visualizes the salary data. Include at least 5 sample employees with different departments and salary ranges.
+```
+
+This will create your main dashboard page with both tabular and visual representations of your data. The AI will generate sample employee records and create a bar chart that makes it easy to compare salaries across your team.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/tutorial_1_light.png",
+                "/ai_builder/overview/tutorial_1_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Adding Interactive Filtering
+
+Now that you have your basic dashboard, let's make it more interactive by adding the ability to filter and search through your employee data.
+
+**Prompt:**
+```
+Add filtering functionality to the employee table. Include a search input above the table that filters rows based on name, and dropdown filters for department. Make sure the filters work together and update the table in real-time.
+```
+
+Your dashboard now becomes much more useful with real-time filtering. Users can quickly find specific employees by name or narrow down results by department. The filters work together, so you can combine a department filter with a name search.
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/tutorial_2_light.png",
+                "/ai_builder/overview/tutorial_2_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+
+## Enabling Data Entry
+
+A static dashboard is useful, but being able to add new data makes your app much more practical. Let's add the ability to create new employee records.
+
+**Prompt:**
+```
+Add an "Add Employee" button above the table. When clicked, open a modal with input fields for Name, Department, and Salary. When the form is submitted, add the new employee to the table and update the bar chart. Include form validation for required fields.
+```
+
+Your app now has full CRUD capability for employee records. The modal form provides a clean interface for data entry, and both your table and chart update immediately when new employees are added.
+
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/tutorial_3_light.png",
+                "/ai_builder/overview/tutorial_3_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+
+## Building a Multi-Page App
+
+Most real applications have multiple pages. Let's add a chatbot page to demonstrate navigation and create a more complete user experience.
+
+**Prompt:**
+```
+Create a new page called "Chat" and add it to the navigation. Build a simple chatbot interface with a message input field, send button, and chat history display. For now, make the bot echo back the user's messages with "Bot says: [user message]".
+```
+
+Your app now has proper navigation between the dashboard and chat functionality. The chatbot page demonstrates how easy it is to add new features and pages to your AI Builder application.
+
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/tutorial_4_light.png",
+                "/ai_builder/overview/tutorial_4_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## What's Next?
+
+You've successfully built a complete web application with data visualization, interactive filtering, data entry, and multi-page navigation. Your app demonstrates many common patterns used in modern web applications:
+
+- **Data presentation** with tables and charts
+- **User interaction** through filtering and forms
+- **Real-time updates** when data changes
+- **Multi-page architecture** with navigation
+
+## Exploring Further
+
+Now that you have a working foundation, try experimenting with these ideas:
+
+- **Customize the data model** - change the employee fields or add new columns
+- **Enhance the visualizations** - try different chart types or add more charts
+- **Improve the chatbot** - give it more sophisticated responses or integrate it with your employee data
+- **Add more pages** - create additional features like employee profiles or reporting dashboards
+
+The power of AI Builder is that you can iterate quickly with natural language prompts. Each new feature is just a conversation away!
+
+
 # What Is Reflex Build
 
-<div class="p-1 my-4 rounded-lg bg-slate-5">
-  <iframe
-    width="100%"
-    height="400"
-    src="https://www.youtube.com/embed/s-kr8v7827g "
-    title="Reflex Build"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen>
-  </iframe>
-</div>
-
-
-Reflex Build is an AI-powered platform that empowers users of all skill levels to create full-stack web applications
-without writing any code—just by describing their ideas in plain English. Instead of hiring developers, users can
-instantly generate web apps or websites, turning ideas into functional apps as quickly as possible.
-
-
-Reflex Build provides everything you need to create stunning websites, front-end interfaces, and full-stack web
-applications—all from a single browser tab, with no installation required. It includes AI-powered coding tools,
-real-time collaboration (currently in beta), and easy project sharing to give you a head start on your app development
-journey.
-
-
+Reflex Build is an AI-powered platform that lets anyone create full-stack web apps just by describing ideas in plain English—no coding needed. It includes a full-fledged built-in IDE, real-time collaboration (beta), and project sharing—all in your browser, no installation required.
 
 ```python exec
 from typing import List, TypedDict
@@ -11201,60 +11876,379 @@ rx.el.div(
 ```
 
 
-# Quickstart
+# Templates
+
+Reflex has many certified templates, seen on the `Trending` tab of the Reflex Build, that can be used to kickstart your app.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/templates_light.png",
+                "/ai_builder/overview/templates_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Using a Template
+
+To use a template, simply click the template and then in the bottom right corner of the app click the `Fork` button. This will create a copy of the template in your own account. You can then edit the app as you like with further prompting.
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/fork_template_light.png",
+                "/ai_builder/overview/fork_template_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+Templates are great to get started if they have similar UI to what you are looking to build. You can then add your own data to the app.
 
 
-Still to come!
+# General App Settings
 
-# Fixing Errors
-
-
-Still to come!
-
-# Breaking up complex prompts
-
-## Incremental Prompting
-       
-Asking for incremental, smaller changes leads to better results, rather than asking for everything all in a single huge prompt. It's better to take it step-by-step rather than give the AI complex tasks all at once.
-
-### Example 1                      
-Too Complex:
-
-`Create a data visualization dashboard that includes user authentication, data integration, multiple charts, real-time updates, and export options.`
-
-Better Approach:
-
-Prompt 1: `Design a simple dashboard layout.`
-
-Prompt 2: `Now let's add a bar chart for visualizing sales data.`
-
-Prompt 3: `Now add user authentication.`
-
-Prompt 4: `Now integrate data from an external API.`
-
-Prompt 5: `Now add real-time updates for the chart.`
-
-Prompt 6: `Now add export options for the dashboard data.`
-
-### Example 2                 
-Too Complex:
-
-`Create an app that takes in data, processes it, generates reports, sends notifications, and allows users to filter results by various criteria.`
-                    
-Better Approach:
-
-Prompt 1: `Create an app that takes in data`
-
-Prompt 2: `Now add logic to process the data.`
-
-Prompt 3: `Now add a feature to generate reports.`
-
-Prompt 4: `Now add a feature to send notifications.`
-
-Prompt 5: `Now add a feature to filter results by various criteria.`
+The **General App Settings** section lets you manage key aspects of your app, including its name, ID, and deletion. This is your central place to view and update your app’s core information.
 
 
-                    
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/app_lifecycle/general_light.png",
+                    "/ai_builder/app_lifecycle/general_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
+
+```python eval
+
+rx.el.div(render_image())
+
+```
+
+
+## How to Access Settings
+
+1. In the AI Builder workspace, click the **Settings** icon located at the bottom-left of the screen, inside the chat box area.
+2. This will open the **General** tab to see your app’s main settings.
+
+## What You Can Do
+
+- **Change App Name**
+  Update the name of your app to reflect its purpose or version.
+
+- **View App ID**
+  Find the unique identifier for your app, which can be used for integrations or support.
+
+- **Delete App**
+  Permanently remove an app you no longer need. **Warning:** This action cannot be undone.
+
+## Common Use Cases
+
+- **Keep Apps Organized**
+  Rename apps to make them easier to find in your workspace.
+
+- **Integration Reference**
+  Use the App ID when connecting your app to other tools or APIs.
+
+- **Clean Up Workspace**
+  Delete outdated or test apps to keep your workspace tidy.
+
+
+# Copy App
+
+The **Copy** feature lets you duplicate an existing app inside Reflex Build.
+This is useful when you want to experiment with changes without affecting the original project, or when you want to use an app as a starting point for a new idea.
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/app_lifecycle/copy_light.png",
+                    "/ai_builder/app_lifecycle/copy_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
+
+```python eval
+
+rx.el.div(render_image())
+
+```
+
+## How to Copy an App
+
+1. In the Reflex Build workspace, click the **Copy** button (bottom-right corner).
+2. Reflex Build will create a new app in your workspace with the same:
+   - Code files and components
+   - State and configuration
+   - Dependencies
+
+The copied app will appear as a separate project, independent from the original.
+
+
+## Common Use Cases
+
+- **Experiment Safely**
+  Try out new components, layouts, or integrations without risking your working app.
+
+- **Create Variations**
+  Use the original app as a base to quickly spin up a different version (e.g., a light and dark theme version).
+
+- **Template Reuse**
+  Turn an app into a personal template and copy it each time you start a new project.
+
+## Best Practices
+
+- Rename your copied app immediately so it’s easy to distinguish from the original.
+
+
+# Deploy App
+
+```python exec
+import reflex as rx
+```
+
+It is easy to deploy your app into production from Reflex Build to Reflex Cloud.
+
+Simply click the `Deploy` button in the bottom right corner of Reflex Build, as shown below:
+
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/app_lifecycle/deploy_light.png",
+                    "/ai_builder/app_lifecycle/deploy_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
+
+```python eval
+
+rx.el.div(render_image())
+
+```
+
+When deploying you can set the following options:
+- **App Name**: The name of your app
+- **Hostname**: Set your url by setting your hostname, i.e. if you set `myapp` as your hostname, your app will be available at `myapp.reflex.run`
+- **Region**: The regions where your app will be deployed
+- **VM Size**: The size of the VM where your app will be deployed
+- **Secrets**: The environment variables that will be set for your app, you can load the variables currently being used by your app by clicking the `Load from settings` button
+
+Note: Hostname customization, region selection, and VM sizing are only available on paid plans.
+
+
+# Download App
+
+You can download your Reflex Build project if you want to work on it locally or self-host it outside the AI Builder.
+
+**Tip:** The recommended workflow is to use the GitHub integration, which keeps your code version-controlled and in sync. Downloading is useful if GitHub integration isn’t available or you just want a one-time export.
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/app_lifecycle/download_light.png",
+                    "/ai_builder/app_lifecycle/download_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
+
+```python eval
+
+rx.el.div(render_image())
+
+```
+
+## How to Download
+
+1. In the AI Builder workspace, go to the **bottom-right corner**.
+2. Click the **Download** button.
+3. A `.zip` file will be generated containing your entire Reflex app, including:
+   - Source code (`.py` files, components, state, etc.)
+   - `requirements.txt` with dependencies
+   - Config files (`rxconfig.py`, `.env`, etc.)
+
+
+# Fork App
+
+The **Fork App** feature lets you take an existing app and create your own version of it. This is perfect for **experimenting, customizing, or building on top of someone else’s work** without affecting the original app.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/overview/fork_template_light.png",
+                "/ai_builder/overview/fork_template_dark.png",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+
+## How to Fork an App
+
+1. Browse or open an app you’d like to use as a starting point.
+2. Click the **Fork** button in the app’s bottom right corner.
+3. The AI Builder will create a **copy of the app** in your workspace.
+4. You can now **edit, customize, and expand** your forked app independently of the original.
+
+## What Happens When You Fork
+
+- You get a **full copy** of the original app, including all pages, components, and configurations.
+- The forked app is **completely separate**, so changes you make do not affect the original.
+- You can **rename, deploy, or share** your forked app like any other app in your workspace.
+
+## Common Use Cases
+
+- **Start From an Example**
+  Use a sample or shared app as a foundation to save time and learn best practices.
+
+- **Experiment Safely**
+  Try new ideas or features without risking changes to the original app.
+
+- **Collaborate and Customize**
+  Fork a teammate’s app to tailor it to your needs while keeping the original intact.
+
+
+# Share App
+
+The **Share** feature makes it easy to show your app to others without deploying it.
+When you share, Reflex Build generates a unique link that points to the current version of your project in the builder.
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+
+def render_image():
+    return rx.el.div(
+        image_zoom(
+            rx.image(
+                src=rx.color_mode_cond(
+                    "/ai_builder/app_lifecycle/share_light.png",
+                    "/ai_builder/app_lifecycle/share_dark.png",
+                ),
+                class_name="p-2 rounded-md h-auto",
+                border=f"0.81px solid {rx.color('slate', 5)}",
+            ),
+            class_name="rounded-md overflow-hidden",
+        ),
+        class_name="w-full flex flex-col rounded-md cursor-pointer",
+    )
+```
+
+```python eval
+
+rx.el.div(render_image())
+
+```
+
+## How to Share
+
+1. In the AI Builder workspace, click the **Share** button (bottom-right corner).
+2. A popup will appear with a **shareable link**.
+3. Copy the link and send it to teammates, collaborators, or stakeholders.
+
+
+## What Others See
+
+- The link opens a **read-only view** of your app generation.
+- Recipients can see the app preview but cannot make edits.
+- This makes it safe to share work-in-progress versions for quick feedback.
+
+
+## Common Use Cases
+
+- **Get Feedback Quickly**
+  Share a work-in-progress version with your team before deploying.
+
+- **Demo Features**
+  Send a link to showcase a new component, layout, or integration.
+
+- **Collaboration**
+  Share context with another developer before handing off to GitHub or download.
+
 
 # Browser Storage
 
