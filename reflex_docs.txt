@@ -5692,7 +5692,7 @@ To monitor your projects usage, you can go to the billing tab in the Reflex Clou
 Here you can see the current billing and usage for your project.
 
 
-## Real Life Examples of compute charges on the Pro tier
+## Real Life Examples of compute charges on the paid tiers
 
 
 ```md alert
@@ -5714,7 +5714,7 @@ Anna, a hobbyist game developer, built a pixel art generator and hosted it on Re
 
 (assuming a 30 day month)
 
-Anna's total cost for compute would be `$2.49` for the month. However, since Pro users receive a `$10` credit, her compute cost is fully covered.
+Anna's total cost for compute would be `$2.49` for the month. However, since paid users receive a `$10` credit, her compute cost is fully covered.
 
 **Charge for compute:**
 
@@ -5742,7 +5742,7 @@ Bob created a social media application and decided to host it on Reflex Cloud. B
 
 (assuming a 30 day month)
 
-Bob would owe `$6.23` for this month. However since Bob is a pro user they receive a `$10` credit which brings Bob's bill down to `$0`.
+Bob would owe `$6.23` for this month. However since Bob is a paid user they receive a `$10` credit which brings Bob's bill down to `$0`.
 
 **Charge for compute:**
 
@@ -5772,7 +5772,7 @@ If users access the app on average for **16 hours per week** in each region, how
 
 (assuming 4 weeks in a month)
 
-Charlie would owe `$40.19` for this month. However since Charlie is a pro user they receive a `$10` credit which brings Bob's bill down to `$30.19`.
+Charlie would owe `$40.19` for this month. However since Charlie is a paid user they receive a `$10` credit which brings Bob's bill down to `$30.19`.
 
 **Charge for compute:**
 
@@ -5803,7 +5803,7 @@ With users accessing the app **2 hours per day** over a **30-day month**, how mu
 
 (assuming a 30 day month)
 
-David would owe `$9.96` for this month. However since David is a pro user they receive a `$10` credit, he will not be charged for compute for this month.
+David would owe `$9.96` for this month. However since David is a paid user they receive a `$10` credit, he will not be charged for compute for this month.
 
 **Charge for compute:**
 
@@ -5834,7 +5834,7 @@ With users actively using the app **6 hours per day in each region** over a **30
 
 (assuming a 30 day month)
 
-Emily would owe `$44.82` for this month. However since Emily is a pro user they receive a `$10` credit which brings Emily's bill down to `$34.82`.
+Emily would owe `$44.82` for this month. However since Emily is a paid user they receive a `$10` credit which brings Emily's bill down to `$34.82`.
 
 **Charge for compute:**
 
@@ -5877,7 +5877,7 @@ Total compute hours = `60 + 360 = 420 compute hours`
 
 (assuming a 30 day month)
 
-Fred would owe `$34.86` for this month. However since Fred is a pro user they receive a `$10` credit which brings Fred's bill down to `$24.86`.
+Fred would owe `$34.86` for this month. However since Fred is a paid user they receive a `$10` credit which brings Fred's bill down to `$24.86`.
 
 **Charge for compute:**
 
@@ -5985,7 +5985,7 @@ from reflex_image_zoom import image_zoom
 # Custom Domains
 
 
-With the Pro tier of Reflex Cloud you can use your own custom domain to host your app. 
+With the Enterprise tier of Reflex Cloud you can use your own custom domain to host your app. 
 
 ## Prerequisites
 
@@ -6691,32 +6691,6 @@ image_zoom(rx.image(src="/environment_variables_2.webp"))
 From here you can add or edit your environment variables. You will need to restart your app for these changes to take effect.
 
 This functionality in the UI can be disabled by an admin of the project.
-
-```python exec
-from pcweb.pages.docs import hosting
-from pcweb.pages.pricing.pricing import pricing_path
-```
-
-# Reflex Branding
-
-Remove Reflex branding from your exported or deployed sites. 
-
-By default, Reflex branding, such as the "Built with Reflex" badge, will appear on all your published sites.
-
-
-## How to remove the Reflex branding from your app
-
-You can turn off the Reflex branding, when deploying to Reflex Cloud, by adding `show_built_with_reflex=False` to the `rx.Config()` in the `rxconfig.py` file. 
-
-In order for this to work a user hosting with Reflex Cloud must be logged in and on a [paid plan]({pricing_path}) (at least pro tier). 
-
-
-```md alert info
-# A paid plan is required to remove the Reflex branding.
-```
-
-If you are self-hosting check out these instructions on [how to remove the Reflex branding from your self-hosted app]({hosting.self_hosting.path}#remove-reflex-branding-from-your-self-hosted-app).
-
 
 ```python exec
 import reflex as rx
@@ -18742,8 +18716,8 @@ categories_data = [
             {
                 "feature": "show_built_with_reflex", 
                 "description": "Toggle the 'Built with Reflex' badge in your app", 
-                "cloud_tier": "Pro", 
-                "self_hosted_tier": "Team",
+                "cloud_tier": "Enterprise", 
+                "self_hosted_tier": "Enterprise",
                 "link": "/docs/enterprise/built-with-reflex",
             },
             {
@@ -19149,9 +19123,7 @@ The "Built with Reflex" badge appears in the bottom right corner of apps using r
 
 ## Removing the Badge
 
-To remove the badge, you need a paid tier:
-- **Cloud**: Pro tier or higher
-- **Self-hosted**: Team tier or higher
+To remove the badge, you need to be on the Enterprise tier.
 
 ## Configuration
 
