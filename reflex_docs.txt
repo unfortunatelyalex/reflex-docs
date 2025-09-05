@@ -10297,7 +10297,7 @@ Use Chat mode when you want to **ask questions** or get **advice without alterin
 ## When to Use Each
 
 - **Build a new feature or component** → Use **Agent**
-- **Set up integrations (DB, API, etc.)** → Use **Agent**
+- **Set up integrations (DB, etc.)** → Use **Agent**
 - **Understand Reflex concepts** → Use **Chat**
 - **Debug an error in your code** → Start with **Chat**, then switch to **Agent**
 - **Explore ideas or best practices** → Use **Chat**
@@ -10496,7 +10496,7 @@ Reflex Build includes a **powerful, in-browser IDE** built on **Monaco Editor**,
   <iframe
     width="100%"
     height="400"
-    src="https://www.youtube.com/embed/aW0ZefEC3SU"
+    src="https://www.youtube.com/embed/UAj9vUweQ5g"
     title="Reflex Build - IDE"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -11948,17 +11948,6 @@ rx.el.div(render_image())
 
 - **Delete App**
   Permanently remove an app you no longer need. **Warning:** This action cannot be undone.
-
-## Common Use Cases
-
-- **Keep Apps Organized**
-  Rename apps to make them easier to find in your workspace.
-
-- **Integration Reference**
-  Use the App ID when connecting your app to other tools or APIs.
-
-- **Clean Up Workspace**
-  Delete outdated or test apps to keep your workspace tidy.
 
 
 # Copy App
