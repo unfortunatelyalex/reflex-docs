@@ -19169,6 +19169,871 @@ config = rxe.Config(
 )
 ```
 
+# Edges
+
+Edges connect nodes together in a flow. This page explains how to define, customize, and interact with edges in Reflex Flow.
+
+## The `Edge` Type
+
+An edge is represented as a Python dictionary with the following fields:
+
+- `id` (`str`) – Unique identifier for the edge.
+- `source` (`str`) – ID of the source node.
+- `target` (`str`) – ID of the target node.
+- `type` (`str`) – Edge type defined in `edge_types`.
+- `sourceHandle` (`str | None`) – Optional source handle ID.
+- `targetHandle` (`str | None`) – Optional target handle ID.
+- `animated` (`bool`) – Whether the edge should animate.
+- `hidden` (`bool`) – Whether the edge is hidden.
+- `deletable` (`bool`) – Whether the edge can be removed.
+- `selectable` (`bool`) – Whether the edge can be selected.
+- `data` (`dict`) – Arbitrary metadata.
+- `label` (`Any`) – Label rendered along the edge.
+- `style` (`dict`) – Custom styles.
+- `className` (`str`) – CSS class for the edge.
+
+## Basic Edge Types
+
+Reflex Flow comes with several built-in edge types:
+
+### Default Edge Types
+
+```python
+edges: list[Edge] = [
+    {"id": "e1", "source": "1", "target": "2", "type": "default"},
+    {"id": "e2", "source": "2", "target": "3", "type": "straight"},
+    {"id": "e3", "source": "3", "target": "4", "type": "step"},
+    {"id": "e4", "source": "4", "target": "5", "type": "smoothstep"},
+    {"id": "e5", "source": "5", "target": "6", "type": "bezier"},
+]
+```
+
+- **default** – Standard curved edge
+- **straight** – Direct line between nodes
+- **step** – Right-angled path with steps
+- **smoothstep** – Smooth right-angled path
+- **bezier** – Curved bezier path
+
+## Edge Styling
+
+### Basic Styling
+
+Add visual styling to edges using the `style` property:
+
+```python
+edges: list[Edge] = [
+    {
+        "id": "styled-edge",
+        "source": "1",
+        "target": "2",
+        "style": {
+            "stroke": "#ff6b6b",
+            "strokeWidth": 3,
+        }
+    }
+]
+```
+
+### Animated Edges
+
+Make edges animate with flowing dots:
+
+```python
+edges: list[Edge] = [
+    {
+        "id": "animated-edge",
+        "source": "1",
+        "target": "2",
+        "animated": True,
+        "style": {"stroke": "#4dabf7"}
+    }
+]
+```
+
+### Edge Labels
+
+Add text labels to edges:
+
+```python
+edges: list[Edge] = [
+    {
+        "id": "labeled-edge",
+        "source": "1",
+        "target": "2",
+        "label": "Connection",
+        "style": {"stroke": "#51cf66"}
+    }
+]
+```
+
+
+# Basic Flow Example
+
+This example demonstrates a simple flow diagram with three nodes and two edges, showing how nodes can be connected and how edges can be animated.
+
+### Nodes
+
+- Input Node – starting point
+- Default Node – standard content node
+- Output Node – endpoint of the flow
+
+### Edges
+
+- Input → Default (animated)
+- Default → Output
+
+### Interactivity
+
+- Nodes can be moved
+- Edges update dynamically
+- Users can drag from handles to create new edges
+- Zoom, pan, and mini-map controls are available
+
+### Visual Layout
+
+- Flow fits viewport automatically
+- Background grid for orientation
+- Light and dark color modes supported
+
+### Example Flow
+
+```python demo exec
+import reflex as rx
+import reflex_enterprise as rxe
+from reflex_enterprise.components.flow.types import Node, Edge
+
+# Common style for all nodes
+node_style = {
+    "backgroundColor": "#ffcc00",
+    "color": "#000000",
+    "padding": "10px",
+    "borderRadius": "5px"
+}
+
+class FlowState(rx.State):
+    nodes: list[Node] = [
+        {
+            "id": "1",
+            "type": "input",
+            "position": {"x": 100, "y": 100},
+            "data": {"label": "Input Node"},
+            "style": node_style
+        },
+        {
+            "id": "2",
+            "type": "default",
+            "position": {"x": 300, "y": 200},
+            "data": {"label": "Default Node"},
+            "style": node_style
+        },
+        {
+            "id": "3",
+            "type": "output",
+            "position": {"x": 500, "y": 100},
+            "data": {"label": "Output Node"},
+            "style": node_style
+        },
+    ]
+
+    edges: list[Edge] = [
+        {"id": "e1-2", "source": "1", "target": "2", "animated": True},
+        {"id": "e2-3", "source": "2", "target": "3"},
+    ]
+
+
+    @rx.event
+    def set_nodes(self, nodes: list[Node]):
+        self.nodes = nodes
+
+    @rx.event
+    def set_edges(self, edges: list[Edge]):
+        self.edges = edges
+
+
+def flow_example():
+    return rx.box(
+        rxe.flow(
+            # Core flow components
+            rxe.flow.controls(),  # Zoom and pan controls
+            rxe.flow.background(),  # Grid background
+            rxe.flow.mini_map(),  # Mini map for navigation
+
+            # Flow configuration
+            nodes=FlowState.nodes,
+            edges=FlowState.edges,
+            on_nodes_change=lambda node_changes: FlowState.set_nodes(
+                rxe.flow.util.apply_node_changes(FlowState.nodes, node_changes)
+            ),
+            on_edges_change=lambda edge_changes: FlowState.set_edges(
+                rxe.flow.util.apply_edge_changes(FlowState.edges, edge_changes)
+            ),
+
+            # Visual settings
+            fit_view=True,
+            attribution_position="bottom-right",
+        ),
+        height="100vh",
+        width="100vw",
+    )
+```
+
+
+# Example React Flow Components
+
+This section showcases examples of interactive flow components built with Reflex and Reflex Enterprise. Learn how to create dynamic nodes, edges, and custom behaviors for building flow diagrams in your React apps.
+
+## Add Node on Edge Drop
+
+In this example, we demonstrate how to dynamically add nodes to a flow when a connection is dropped onto the canvas. When the user drops a connection, a new node is created at the drop point, and an edge is added between the source node and the new node.
+
+
+```python demo exec
+import reflex as rx
+
+import reflex_enterprise as rxe
+from reflex_enterprise.components.flow.types import (
+    ConnectionInProgress,
+    Edge,
+    NoConnection,
+    Node,
+    XYPosition,
+)
+
+node_style = {
+    "color": "#000000",
+}
+
+initial_nodes: list[Node] = [
+    {
+        "id": "0",
+        "type": "input",
+        "data": {"label": "Node"},
+        "position": {"x": 0, "y": 50},
+        "style": node_style
+    },
+]
+
+
+class AddNodesOnEdgeDropState(rx.State):
+    nodes: rx.Field[list[Node]] = rx.field(default_factory=lambda: initial_nodes)
+    edges: rx.Field[list[Edge]] = rx.field(default_factory=list)
+    node_id: int = 1
+
+    @rx.event
+    def increment(self):
+        self.node_id += 1
+
+    @rx.event
+    def set_nodes(self, nodes: list[Node]):
+        self.nodes = nodes
+
+    @rx.event
+    def set_edges(self, edges: list[Edge]):
+        self.edges = edges
+
+    @rx.event
+    def handle_connect_end(
+        self,
+        connection_status: NoConnection | ConnectionInProgress,
+        event: rx.event.PointerEventInfo,
+        flow_position: XYPosition,
+    ):
+        if not connection_status["isValid"]:
+            node_id = str(self.node_id)
+            self.increment()
+            self.nodes.append(
+                {
+                    "id": node_id,
+                    "position": flow_position,
+                    "data": {"label": f"Node {node_id}"},
+                    "origin": (0.5, 0.0),
+                    "style": node_style
+                }
+            )
+            self.edges.append(
+                {
+                    "id": node_id,
+                    "source": connection_status["fromNode"]["id"],
+                    "target": node_id,
+                    "style": node_style
+                }
+            )
+
+def add_node_on_edge_drop():
+    return rx.box(
+        rxe.flow.provider(
+            rxe.flow(
+                rxe.flow.controls(),
+                rxe.flow.mini_map(),
+                rxe.flow.background(),
+                on_connect=lambda connection: AddNodesOnEdgeDropState.set_edges(
+                    rxe.flow.util.add_edge(connection, AddNodesOnEdgeDropState.edges)
+                ),
+                on_connect_end=(
+                    lambda connection_status, event: (
+                        AddNodesOnEdgeDropState.handle_connect_end(
+                            connection_status,
+                            event,
+                            rxe.flow.api.screen_to_flow_position(
+                                x=event.client_x,
+                                y=event.client_y,
+                            ),
+                        )
+                    )
+                ),
+                nodes=AddNodesOnEdgeDropState.nodes,
+                edges=AddNodesOnEdgeDropState.edges,
+                on_nodes_change=lambda changes: AddNodesOnEdgeDropState.set_nodes(
+                    rxe.flow.util.apply_node_changes(
+                        AddNodesOnEdgeDropState.nodes, changes
+                    )
+                ),
+                on_edges_change=lambda changes: AddNodesOnEdgeDropState.set_edges(
+                    rxe.flow.util.apply_edge_changes(
+                        AddNodesOnEdgeDropState.edges, changes
+                    )
+                ),
+                fit_view=True,
+                fit_view_options={"padding": 2},
+                node_origin=(0.5, 0.0),
+            )
+        ),
+        height="100vh",
+        width="100vw",
+    )
+
+```
+
+## Connection Limit on Custom Node
+
+This example demonstrates how to create a custom node with a connection limit on its handle. The handle can be configured to allow a specific number of connections, or no connections at all, using the isConnectable property. This is useful when you want to restrict the number of connections a node can have.
+
+```python demo exec
+import reflex as rx
+
+import reflex_enterprise as rxe
+from reflex_enterprise.components.flow.types import Edge, HandleType, Node, Position
+
+node_style = {
+    "color": "#000000",
+}
+
+class ConnectionLimitState(rx.State):
+    nodes: rx.Field[list[Node]] = rx.field(
+        default_factory=lambda: [
+            {
+                "id": "1",
+                "type": "input",
+                "data": {"label": "Node 1"},
+                "position": {"x": 0, "y": 25},
+                "sourcePosition": "right",
+                "style": node_style
+            },
+            {
+                "id": "2",
+                "type": "custom",
+                "data": {},
+                "position": {"x": 250, "y": 50},
+                "style": node_style
+            },
+            {
+                "id": "3",
+                "type": "input",
+                "data": {"label": "Node 2"},
+                "position": {"x": 0, "y": 100},
+                "sourcePosition": "right",
+                "style": node_style
+            },
+        ]
+    )
+    edges: rx.Field[list[Edge]] = rx.field(default_factory=list)
+
+    @rx.event
+    def set_nodes(self, nodes: list[Node]):
+        self.nodes = nodes
+
+    @rx.event
+    def set_edges(self, edges: list[Edge]):
+        self.edges = edges
+
+
+@rx.memo
+def custom_handle(
+    type: rx.Var[HandleType], position: rx.Var[Position], connection_count: rx.Var[int]
+):
+    connections = rxe.flow.api.get_node_connections()
+    return rxe.flow.handle(
+        type=type,
+        position=position,
+        connection_count=connection_count,
+        is_connectable=connections.length() < connection_count.guess_type(),
+    )
+
+
+@rx.memo
+def custom_node():
+    return rx.el.div(
+        custom_handle(type="target", position="left", connection_count=1),
+        rx.el.div("← Only one edge allowed"),
+        class_name="border border-1 p-2 rounded-sm",
+        border_color=rx.color_mode_cond("black", ""),
+        color="black",
+        bg="white",
+    )
+
+
+def connection_limit():
+    return rx.box(
+        rxe.flow(
+            rxe.flow.background(),
+            nodes=ConnectionLimitState.nodes,
+            edges=ConnectionLimitState.edges,
+            on_nodes_change=lambda changes: ConnectionLimitState.set_nodes(
+                rxe.flow.util.apply_node_changes(ConnectionLimitState.nodes, changes)
+            ),
+            on_edges_change=lambda changes: ConnectionLimitState.set_edges(
+                rxe.flow.util.apply_edge_changes(ConnectionLimitState.edges, changes)
+            ),
+            on_connect=lambda connection: ConnectionLimitState.set_edges(
+                rxe.flow.util.add_edge(connection, ConnectionLimitState.edges)
+            ),
+            node_types={
+                "custom": rx.vars.function.ArgsFunctionOperation.create(
+                    (), custom_node()
+                )
+            },
+            color_mode="light",
+            fit_view=True,
+        ),
+        height="100vh",
+        width="100vw",
+    )
+```
+
+
+# Nodes
+
+Nodes are the fundamental building blocks of a flow. This page explains how to define and customize nodes in Reflex Flow.
+
+## The `Node` Type
+
+A node is represented as a Python dictionary with the following fields:
+
+- `id` (`str`) – Unique identifier for the node.
+- `position` (`dict`) – Position of the node with `x` and `y` coordinates.
+- `data` (`dict`) – Arbitrary data passed to the node component.
+- `type` (`str`) – Node type defined in `node_types`.
+- `sourcePosition` (`str`) – Controls source handle position ("top", "right", "bottom", "left").
+- `targetPosition` (`str`) – Controls target handle position ("top", "right", "bottom", "left").
+- `hidden` (`bool`) – Whether the node is visible on the canvas.
+- `selected` (`bool`) – Whether the node is currently selected.
+- `draggable` (`bool`) – Whether the node can be dragged.
+- `selectable` (`bool`) – Whether the node can be selected.
+- `connectable` (`bool`) – Whether the node can be connected to other nodes.
+- `deletable` (`bool`) – Whether the node can be deleted.
+- `width` (`float`) – Width of the node.
+- `height` (`float`) – Height of the node.
+- `parentId` (`str`) – Parent node ID for creating sub-flows.
+- `style` (`dict`) – Custom styles for the node.
+- `className` (`str`) – CSS class name for the node.
+
+## Built-in Node Types
+
+Reflex Flow includes several built-in node types:
+
+```python
+nodes: list[Node] = [
+    {"id": "1", "type": "input", "position": {"x": 100, "y": 100}, "data": {"label": "Start"}},
+    {"id": "2", "type": "default", "position": {"x": 300, "y": 100}, "data": {"label": "Process"}},
+    {"id": "3", "type": "output", "position": {"x": 500, "y": 100}, "data": {"label": "End"}},
+]
+```
+
+- **input** – Entry point with only source handles
+- **default** – Standard node with both source and target handles
+- **output** – Exit point with only target handles
+
+## Basic Node Configuration
+
+### Node Positioning
+
+```python
+node = {
+    "id": "positioned-node",
+    "type": "default",
+    "position": {"x": 250, "y": 150},
+    "data": {"label": "Positioned Node"}
+}
+```
+
+### Node Styling
+
+```python
+styled_node = {
+    "id": "styled-node",
+    "type": "default",
+    "position": {"x": 100, "y": 200},
+    "data": {"label": "Custom Style"},
+    "style": {
+        "background": "#ff6b6b",
+        "color": "white",
+        "border": "2px solid #ff5252",
+        "borderRadius": "8px",
+        "padding": "10px"
+    }
+}
+```
+
+### Handle Positioning
+
+```python
+node_with_handles = {
+    "id": "handle-node",
+    "type": "default",
+    "position": {"x": 300, "y": 300},
+    "data": {"label": "Custom Handles"},
+    "sourcePosition": "right",
+    "targetPosition": "left"
+}
+```
+
+
+# Adding Interactivity to Your Flow
+
+This guide shows how to create an interactive flow in Reflex, allowing you to select, drag, and connect nodes and edges.
+
+## Define the State
+
+We start by defining the nodes and edges of the flow. The `FlowState` class holds the nodes and edges as state variables and includes event handlers to respond to changes.
+
+```python
+import reflex as rx
+import reflex_enterprise as rxe
+from reflex_enterprise.components.flow.types import Node, Edge
+
+class FlowState(rx.State):
+    nodes: list[Node] = [
+        {"id": "1", "type": "input", "position": {"x": 100, "y": 100}, "data": {"label": "Node 1"}},
+        {"id": "2", "type": "default", "position": {"x": 300, "y": 200}, "data": {"label": "Node 2"}},
+    ]
+
+    edges: list[Edge] = [
+        {"id": "e1-2", "source": "1", "target": "2", "label": "Connection", "type": "step"}
+    ]
+```
+
+# Add Event Handlers
+
+Event handlers allow the flow to respond to user interactions such as dragging nodes, updating edges, or creating new connections.
+
+```python
+@rx.event
+def set_nodes(self, nodes: list[Node]):
+    self.nodes = nodes
+
+@rx.event
+def set_edges(self, edges: list[Edge]):
+    self.edges = edges
+
+```
+
+- set_nodes updates nodes when they are moved or edited.
+
+- set_edges updates edges when they are modified or deleted.
+
+
+## Render the Interactive Flow
+
+Finally, we render the flow using **rxe.flow**, passing in the state and event handlers. Additional UI features include zoom/pan controls, a background grid, and a mini-map for navigation.
+
+```python
+def interactive_flow():
+    return rx.box(
+        rxe.flow(
+            rxe.flow.controls(),
+            rxe.flow.background(),
+            rxe.flow.mini_map(),
+
+            nodes=FlowState.nodes,
+            edges=FlowState.edges,
+            on_nodes_change=lambda node_changes: FlowState.set_nodes(
+                rxe.flow.util.apply_node_changes(FlowState.nodes, node_changes)
+            ),
+            on_edges_change=lambda edge_changes: FlowState.set_edges(
+                rxe.flow.util.apply_edge_changes(FlowState.edges, edge_changes)
+            ),
+            on_connect=FlowState.on_connect,
+            fit_view=True,
+
+            attribution_position="bottom-right",
+        ),
+        height="100vh",
+        width="100vw",
+    )
+```
+
+
+# Hooks (API)
+
+The `rxe.flow.api` module provides hooks to interact with the Flow instance. These hooks are wrappers around the `useReactFlow` hook from React Flow.
+
+## Node Hooks
+
+- `get_nodes()`: Returns an array of all nodes in the flow.
+- `set_nodes(nodes)`: Sets the nodes in the flow.
+- `add_nodes(nodes)`: Adds nodes to the flow.
+- `get_node(id)`: Returns a node by its ID.
+- `update_node(id, node_update, replace=False)`: Updates a node in the flow.
+- `update_node_data(id, data_update, replace=False)`: Updates a node's data in the flow.
+
+## Edge Hooks
+
+- `get_edges()`: Returns an array of all edges in the flow.
+- `set_edges(edges)`: Sets the edges in the flow.
+- `add_edges(edges)`: Adds edges to the flow.
+- `get_edge(id)`: Returns an edge by its ID.
+- `update_edge(id, edge_update, replace=False)`: Updates an edge in the flow.
+- `update_edge_data(id, data_update, replace=False)`: Updates an edge's data in the flow.
+
+## Viewport Hooks
+
+- `screen_to_flow_position(x, y, snap_to_grid=False)`: Translates a screen pixel position to a flow position.
+- `flow_to_screen_position(x, y)`: Translates a position inside the flow’s canvas to a screen pixel position.
+
+## Other Hooks
+
+- `to_object()`: Converts the React Flow state to a JSON object.
+- `get_intersecting_nodes(node, partially=True, nodes=None)`: Find all the nodes currently intersecting with a given node or rectangle.
+- `get_node_connections(id=None, handle_type=None, handle_id=None)`: This hook returns an array of connections on a specific node, handle type ("source", "target") or handle ID.
+- `get_connection()`: Returns the current connection state when there is an active connection interaction.
+
+
+# Overview
+
+At its core, a flow diagram is an interactive graph composed of nodes connected by edges. To help understand the key concepts, let’s go over the main components of a flow.
+
+### Nodes
+
+Nodes are the building blocks of a flow. While there are a few default node types available, the real power comes from customizing them. You can design nodes to include interactive elements, display dynamic data, or support multiple connection points. The framework provides the foundation—you provide the functionality and style.
+
+### Handles
+
+Handles are the points on a node where edges attach. They typically appear on the top, bottom, left, or right sides of a node, but can be positioned and styled freely. Nodes can have multiple handles, allowing for complex connection setups.
+
+### Edges
+
+Edges are the connections between nodes. Each edge requires a source node and a target node. Edges can be styled and customized, and nodes with multiple handles can support multiple edges. Custom edges can include interactive elements, specialized routing, or unique visual styles beyond simple lines.
+
+### Connection Line
+
+When creating a new edge, you can click and drag from one handle to another. While dragging, the placeholder edge is called a connection line. Connection lines behave like edges and can be customized in appearance and behavior.
+
+### Viewport
+
+The viewport is the visible area containing the flow. Each node has x- and y-coordinates representing its position. Moving the viewport changes these coordinates, and zooming in or out adjusts the zoom level. The viewport ensures the diagram remains navigable and interactive.
+
+
+# Flow Components
+
+This page documents the main components provided by the `rxe.flow` library.
+
+## rxe.flow.provider
+
+The `FlowProvider` component is a context provider that makes it possible to access a flow’s internal state outside of the `<ReactFlow />` component. Many of the hooks we provide rely on this component to work.
+
+**Props:**
+
+- `initial_nodes`: `Sequence[Node]` - These nodes are used to initialize the flow. They are not dynamic.
+- `default_edges`: `Sequence[Edge]` - These edges are used to initialize the flow. They are not dynamic.
+- `initial_width`: `float` - The initial width is necessary to be able to use fitView on the server.
+- `initial_height`: `float` - The initial height is necessary to be able to use fitView on the server.
+- `fit_view`: `bool` - When true, the flow will be zoomed and panned to fit all the nodes initially provided.
+- `initial_fit_view_options`: `FitViewOptions` - You can provide an object of options to customize the initial fitView behavior.
+- `initial_min_zoom`: `float` - Initial minimum zoom level.
+- `initial_max_zoom`: `float` - Initial maximum zoom level.
+- `node_origin`: `NodeOrigin` - The origin of the node to use when placing it in the flow or looking up its x and y position.
+- `node_extent`: `CoordinateExtent` - The boundary a node can be moved in.
+
+## rxe.flow
+
+The `Flow` component is the main component that renders the flow. It takes in nodes and edges, and provides event handlers for user interactions.
+
+**Props:**
+
+- `nodes`: `Sequence[Node]` - An array of nodes to render in a controlled flow.
+- `edges`: `Sequence[Edge]` - An array of edges to render in a controlled flow.
+- `default_nodes`: `Sequence[Node]` - The initial nodes to render in an uncontrolled flow.
+- `default_edges`: `Sequence[Edge]` - The initial edges to render in an uncontrolled flow.
+- `node_types`: `Mapping[str, Any]` - Custom node types.
+- `edge_types`: `Mapping[str, Any]` - Custom edge types.
+- `on_nodes_change`: Event handler for when nodes change.
+- `on_edges_change`: Event handler for when edges change.
+- `on_connect`: Event handler for when a connection is made.
+- `fit_view`: `bool` - When true, the flow will be zoomed and panned to fit all the nodes initially provided.
+- `fit_view_options`: `FitViewOptions` - Options for `fit_view`.
+- `style`: The style of the component.
+
+## rxe.flow.background
+
+The `Background` component renders a background for the flow. It can be a pattern of lines, dots, or a cross.
+
+**Props:**
+
+- `color`: `str` - Color of the pattern.
+- `bg_color`: `str` - Color of the background.
+- `variant`: `Literal["lines", "dots", "cross"]` - The type of pattern to render.
+- `gap`: `float | tuple[float, float]` - The gap between patterns.
+- `size`: `float` - The size of the pattern elements.
+
+**Example:**
+
+```python
+rxe.flow.background(variant="dots", gap=20, size=1)
+```
+
+## rxe.flow.controls
+
+The `Controls` component renders a panel with buttons to zoom in, zoom out, fit the view, and lock the viewport.
+
+**Props:**
+
+- `show_zoom`: `bool` - Whether to show the zoom buttons.
+- `show_fit_view`: `bool` - Whether to show the fit view button.
+- `show_interactive`: `bool` - Whether to show the lock button.
+- `position`: `PanelPosition` - The position of the controls on the pane.
+
+**Example:**
+
+```python
+rxe.flow.controls()
+```
+
+## rxe.flow.mini_map
+
+The `MiniMap` component renders a small overview of your flow.
+
+**Props:**
+
+- `node_color`: `str | Any` - Color of nodes on minimap.
+- `node_stroke_color`: `str | Any` - Stroke color of nodes on minimap.
+- `pannable`: `bool` - Determines whether you can pan the viewport by dragging inside the minimap.
+- `zoomable`: `bool` - Determines whether you can zoom the viewport by scrolling inside the minimap.
+- `position`: `PanelPosition` - Position of minimap on pane.
+
+**Example:**
+
+```python
+rxe.flow.mini_map(pannable=True, zoomable=True)
+```
+
+
+# Theming
+
+You can customize the appearance of the Flow component using CSS. The Flow component comes with a default theme, which you can override with your own styles.
+
+## CSS Variables
+
+The Flow component uses CSS variables for theming. You can override these variables to change the appearance of the flow. Here are some of the most common variables:
+
+```css
+.react-flow {
+  --xy-background-color: #f7f9fb;
+  --xy-node-border-default: 1px solid #ededed;
+  --xy-node-boxshadow-default: 0px 3.54px 4.55px 0px #00000005,
+    0px 3.54px 4.55px 0px #0000000d, 0px 0.51px 1.01px 0px #0000001a;
+  --xy-node-border-radius-default: 8px;
+  --xy-handle-background-color-default: #ffffff;
+  --xy-handle-border-color-default: #aaaaaa;
+  --xy-edge-label-color-default: #505050;
+}
+```
+
+## Custom Stylesheets
+
+You can add custom stylesheets to your app to override the default styles. To do this, add the `stylesheets` prop to your `rxe.App` or `rx.App` instance:
+
+```python
+app = rxe.App(
+    stylesheets=[
+        "/css/my-custom-styles.css",
+    ],
+)
+```
+
+Then, create a file `assets/css/my-custom-styles.css` in your project and add your custom styles there.
+
+## Customizing Node and Edge Styles
+
+You can also apply custom styles to individual nodes and edges using the `style` and `className` props.
+
+### Using the **style** prop
+
+You can pass a style dictionary to the `style` prop of a node or edge:
+
+```python
+node = {
+    "id": "1",
+    "position": {"x": 100, "y": 100},
+    "data": {"label": "Node 1"},
+    "style": {"backgroundColor": "#ffcc00"},
+}
+```
+
+### Using the **className** prop
+
+You can also pass a class name to the `className` prop and define the styles in your CSS file:
+
+```python
+# In your python code
+node = {
+    "id": "1",
+    "position": {"x": 100, "y": 100},
+    "data": {"label": "Node 1"},
+    "className": "my-custom-node",
+}
+```
+
+```css
+/* In your CSS file */
+.my-custom-node {
+    background-color: #ffcc00;
+    border: 2px solid #ff9900;
+    border-radius: 10px;
+}
+```
+
+
+# Utility Functions
+
+The `rxe.flow.util` module provides utility functions for working with Flow components.
+
+## Path Utilities
+
+These functions are used to calculate the path for an edge.
+
+- `get_simple_bezier_path(source_x, source_y, target_x, target_y, source_position="bottom", target_position="top")`: Returns everything you need to render a simple bezier edge between two nodes.
+- `get_bezier_path(source_x, source_y, target_x, target_y, source_position="bottom", target_position="top", curvature=0.5)`: Returns everything you need to render a bezier edge between two nodes.
+- `get_straight_path(source_x, source_y, target_x, target_y)`: Calculates the straight line path between two points.
+- `get_smooth_step_path(source_x, source_y, target_x, target_y, source_position="bottom", target_position="top", border_radius=5, center_x=None, center_y=None, offset=20, step_position=0.5)`: Returns everything you need to render a stepped path between two nodes.
+
+## Change Handlers
+
+These functions are used to apply changes to nodes and edges from the `on_nodes_change` and `on_edges_change` event handlers.
+
+- `apply_node_changes(nodes, changes)`: Applies changes to nodes in the flow.
+- `apply_edge_changes(edges, changes)`: Applies changes to edges in the flow.
+
+## Edge and Connection Utilities
+
+- `add_edge(params, edges)`: Creates a new edge in the flow.
+
+## Graph Utilities
+
+- `get_incomers(node_id, nodes, edges)`: Returns all incoming nodes connected to the given node.
+- `get_outgoers(node_id, nodes, edges)`: Returns all outgoing nodes connected to the given node.
+- `get_connected_edges(nodes, edges)`: Returns all edges connected to the given nodes.
+
+
 ---
 title: Interactive Maps
 ---
