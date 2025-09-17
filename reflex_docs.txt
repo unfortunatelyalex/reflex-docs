@@ -10128,12 +10128,6 @@ def signup_multiple_thirdparty() -> rx.Component:
 ```
 
 
-## Overview
-
-
-
-## Overview
-
 # Integrations Shortcut
 
 Reflex Build supports powerful integrations like databases, OpenAI, and Databricks, allowing you to connect external services to your app without complex setup. These integrations help you add advanced functionality—like AI-powered features, data analytics, or persistent storage—while speeding up development.
@@ -10150,8 +10144,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/shortcut_light.png",
-                "/ai_builder/features/shortcut_dark.png",
+                "/ai_builder/features/shortcut_light.webp",
+                "/ai_builder/features/shortcut_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10198,8 +10192,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/features/knowledge_light.png",
-                    "/ai_builder/features/knowledge_dark.png",
+                    "/ai_builder/features/knowledge_light.webp",
+                    "/ai_builder/features/knowledge_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10254,8 +10248,8 @@ def interaction_mode_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/features/interaction_modes_light.png",
-                    "/ai_builder/features/interaction_modes_dark.png",
+                    "/ai_builder/features/interaction_modes_light.webp",
+                    "/ai_builder/features/interaction_modes_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10331,8 +10325,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/features/secrets_light.png",
-                    "/ai_builder/features/secrets_dark.png",
+                    "/ai_builder/features/secrets_light.webp",
+                    "/ai_builder/features/secrets_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10378,8 +10372,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/secret_bulk_light.png",
-                "/ai_builder/features/secret_bulk_dark.png",
+                "/ai_builder/features/secret_bulk_light.webp",
+                "/ai_builder/features/secret_bulk_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10408,8 +10402,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/features/diff_light.png",
-                    "/ai_builder/features/diff_dark.png",
+                    "/ai_builder/features/diff_light.webp",
+                    "/ai_builder/features/diff_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10600,8 +10594,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/restore_light.png",
-                "/ai_builder/features/restore_dark.png",
+                "/ai_builder/features/restore_light.webp",
+                "/ai_builder/features/restore_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10688,8 +10682,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/integrations/databricks_light.png",
-                "/ai_builder/integrations/databricks_dark.png",
+                "/ai_builder/integrations/databricks_light.webp",
+                "/ai_builder/integrations/databricks_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10743,8 +10737,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/integrations/database_light.png",
-                "/ai_builder/integrations/database_dark.png",
+                "/ai_builder/integrations/database_light.webp",
+                "/ai_builder/integrations/database_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10916,8 +10910,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/integrations/azure_auth_light.png",
-                "/ai_builder/integrations/azure_auth_dark.png",
+                "/ai_builder/integrations/azure_auth_light.webp",
+                "/ai_builder/integrations/azure_auth_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10979,8 +10973,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/integrations/google_light.png",
-                "/ai_builder/integrations/google_dark.png",
+                "/ai_builder/integrations/google_light.webp",
+                "/ai_builder/integrations/google_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11058,8 +11052,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/integrations/open_ai_light.png",
-                "/ai_builder/integrations/open_ai_dark.png",
+                "/ai_builder/integrations/open_ai_light.webp",
+                "/ai_builder/integrations/open_ai_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11358,8 +11352,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_1_light.png",
-                "/ai_builder/overview/tutorial_1_dark.png",
+                "/ai_builder/overview/tutorial_1_light.webp",
+                "/ai_builder/overview/tutorial_1_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11386,8 +11380,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_2_light.png",
-                "/ai_builder/overview/tutorial_2_dark.png",
+                "/ai_builder/overview/tutorial_2_light.webp",
+                "/ai_builder/overview/tutorial_2_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11416,8 +11410,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_3_light.png",
-                "/ai_builder/overview/tutorial_3_dark.png",
+                "/ai_builder/overview/tutorial_3_light.webp",
+                "/ai_builder/overview/tutorial_3_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11446,8 +11440,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_4_light.png",
-                "/ai_builder/overview/tutorial_4_dark.png",
+                "/ai_builder/overview/tutorial_4_light.webp",
+                "/ai_builder/overview/tutorial_4_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11543,8 +11537,8 @@ class LandingState(rx.State):
 
 class BuildDocState(rx.State):
     current_feature: dict[str, str] = {
-        "light": "/ai_builder/what_is_reflex_build/project_bar_light.png",
-        "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.png",
+        "light": "/ai_builder/what_is_reflex_build/project_bar_light.webp",
+        "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.webp",
     }
 
     image_opacity: float = 1.0  # Use float instead of string for opacity
@@ -11555,8 +11549,8 @@ class BuildDocState(rx.State):
             "title": "Project Menu Bar",
             "subtitle": "Browse previously built applications, create new sessions, store database variables, and much more!",
             "img": {
-                "light": "/ai_builder/what_is_reflex_build/project_bar_light.png",
-                "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.png",
+                "light": "/ai_builder/what_is_reflex_build/project_bar_light.webp",
+                "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.webp",
             },
             "selected": True,
         },
@@ -11564,8 +11558,8 @@ class BuildDocState(rx.State):
             "title": "Chat Area",
             "subtitle": "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
             "img": {
-                "light": "/ai_builder/what_is_reflex_build/chat_light.png",
-                "dark": "/ai_builder/what_is_reflex_build/chat_dark.png",
+                "light": "/ai_builder/what_is_reflex_build/chat_light.webp",
+                "dark": "/ai_builder/what_is_reflex_build/chat_dark.webp",
             },
             "selected": False,
         },
@@ -11573,8 +11567,8 @@ class BuildDocState(rx.State):
             "title": "Application Workspace",
             "subtitle": "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
             "img": {
-                "light": "/ai_builder/what_is_reflex_build/file_tree_light.png",
-                "dark": "/ai_builder/what_is_reflex_build/file_tree_dark.png",
+                "light": "/ai_builder/what_is_reflex_build/file_tree_light.webp",
+                "dark": "/ai_builder/what_is_reflex_build/file_tree_dark.webp",
             },
             "selected": False,
         },
@@ -11582,8 +11576,8 @@ class BuildDocState(rx.State):
             "title": "Code Editor",
             "subtitle": "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
             "img": {
-                "light": "/ai_builder/what_is_reflex_build/code_light.png",
-                "dark": "/ai_builder/what_is_reflex_build/code_dark.png",
+                "light": "/ai_builder/what_is_reflex_build/code_light.webp",
+                "dark": "/ai_builder/what_is_reflex_build/code_dark.webp",
             },
             "selected": False,
         },
@@ -11591,8 +11585,8 @@ class BuildDocState(rx.State):
             "title": "Bottom Menu Bar",
             "subtitle": "This menu contains important actions such as deploying, downloading, and sharing your application.",
             "img": {
-                "light": "/ai_builder/what_is_reflex_build/bottom_light.png",
-                "dark": "/ai_builder/what_is_reflex_build/bottom_dark.png",
+                "light": "/ai_builder/what_is_reflex_build/bottom_light.webp",
+                "dark": "/ai_builder/what_is_reflex_build/bottom_dark.webp",
             },
             "selected": False,
         },
@@ -11600,8 +11594,8 @@ class BuildDocState(rx.State):
             "title": "Preview Tab",
             "subtitle": "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
             "img": {
-                "light": "/ai_builder/what_is_reflex_build/preview_light.png",
-                "dark": "/ai_builder/what_is_reflex_build/preview_dark.png",
+                "light": "/ai_builder/what_is_reflex_build/preview_light.webp",
+                "dark": "/ai_builder/what_is_reflex_build/preview_dark.webp",
             },
             "selected": False,
         },
@@ -11637,38 +11631,38 @@ class BuildDocState(rx.State):
 
 feature_images = [
     [
-        "/ai_builder/what_is_reflex_build/project_bar_light.png",
-        "/ai_builder/what_is_reflex_build/project_bar_dark.png",
+        "/ai_builder/what_is_reflex_build/project_bar_light.webp",
+        "/ai_builder/what_is_reflex_build/project_bar_dark.webp",
         "Project Menu Bar",
         "Browse previously built applications, create new sessions, store database variables, and much more!",
     ],
     [
-        "/ai_builder/what_is_reflex_build/chat_light.png",
-        "/ai_builder/what_is_reflex_build/chat_dark.png",
+        "/ai_builder/what_is_reflex_build/chat_light.webp",
+        "/ai_builder/what_is_reflex_build/chat_dark.webp",
         "Chat Area",
         "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
     ],
     [
-        "/ai_builder/what_is_reflex_build/file_tree_light.png",
-        "/ai_builder/what_is_reflex_build/file_tree_dark.png",
+        "/ai_builder/what_is_reflex_build/file_tree_light.webp",
+        "/ai_builder/what_is_reflex_build/file_tree_dark.webp",
         "Application Workspace",
         "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
     ],
     [
-        "/ai_builder/what_is_reflex_build/code_light.png",
-        "/ai_builder/what_is_reflex_build/code_dark.png",
+        "/ai_builder/what_is_reflex_build/code_light.webp",
+        "/ai_builder/what_is_reflex_build/code_dark.webp",
         "Code Editor",
         "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
     ],
     [
-        "/ai_builder/what_is_reflex_build/bottom_light.png",
-        "/ai_builder/what_is_reflex_build/bottom_dark.png",
+        "/ai_builder/what_is_reflex_build/bottom_light.webp",
+        "/ai_builder/what_is_reflex_build/bottom_dark.webp",
         "Bottom Menu Bar",
         "This menu contains important actions such as deploying, downloading, and sharing your application.",
     ],
     [
-        "/ai_builder/what_is_reflex_build/preview_light.png",
-        "/ai_builder/what_is_reflex_build/preview_dark.png",
+        "/ai_builder/what_is_reflex_build/preview_light.webp",
+        "/ai_builder/what_is_reflex_build/preview_dark.webp",
         "Preview Tab",
         "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
     ],
@@ -11864,8 +11858,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/templates_light.png",
-                "/ai_builder/overview/templates_dark.png",
+                "/ai_builder/overview/templates_light.webp",
+                "/ai_builder/overview/templates_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11885,8 +11879,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/fork_template_light.png",
-                "/ai_builder/overview/fork_template_dark.png",
+                "/ai_builder/overview/fork_template_light.webp",
+                "/ai_builder/overview/fork_template_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11914,8 +11908,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/general_light.png",
-                    "/ai_builder/app_lifecycle/general_dark.png",
+                    "/ai_builder/app_lifecycle/general_light.webp",
+                    "/ai_builder/app_lifecycle/general_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11965,8 +11959,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/copy_light.png",
-                    "/ai_builder/app_lifecycle/copy_dark.png",
+                    "/ai_builder/app_lifecycle/copy_light.webp",
+                    "/ai_builder/app_lifecycle/copy_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -12031,8 +12025,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/deploy_light.png",
-                    "/ai_builder/app_lifecycle/deploy_dark.png",
+                    "/ai_builder/app_lifecycle/deploy_light.webp",
+                    "/ai_builder/app_lifecycle/deploy_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -12075,8 +12069,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/download_light.png",
-                    "/ai_builder/app_lifecycle/download_dark.png",
+                    "/ai_builder/app_lifecycle/download_light.webp",
+                    "/ai_builder/app_lifecycle/download_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
@@ -12117,8 +12111,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/overview/fork_template_light.png",
-                "/ai_builder/overview/fork_template_dark.png",
+                "/ai_builder/overview/fork_template_light.webp",
+                "/ai_builder/overview/fork_template_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -12169,8 +12163,8 @@ def render_image():
         image_zoom(
             rx.image(
                 src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/share_light.png",
-                    "/ai_builder/app_lifecycle/share_dark.png",
+                    "/ai_builder/app_lifecycle/share_light.webp",
+                    "/ai_builder/app_lifecycle/share_dark.webp",
                 ),
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
