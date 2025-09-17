@@ -2,3 +2,6 @@ dev*
 .git
 .txt
 .python-version
+__pycache__/
+*.pyc
+*.pyo
