@@ -147,8 +147,10 @@ jobs:
             echo "::warning::Failed to update timestamp"
           fi
 
-      - name: Commit timestamp update
+      - name: Commit and push timestamp update
         if: steps.update-checked.outputs.updated == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           git add README.md
           
@@ -157,6 +159,13 @@ jobs:
           else
             git commit -m "ci: update last checked timestamp [skip ci]"
             echo "Timestamp changes committed"
+            
+            echo "Pushing timestamp update..."
+            git push https://unfortunatelyalex:${{ secrets.PAT }}@github.com/unfortunatelyalex/reflex-docs.git main || {
+              echo "::error::Failed to push timestamp update"
+              exit 1
+            }
+            echo "✅ Timestamp update pushed successfully"
           fi
 
   publish-changes:
@@ -168,13 +177,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Pull latest changes to get timestamp updates
+        run: |
+          echo "Syncing with remote repository to get latest timestamp updates..."
+          git pull --rebase origin main || {
+            echo "::error::Failed to sync with remote repository"
+            exit 1
+          }
+
       - name: Download generated docs
+        if: needs.generate-docs.outputs.changes-detected == 'true'
         uses: actions/download-artifact@v4
         with:
           name: generated-docs-${{ github.run_number }}
         continue-on-error: true
 
-      - name: Update last updated timestamp
+      - name: Update last updated timestamp (only if docs changed)
+        if: needs.generate-docs.outputs.changes-detected == 'true'
         run: |
           current_time_str="$(date '+%Y-%m-%d %H:%M:%S %Z')"
           NEW_UPDATED_TIME_STRING="- Last updated: \`$current_time_str\`"
@@ -187,6 +206,7 @@ jobs:
           echo "All changes staged for commit"
 
       - name: Commit documentation updates
+        if: needs.generate-docs.outputs.changes-detected == 'true'
         run: |
           if git diff --cached --quiet; then
             echo "No changes to commit"
@@ -198,15 +218,8 @@ jobs:
           - Generated on $(date '+%Y-%m-%d %H:%M:%S %Z')
           [automated commit]"
 
-      - name: Pull latest changes
-        run: |
-          echo "Syncing with remote repository..."
-          git pull --rebase --autostash origin main || {
-            echo "::error::Failed to sync with remote repository"
-            exit 1
-          }
-
       - name: Push documentation updates
+        if: needs.generate-docs.outputs.changes-detected == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
