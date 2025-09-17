@@ -58,11 +58,6 @@ jobs:
           ${{ env.PYTHON_EXEC }} -m pip install --upgrade pip setuptools wheel
           ${{ env.PYTHON_EXEC }} -m pip install -r requirements.txt
 
-      - name: Install Playwright browsers
-        run: |
-          ${{ env.PYTHON_EXEC }} -m playwright install --with-deps
-          ${{ env.PYTHON_EXEC }} -m playwright install-deps
-
       - name: Validate automation script
         run: |
           if [[ ! -f "haupt.py" ]]; then
@@ -91,7 +86,7 @@ jobs:
       - name: Restore dependencies
         run: ${{ env.PYTHON_EXEC }} -m pip install -r requirements.txt
 
-      - name: Run documentation automation
+      - name: Run documentation automation (API fetch)
         id: run-script
         run: |
           echo "Starting documentation generation..."
