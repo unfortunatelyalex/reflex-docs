@@ -2079,7 +2079,7 @@ def chat() -> rx.Component:
 
 def action_bar() -> rx.Component:
     return rx.hstack(
-        rx.input(placeholder="Ask a question", on_change=State.set_question, style=style.input_style),
+        rx.input(placeholder="Ask a question", on_change=State.set_question1, style=style.input_style),
         rx.button("Ask", on_click=State.answer, style=style.button_style),
     )
 ```
@@ -2119,7 +2119,7 @@ def action_bar() -> rx.Component:
         rx.input(
             value=State.question,
             placeholder="Ask a question",
-            on_change=State.set_question,
+            on_change=State.set_question2,
             style=style.input_style),
         rx.button("Ask", on_click=State.answer, style=style.button_style),
     )
@@ -2193,7 +2193,7 @@ We will use OpenAI's API to give our chatbot some intelligence.
 
 First, ensure you have an active OpenAI subscription.
 Next, install the latest openai package:
-```bash 
+```bash
 pip install --upgrade openai
 ```
 
@@ -2219,7 +2219,7 @@ Making your chatbot intelligent requires connecting to a language model API. Thi
 
 1. First, the user types a prompt that is updated via the `on_change` event handler.
 2. Next, when a prompt is ready, the user can choose to submit it by clicking the `Ask` button which in turn triggers the `State.answer` method inside our `state.py` file.
-3. Finally, if the method is triggered, the `prompt` is sent via a request to OpenAI client and returns an answer that we can trim and use to update the chat history! 
+3. Finally, if the method is triggered, the `prompt` is sent via a request to OpenAI client and returns an answer that we can trim and use to update the chat history!
 
 
 ```python
@@ -2230,7 +2230,7 @@ def action_bar() -> rx.Component:
             value=State.question,
             placeholder="Ask a question",
             # on_change event updates the input as the user types a prompt.
-            on_change=State.set_question,
+            on_change=State.set_question3,
             style=style.input_style),
 
         # on_click event triggers the API to send the prompt to OpenAI.
@@ -2365,13 +2365,13 @@ class State(rx.State):
 
     async def answer(self):
         client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
-        
+
         # Start streaming completion from OpenAI
         session = await client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 \{"role": "user", "content": self.question}
-            ],    
+            ],
             temperature=0.7,
             stream=True,
         )
@@ -2381,7 +2381,7 @@ class State(rx.State):
         self.chat_history.append((self.question, answer))
         self.question = ""
         yield
-        
+
         # Process streaming response
         async for item in session:
             if hasattr(item.choices[0].delta, "content"):
@@ -2433,6 +2433,7 @@ Congratulations! You have built your first chatbot. From here, you can read thro
 ### One More Thing
 
 With our hosting service, you can deploy this app with a single command within minutes. Check out our [Hosting Quick Start]({hosting.deploy_quick_start.path}).
+
 
 # Project Structure
 
@@ -2709,6 +2710,18 @@ class ChatappState(rx.State):
 
     # Keep track of the chat history as a list of (question, answer) tuples.
     chat_history: list[tuple[str, str]]
+
+    def set_question(self, q: str):
+        self.question = q
+
+    def set_question1(self, q: str):
+        self.question = q
+
+    def set_question2(self, q: str):
+        self.question = q
+
+    def set_question3(self, q: str):
+        self.question = q
 
     def answer(self) -> None:
         # Our chatbot is not very smart right now...
@@ -6865,6 +6878,17 @@ class ClientStorageState(rx.State):
     my_local_storage: str = rx.LocalStorage("")
     custom_cookie: str = rx.Cookie(name="CustomNamedCookie", max_age=3600)
 
+    @rx.event
+    def set_my_cookie(self, value: str):
+        self.my_cookie = value
+
+    @rx.event
+    def set_my_local_storage(self, value: str):
+        self.my_local_storage = value
+
+    @rx.event
+    def set_custom_cookie(self, value: str):
+        self.custom_cookie = value
 
 def client_storage_example():
     return rx.vstack(
@@ -8673,12 +8697,16 @@ available_items = ["2:00", "3:00", "4:00", "5:00"]
 class SingleSelectionChipsState(rx.State):
     selected_item: str = ""
 
+    @rx.event
+    def set_selected_item(self, value: str):
+        self.selected_item = value
+
 def unselected_item(item: str) -> rx.Component:
     return rx.badge(
         item,
         color_scheme="gray",
         **chip_props,
-        on_click=SingleSelectionChipsState.setvar("selected_item", item),
+        on_click=SingleSelectionChipsState.set_selected_item(item),
     )
 
 def selected_item(item: str) -> rx.Component:
@@ -8687,7 +8715,7 @@ def selected_item(item: str) -> rx.Component:
         item,
         color_scheme="mint",
         **chip_props,
-        on_click=SingleSelectionChipsState.setvar("selected_item", ""),
+        on_click=SingleSelectionChipsState.set_selected_item(""),
     )
 
 def item_chip(item: str) -> rx.Component:
@@ -13682,6 +13710,10 @@ SYNTHETIC_EVENTS = [
         "state": """class ChangeState(rx.State):
     checked: bool = False
 
+    @rx.event
+    def set_checked(self):
+        self.checked = not self.checked
+
 """,
         "example": """rx.switch(on_change=ChangeState.set_checked)""",
     },
@@ -13741,7 +13773,7 @@ SYNTHETIC_EVENTS = [
     @rx.event
     def on_mount(self):
         self.events = self.events[-4:] + ["on_mount @ " + str(datetime.now())]
-        
+
     @rx.event
     async def load_data(self):
         # Common pattern: Set loading state, yield to update UI, then fetch data
@@ -13780,7 +13812,7 @@ SYNTHETIC_EVENTS = [
         self.events = self.events[-4:] + ["on_unmount @ " + str(datetime.now())]
         # Common pattern: Clean up resources when component is removed
         self.status = f"Resource {self.resource_id} cleaned up"
-        
+
     @rx.event
     def initialize_resource(self):
         self.status = f"Resource {self.resource_id} initialized"
@@ -17919,7 +17951,7 @@ You can also set props conditionally using `rx.cond`. In this example, we set th
 class PropCondState(rx.State):
 
     value: int
-    
+
     @rx.event
     def set_end(self, value: list[int | float]):
         self.value = value[0]
@@ -17960,6 +17992,10 @@ class MatchState(rx.State):
         "pug",
         "corgi",
     ]
+
+    @rx.event
+    def set_cat_breed(self, breed: str):
+        self.cat_breed = breed
 
 
 def match_demo():
@@ -18343,6 +18379,10 @@ import reflex_enterprise as rxe
 class BasicDndState(rx.State):
     drop_count: int = 0
 
+    def increment_drop_count(self):
+        self.drop_count += 1
+
+
 @rx.memo
 def draggable_card():
     return rxe.dnd.draggable(
@@ -18378,7 +18418,7 @@ def basic_drag_drop():
                     font_weight="bold"
                 ),
                 accept=["BasicCard"],
-                on_drop=BasicDndState.setvar("drop_count", BasicDndState.drop_count + 1),
+                on_drop=BasicDndState.increment_drop_count,
             ),
             spacing="4",
             align="start"
@@ -18397,6 +18437,10 @@ import reflex_enterprise as rxe
 
 class MultiPositionState(rx.State):
     card_position: int = 0
+
+    def set_card_position(self, position: int):
+        self.card_position = position
+
 
 @rx.memo
 def movable_card():
@@ -18432,7 +18476,7 @@ def drop_zone(position: int):
         border_color=rx.cond(params.is_over, "green.500", "red.500"),
         bg=rx.cond(params.is_over, "green.100", "blue.100"),
         accept=["MovableCard"],
-        on_drop=MultiPositionState.setvar("card_position", position),
+        on_drop=lambda _: MultiPositionState.set_card_position(position),
         display="flex",
         align_items="center",
         justify_content="center"
@@ -18443,7 +18487,7 @@ def multi_position_example():
         rx.text("Drag the card between positions", weight="bold"),
         rx.grid(
             drop_zone(0),
-            drop_zone(1), 
+            drop_zone(1),
             drop_zone(2),
             drop_zone(3),
             columns="2",
@@ -18466,7 +18510,10 @@ import reflex_enterprise as rxe
 class StateTrackingState(rx.State):
     drag_info: str = "No drag activity"
 
-@rx.memo  
+    def set_drag_info(self, value: str):
+        self.drag_info = value
+
+@rx.memo
 def tracked_draggable():
     drag_params = rxe.dnd.Draggable.collected_params
     return rxe.dnd.draggable(
@@ -18479,7 +18526,7 @@ def tracked_draggable():
             opacity=rx.cond(drag_params.is_dragging, 0.5, 1.0)
         ),
         type="TrackedItem",
-        on_end=StateTrackingState.setvar("drag_info", "Drag ended")
+        on_end=StateTrackingState.set_drag_info("Drag ended")
     )
 
 def tracked_drop_target():
@@ -18498,8 +18545,8 @@ def tracked_drop_target():
             justify_content="center"
         ),
         accept=["TrackedItem"],
-        on_drop=StateTrackingState.setvar("drag_info", "Item successfully dropped!"),
-        on_hover=StateTrackingState.setvar("drag_info", "Item hovering over drop zone")
+        on_drop=StateTrackingState.set_drag_info("Item successfully dropped!"),
+        on_hover=StateTrackingState.set_drag_info("Item hovering over drop zone")
     )
 
 def state_tracking_example():
@@ -18541,10 +18588,10 @@ class DynamicListState(rx.State):
     def move_item(self, item_data: dict, target_list: str):
         item_id = item_data.get("id")
         source_list = item_data.get("list_id")
-        
+
         if not item_id or not source_list:
             return
-            
+
         # Find the item in the source list
         source_items = getattr(self, f"list_{source_list.lower()}")
         item_to_move = None
@@ -18552,23 +18599,23 @@ class DynamicListState(rx.State):
             if item.id == item_id:
                 item_to_move = item
                 break
-                
+
         if not item_to_move:
             return
-            
+
         # Remove from source list only
         if source_list == "A":
             self.list_a = [item for item in self.list_a if item.id != item_id]
         else:
             self.list_b = [item for item in self.list_b if item.id != item_id]
-        
+
         # Create new item for target list
         new_item = ListItem(
             id=item_id,
             text=item_to_move.text,
             list_id=target_list
         )
-        
+
         # Add to target list
         if target_list == "A":
             self.list_a.append(new_item)
@@ -18735,6 +18782,9 @@ import reflex_enterprise as rxe
 class SimpleState(rx.State):
     message: str = "No items dropped yet"
 
+    def set_message_from_item(self, item: dict):
+        self.message = f"Dropped: {item['name']}"
+
 def simple_draggable():
     return rxe.dnd.draggable(
         rx.box(
@@ -18758,7 +18808,7 @@ def simple_drop_target():
             min_height="100px"
         ),
         accept=["simple"],
-        on_drop=lambda item: SimpleState.setvar("message", f"Dropped: {item['name']}")
+        on_drop=SimpleState.set_message_from_item
     )
 
 def item_data_example():
@@ -18780,6 +18830,12 @@ import reflex_enterprise as rxe
 class CollectState(rx.State):
     drag_info: str = "No drag activity"
     drop_info: str = "No drop activity"
+
+    def handle_drop(self, item: dict):
+        self.drop_info = f"Dropped: {item.get('name', 'Unknown')}"
+        return rx.toast(f"Successfully dropped {item.get('name', 'item')}")
+
+
 
 def collect_draggable():
     params = rxe.dnd.Draggable.collected_params
@@ -18830,10 +18886,7 @@ def collect_drop_target():
             min_height="120px"
         ),
         accept=["collect_item"],
-        on_drop=lambda item: [
-            CollectState.setvar("drop_info", f"Dropped: {item.get('name', 'Unknown')}"),
-            rx.toast(f"Successfully dropped {item.get('name', 'item')}")
-        ]
+        on_drop=CollectState.handle_drop,
     )
 
 def custom_collect_example():
@@ -20726,12 +20779,12 @@ import reflex_enterprise as rxe
 class InteractiveMapState(rx.State):
     last_click: str = "No clicks yet"
     current_zoom: float = 13.0
-    
+
     def handle_map_click(self, event):
         lat = event.get("latlng", {}).get("lat", 0)
         lng = event.get("latlng", {}).get("lng", 0)
         self.last_click = f"Clicked at: {lat:.4f}, {lng:.4f}"
-    
+
     def handle_zoom_change(self, event):
         self.current_zoom = float(event.get("target", {}).get("_zoom", 13.0))
 
@@ -20820,11 +20873,11 @@ map_api = rxe.map.api("api-demo-map")
 
 class MapAPIState(rx.State):
     current_location: str = "London"
-    
+
     def fly_to_london(self):
         yield map_api.fly_to([51.505, -0.09], 13)
         self.current_location = "London"
-    
+
     def fly_to_paris(self):
         yield map_api.fly_to([48.8566, 2.3522], 13)
         self.current_location = "Paris"
@@ -20903,44 +20956,47 @@ class AdvancedMapState(rx.State):
     constraints_applied: bool = False
     location_tracking: bool = False
     location_status: str = "Location tracking disabled"
-    
+
+    def set_location_status(self, status: str):
+        self.location_status = status
+
     def setup_map_constraints(self):
         map_api = rxe.map.api("advanced-demo-map")
-        
+
         # Set maximum bounds (restrict panning to London area)
         max_bounds = rxe.map.latlng_bounds(
             corner1_lat=51.4, corner1_lng=-0.3,
             corner2_lat=51.6, corner2_lng=0.1
         )
         yield map_api.set_max_bounds(max_bounds)
-        
+
         # Set min/max zoom levels
         yield map_api.set_min_zoom(10)
         yield map_api.set_max_zoom(16)
-        
+
         # Disable scroll wheel zoom
         yield map_api.scroll_wheel_zoom(False)
-        
+
         self.constraints_applied = True
-    
+
     def remove_constraints(self):
         map_api = rxe.map.api("advanced-demo-map")
-        
+
         # Remove bounds restriction
         yield map_api.set_max_bounds(None)
-        
+
         # Reset zoom limits
         yield map_api.set_min_zoom(1)
         yield map_api.set_max_zoom(18)
-        
+
         # Re-enable scroll wheel zoom
         yield map_api.scroll_wheel_zoom(True)
-        
+
         self.constraints_applied = False
-    
+
     def toggle_location_tracking(self):
         map_api = rxe.map.api("advanced-demo-map")
-        
+
         if self.location_tracking == False:
             # Start location tracking
             locate_options = rxe.map.locate_options(
@@ -20996,8 +21052,8 @@ def advanced_example():
             zoom=12.0,
             height="400px",
             width="100%",
-            on_locationfound=lambda e: AdvancedMapState.setvar("location_status", "Location found!"),
-            on_locationerror=lambda e: AdvancedMapState.setvar("location_status", "Location error - permission denied or unavailable"),
+            on_locationfound=lambda e: AdvancedMapState.set_location_status("Location found!"),
+            on_locationerror=lambda e: AdvancedMapState.set_location_status("Location error - permission denied or unavailable"),
         ),
         spacing="3"
     )
@@ -21010,16 +21066,16 @@ Many API methods that retrieve information require callbacks to handle the resul
 ```python
 class CallbackMapState(rx.State):
     map_info: str = ""
-    
+
     def handle_center_result(self, result):
         lat = result.get("lat", 0)
         lng = result.get("lng", 0)
         self.map_info = f"Center: {lat:.4f}, {lng:.4f}"
-    
+
     def handle_bounds_result(self, result):
         # result will contain bounds information
         self.map_info = f"Bounds: {result}"
-    
+
     def get_map_info(self):
         map_api = rxe.map.api("info-map")
         yield map_api.get_center(self.handle_center_result)
@@ -21068,7 +21124,7 @@ def dynamic_markers():
             lambda marker: rxe.map.marker(
                 rxe.map.popup(marker["title"]),
                 position=rxe.map.latlng(
-                    lat=marker["lat"], 
+                    lat=marker["lat"],
                     lng=marker["lng"]
                 )
             )
@@ -21405,6 +21461,9 @@ import reflex_enterprise as rxe
 class MultiSelectState(rx.State):
     selected_fruits: list = []
 
+    def set_selected_fruits(self, value: list):
+        self.selected_fruits = value
+
 
 def multi_select_example():
     return rx.vstack(
@@ -21413,9 +21472,10 @@ def multi_select_example():
             placeholder="Pick all that you like",
             data=["Apple", "Banana", "Cherry", "Date", "Elderberry"],
             value=MultiSelectState.selected_fruits,
-            on_change=lambda value: MultiSelectState.setvar("selected_fruits", value),
+            on_change=MultiSelectState.set_selected_fruits,
         )
     )
+
 ```
 
 
@@ -21464,7 +21524,11 @@ import reflex as rx
 import reflex_enterprise as rxe
 
 class JsonInputState(rx.State):
-    json_data: str = ''
+    json_data: str = ""
+
+    def set_json_data(self, value: str):
+        self.json_data = value
+
 
 def json_input_example():
     return rxe.mantine.json_input(
@@ -21476,7 +21540,7 @@ def json_input_example():
         required=True,
         size="md",
         format_on_blur=True,
-        on_change=lambda value: JsonInputState.setvar("json_data", value),
+        on_change=JsonInputState.set_json_data,
         width="300px",
     )
 ```
@@ -23783,6 +23847,9 @@ coins = ["BTC", "ETH", "LTC", "DOGE"]
 class VarSelectState(rx.State):
     selected: str = "DOGE"
 
+    def set_selected(self, value: str):
+        self.selected = value
+
 def var_operations_example():
     return rx.vstack(
         # Using a var operation to concatenate a string with a var.
@@ -23817,10 +23884,13 @@ class EqualsState(rx.State):
     selected: str = "Apple"
     favorite: str = "Banana"
 
+    def set_selected(self, value: str):
+        self.selected = value
+
 
 def var_equals_example():
     return rx.vstack(
-        rx.text(EqualsState.favorite.to_string() + "is my favorite fruit!"),
+        rx.text(EqualsState.favorite.to_string() + " is my favorite fruit!"),
         rx.select(
             fruits,
             value=EqualsState.selected,
@@ -24313,6 +24383,9 @@ Try typing in the input box and clicking out.
 class UppercaseState(rx.State):
     text: str = "hello"
 
+    def set_text(self, value: str):
+        self.text = value
+
     @rx.var
     def upper_text(self) -> str:
         # This will be recomputed whenever `text` changes.
@@ -24400,13 +24473,13 @@ Async computed vars are useful for operations that require asynchronous processi
 ```python demo exec
 class AsyncVarState(rx.State):
     count: int = 0
-    
+
     @rx.var
     async def delayed_count(self) -> int:
         # Simulate an async operation like an API call
         await asyncio.sleep(0.5)
         return self.count * 2
-    
+
     @rx.event
     def increment(self):
         self.count += 1
@@ -24434,26 +24507,26 @@ useful for expensive async operations like API calls or database queries.
 class AsyncCachedVarState(rx.State):
     user_id: int = 1
     refresh_trigger: int = 0
-    
+
     @rx.var(cache=True)
     async def user_data(self) -> dict:
         # In a real app, this would be an API call
         await asyncio.sleep(1)  # Simulate network delay
-        
+
         # Simulate different user data based on user_id
         users = {
             1: {"name": "Alice", "email": "alice@example.com"},
             2: {"name": "Bob", "email": "bob@example.com"},
             3: {"name": "Charlie", "email": "charlie@example.com"},
         }
-        
+
         return users.get(self.user_id, {"name": "Unknown", "email": "unknown"})
-    
+
     @rx.event
     def change_user(self):
         # Cycle through users 1-3
         self.user_id = (self.user_id % 3) + 1
-    
+
     @rx.event
     def force_refresh(self):
         # This will not affect user_data dependencies, but will trigger a state update
@@ -24514,6 +24587,10 @@ class TranslationState(rx.State):
     input_text: str = "Hola Mundo"
     current_translation: Translation = Translation(original_text="", translated_text="")
 
+    # Explicitly define the setter method
+    def set_input_text(self, value: str):
+        self.input_text = value
+
     @rx.event
     def translate(self):
         self.current_translation.original_text = self.input_text
@@ -24521,7 +24598,11 @@ class TranslationState(rx.State):
 
 def translation_example():
     return rx.vstack(
-        rx.input(on_blur=TranslationState.setvar("input_text"), default_value=TranslationState.input_text, placeholder="Text to translate...",),
+        rx.input(
+            on_blur=TranslationState.set_input_text,
+            default_value=TranslationState.input_text,
+            placeholder="Text to translate...",
+        ),
         rx.button("Translate", on_click=TranslationState.translate),
         rx.text(TranslationState.current_translation.translated_text),
     )
@@ -25002,6 +25083,10 @@ class ReusableCounter(rx.ComponentState):
     count: int = 0
 
     @rx.event
+    def set_count(self, value: int):
+        self.count = value
+
+    @rx.event
     def increment(self):
         self.count += 1
 
@@ -25056,6 +25141,10 @@ class EditableText(rx.ComponentState):
     text: str = "Click to edit"
     original_text: str
     editing: bool = False
+
+    @rx.event
+    def set_text(self, value: str):
+        self.text = value
 
     @rx.event
     def start_editing(self, original_text: str):
@@ -25144,6 +25233,9 @@ EditableText._per_component_state_instance_count = 4
 class EditableTextDemoState(rx.State):
     value: str = "Global state text"
 
+    @rx.event
+    def set_value(self, value: str):
+        self.value = value
 
 def editable_text_with_global_state():
     return rx.vstack(
@@ -25308,6 +25400,8 @@ input `on_change` event, which improves performance.
 class SettingsState(rx.State):
      salutation: str = "Hello"
 
+     def set_salutation(self, value: str):
+        self.salutation = value
 
 def set_salutation_popover():
     return rx.popover.root(
@@ -25371,7 +25465,7 @@ Here's an example that demonstrates how to use `get_var_value` to access data be
 class CounterState(rx.State):
     # This variable will be accessed from another state
     count: int = 0
-    
+
     @rx.event
     async def increment(self):
         # Increment the counter when the button is clicked
@@ -25381,7 +25475,7 @@ class CounterState(rx.State):
 class DisplayState(rx.State):
     # This will show the current count value
     message: str = ""
-    
+
     @rx.event
     async def show_count(self):
         # Use get_var_value to access just the count variable from CounterState
@@ -25433,6 +25527,7 @@ states with computed vars are always loaded to ensure the values are recalculate
 When using computed vars, it better to define them in a state that directly inherits from `rx.State` and
 does not have other states inheriting from it, to avoid loading unnecessary data.
 
+
 ```python exec
 import reflex as rx
 from pcweb.templates.docpage import definition
@@ -25447,7 +25542,7 @@ State mixins allow you to define shared functionality that can be reused across 
 A state mixin is a State class marked with `mixin=True` that cannot be instantiated directly but can be inherited by other State classes. Mixins provide a way to share:
 
 - Base variables
-- Computed variables  
+- Computed variables
 - Event handlers
 - Backend variables
 
@@ -25639,7 +25734,7 @@ This pattern allows you to build complex functionality by composing simpler mixi
 # Mixin Design Guidelines
 
 - **Single Responsibility**: Each mixin should have a focused purpose
-- **Avoid Deep Inheritance**: Keep mixin hierarchies shallow for clarity  
+- **Avoid Deep Inheritance**: Keep mixin hierarchies shallow for clarity
 - **Document Dependencies**: If mixins depend on specific variables, document them
 - **Test Mixins**: Create test cases for mixin functionality
 - **Naming Convention**: Use descriptive names ending with "Mixin"
@@ -25696,13 +25791,22 @@ class ContactFormState(ValidationMixin, rx.State):
     email: str = ""
     message: str = ""
 
+    def set_name(self, value: str):
+        self.name = value
+
+    def set_email(self, value: str):
+        self.email = value
+
+    def set_message(self, value: str):
+        self.message = value
+
     @rx.event
     def submit_form(self):
         self.clear_errors()
         valid_name = self.validate_required("name", self.name)
         valid_email = self.validate_email(self.email)
         valid_message = self.validate_required("message", self.message)
-        
+
         if valid_name and valid_email and valid_message:
             self.is_loading = True
             yield rx.sleep(1)
@@ -27410,6 +27514,10 @@ class DropdownMenuState2(rx.State):
     which_dialog_open: str = ""
 
     @rx.event
+    def set_which_dialog_open(self, value: str):
+        self.which_dialog_open = value
+
+    @rx.event
     def delete(self):
         yield rx.toast("Deleted item")
 
@@ -29049,6 +29157,10 @@ class ContextMenuState(rx.State):
     which_dialog_open: str = ""
 
     @rx.event
+    def set_which_dialog_open(self, value: str):
+        self.which_dialog_open = value
+
+    @rx.event
     def delete(self):
         yield rx.toast("Deleted item")
 
@@ -29174,6 +29286,9 @@ class MatchState(rx.State):
     cat_breed: str = ""
     animal_options: List[str] = ["persian", "siamese", "maine coon", "ragdoll", "pug", "corgi"]
 
+    @rx.event
+    def set_cat_breed(self, breed: str):
+        self.cat_breed = breed
 
 def match_demo():
     return rx.flex(
@@ -29276,6 +29391,10 @@ import reflex as rx
 class MultiMatchState(rx.State):
     animal_breed: str = ""
     animal_options: List[str] = ["persian", "siamese", "maine coon", "pug", "corgi", "mustang", "rahvan", "football", "golf"]
+
+    @rx.event
+    def set_animal_breed(self, breed: str):
+        self.animal_breed = breed
 
 def multi_match_demo():
     return rx.flex(
@@ -29583,6 +29702,10 @@ from typing import List
 class ListState(rx.State):
     items: List[str] = ["Write Code", "Sleep", "Have Fun"]
     new_item: str
+
+    @rx.event
+    def set_new_item(self, new_item: str):
+        self.new_item = new_item
 
     @rx.event
     def add_item(self):
@@ -30474,8 +30597,24 @@ class FlexPlaygroundState(rx.State):
     justify: str = "start"
     direction: str = "row"
     wrap: str = "nowrap"
-    
-    
+
+    @rx.event
+    def set_align(self, value: str):
+        self.align = value
+
+    @rx.event
+    def set_justify(self, value: str):
+        self.justify = value
+
+    @rx.event
+    def set_direction(self, value: str):
+        self.direction = value
+
+    @rx.event
+    def set_wrap(self, value: str):
+        self.wrap = value
+
+
 def select(label, items, value, on_change):
     return rx.flex(
         rx.text(label),
@@ -30553,12 +30692,12 @@ affects the computed  sizes of the flex items based on the props that are set.
 ```python demo exec
 class FlexGrowShrinkState(rx.State):
     width_pct: list[int] = [100]
-    
+
     @rx.event
     def set_width_pct(self, value: list[int | float]):
         self.width_pct = [int(value[0])]
-    
-    
+
+
 def border_box(*children, **props):
     return rx.box(
         *children,
@@ -30567,7 +30706,7 @@ def border_box(*children, **props):
         **props,
     )
 
-    
+
 def example2():
     return rx.box(
         rx.flex(
@@ -31138,6 +31277,12 @@ class SegmentedState(rx.State):
     """The app state."""
 
     control: str = "test"
+
+    @rx.event
+    def set_control(self, value: str | list[str]):
+        self.control = value
+
+
 ```
 
 # Segmented Control
@@ -31158,7 +31303,7 @@ rx.vstack(
         rx.segmented_control.item("Home", value="home"),
         rx.segmented_control.item("About", value="about"),
         rx.segmented_control.item("Test", value="test"),
-        on_change=SegmentedState.setvar("control"),
+        on_change=SegmentedState.set_control,
         value=SegmentedState.control,
     ),
     rx.card(
@@ -31892,7 +32037,7 @@ def index():
         ),
         rx.cond(
             State.video,
-            rx.video(url=rx.get_upload_url(State.video)),
+            rx.video(src=rx.get_upload_url(State.video)),
         ),
         padding="5em",
     )
@@ -32489,6 +32634,9 @@ class SelectState3(rx.State):
 
     value: str = "apple"
 
+    def set_value(self, value: str):
+        self.value = value
+
     @rx.event
     def change_value(self):
         """Change the select value var."""
@@ -32711,6 +32859,9 @@ class SelectState2(rx.State):
 
     value: str = ""
 
+    def set_value(self, value: str):
+        self.value = value
+
     @rx.event
     def choose_randomly(self):
         """Change the select value var."""
@@ -32743,24 +32894,28 @@ If `on_open_change` handler does not alter the `open` prop, the select will not 
 
 ```python demo exec
 class SelectState8(rx.State):
-   is_open: bool = False
+    is_open: bool = False
+
+    @rx.event
+    def set_is_open(self, value: bool):
+        self.is_open = value
 
 def select_example8():
-   return rx.flex(
-       rx.select.root(
-           rx.select.trigger(placeholder="No Selection"),
-           rx.select.content(
-               rx.select.group(
-                   rx.select.item("Apple", value="apple"),
-                   rx.select.item("Grape", value="grape"),
-               ),
-           ),
-           open=SelectState8.is_open,
-           on_open_change=SelectState8.set_is_open,
-       ),
-       rx.button("Toggle", on_click=SelectState8.set_is_open(~SelectState8.is_open)),
-       spacing="2",
-   )
+    return rx.flex(
+        rx.select.root(
+            rx.select.trigger(placeholder="No Selection"),
+            rx.select.content(
+                rx.select.group(
+                    rx.select.item("Apple", value="apple"),
+                    rx.select.item("Grape", value="grape"),
+                ),
+            ),
+            open=SelectState8.is_open,
+            on_open_change=SelectState8.set_is_open,
+        ),
+        rx.button("Toggle", on_click=SelectState8.set_is_open(~SelectState8.is_open)),
+        spacing="2",
+    )
 ```
 
 ### Submitting a Form with Select
@@ -32922,6 +33077,9 @@ The `on_blur` event handler is called when focus has left the `input` for exampl
 class TextfieldBlur(rx.State):
     text: str = "Hello World!"
 
+    @rx.event
+    def set_text(self, value: str):
+        self.text = value
 
 def blur_example():
     return rx.vstack(
@@ -32939,6 +33097,9 @@ The `on_change` event handler is called when the `value` of `input` has changed.
 class TextfieldControlled(rx.State):
     text: str = "Hello World!"
 
+    @rx.event
+    def set_text(self, value: str):
+        self.text = value
 
 def controlled_example():
     return rx.vstack(
@@ -33473,6 +33634,19 @@ class RadixFormState(rx.State):
 
     mock_username_db: list[str] = ["reflex", "admin"]
 
+    # Add explicit setters
+    def set_user_entered_username(self, value: str):
+        self.user_entered_username = value
+
+    def set_user_entered_email(self, value: str):
+        self.user_entered_email = value
+
+    def set_username(self, value: str):
+        self.username = value
+
+    def set_email(self, value: str):
+        self.email = value
+
     @rx.var
     def invalid_email(self) -> bool:
         return not re.match(r"[^@]+@[^@]+\.[^@]+", self.user_entered_email)
@@ -33621,6 +33795,10 @@ The `on_change` trigger is called when the `checkbox` is clicked.
 class CheckboxState(rx.State):
     checked: bool = False
 
+    @rx.event
+    def set_checked(self, value: bool):
+        self.checked = value
+
 def checkbox_example():
     return rx.vstack(
         rx.heading(CheckboxState.checked),
@@ -33759,6 +33937,9 @@ The text area component can be controlled by a single value. The `on_blur` prop 
 class TextAreaBlur(rx.State):
     text: str = "Hello World!"
 
+    @rx.event
+    def set_text(self, text: str):
+        self.text = text
 
 def blur_example():
     return rx.vstack(
@@ -33778,6 +33959,10 @@ Here we show how to use a text area in a form. We use the `name` prop to identif
 class TextAreaFeedbackState(rx.State):
     feedback: str = ""
     submitted: bool = False
+
+    @rx.event
+    def set_feedback(self, value: str):
+        self.feedback = value
 
     @rx.event
     def submit_feedback(self, form_data: dict):
@@ -33855,6 +34040,9 @@ rx.input(
 class TextfieldBlur1(rx.State):
     text: str = "Hello World!"
 
+    @rx.event
+    def set_text(self, text: str):
+        self.text = text
 
 def blur_example1():
     return rx.vstack(
@@ -33875,6 +34063,9 @@ def blur_example1():
 class TextfieldControlled1(rx.State):
     text: str = "Hello World!"
 
+    @rx.event
+    def set_text(self, text: str):
+        self.text = text
 
 def controlled_example1():
     return rx.vstack(
@@ -34093,7 +34284,7 @@ The video component can display a video given an src path as an argument. This c
 
 ```python demo
 rx.video(
-    url="https://www.youtube.com/embed/9bZkp7q19f0", 
+    src="https://www.youtube.com/embed/9bZkp7q19f0",
     width="400px",
     height="auto"
 )
@@ -34106,6 +34297,7 @@ If we had a local file in the `assets` folder named `test.mp4` we could set `url
 # How to let your user upload a video
 To let a user upload a video to your app check out the [upload docs]({library.forms.upload.path}).
 ```
+
 
 ---
 components:
@@ -34222,7 +34414,7 @@ from pcweb.templates.docpage import docdemo, docdemobox, doccode, docgraphing
 ## Examples
 
 Using a date from a state var as a value, we will display it in a few different
-way using `rx.moment`. 
+way using `rx.moment`.
 
 The `date_now` state var is initialized when the site was deployed. The
 button below can be used to update the var to the current datetime, which will
@@ -34312,7 +34504,7 @@ subtract_example = """rx.vstack(
 ```python eval
 rx.tabs(
     rx.tabs.list(
-        rx.tabs.trigger("Add", value="add"), 
+        rx.tabs.trigger("Add", value="add"),
         rx.tabs.trigger("Subtract", value="subtract")
     ),
     rx.tabs.content(docdemo(add_example, comp=eval(add_example)), value="add"),
@@ -34353,6 +34545,9 @@ class MomentLiveState(rx.State):
     def on_update(self, date):
         return rx.toast(f"Date updated: {date}")
 
+    @rx.event
+    def set_updating(self, value: bool):
+        self.updating = value
 
 def moment_live_example():
     return rx.hstack(
@@ -34367,6 +34562,7 @@ def moment_live_example():
         ),
     )
 ```
+
 
 ---
 components:
@@ -35965,13 +36161,13 @@ class DatabaseTableState(rx.State):
     sort_value = ""
     search_value = ""
 
-    
+
     @rx.event
     def load_entries(self):
         """Simulate querying the database with filter and sort."""
         # Start with all users
         result = self.users.copy()
-        
+
         # Apply filtering if search value exists
         if self.search_value != "":
             search_term = self.search_value.lower()
@@ -35979,14 +36175,14 @@ class DatabaseTableState(rx.State):
                 user for user in result
                 if any(search_term in str(value).lower() for value in user.values())
             ]
-        
+
         # Apply sorting if sort column is selected
         if self.sort_value != "":
             result = sorted(result, key=lambda x: x[self.sort_value])
-            
+
         self.filtered_users = result
         yield
-        
+
     @rx.event
     def sort_values(self, sort_value):
         """Update sort value and reload data."""
@@ -36068,6 +36264,14 @@ class InMemoryTableState(rx.State):
 
     sort_value = ""
     search_value = ""
+
+    @rx.event
+    def set_sort_value(self, value: str):
+        self.sort_value = value
+
+    @rx.event
+    def set_search_value(self, value: str):
+        self.search_value = value
 
     @rx.var(cache=True)
     def current_people(self) -> list[Person]:
@@ -36292,7 +36496,7 @@ class DatabaseTableState2(rx.State):
         {"name": "Charlie Wilson", "email": "charlie@example.com", "phone": "555-7890", "address": "654 Elm St"},
         {"name": "Emily Davis", "email": "emily@example.com", "phone": "555-2345", "address": "987 Cedar Ln"},
     ]
-    
+
     users: list[dict] = []
     sort_value = ""
     search_value = ""
@@ -36301,7 +36505,7 @@ class DatabaseTableState2(rx.State):
     def load_entries(self):
         # Start with all users
         result = self._users.copy()
-        
+
         # Apply filtering if search value exists
         if self.search_value != "":
             search_term = self.search_value.lower()
@@ -36309,11 +36513,11 @@ class DatabaseTableState2(rx.State):
                 user for user in result
                 if any(search_term in str(value).lower() for value in user.values())
             ]
-        
+
         # Apply sorting if sort column is selected
         if self.sort_value != "":
             result = sorted(result, key=lambda x: x[self.sort_value])
-            
+
         self.users = result
 
     @rx.event
@@ -36694,7 +36898,7 @@ class TableDownloadState(rx.State):
         if not self.users:
             self.load_entries()
 
-        fieldnames = ["id", "name", "email", "phone", "address"] 
+        fieldnames = ["id", "name", "email", "phone", "address"]
         output = io.StringIO()
         writer = csv.DictWriter(output, fieldnames=fieldnames)
         writer.writeheader()
@@ -36904,6 +37108,7 @@ rx.flex(
     spacing="2",
 )
 ```
+
 
 ---
 components:
@@ -38078,6 +38283,15 @@ class AxisState(rx.State):
     y_axis_postion: str = "left"
 
     y_axis_offset: int
+
+    @rx.event
+    @rx.event
+    def set_y_axis_position(self, position: str):
+        self.y_axis_position = position
+
+    @rx.event
+    def set_x_axis_position(self, position: str):
+        self.x_axis_position = position
 
     @rx.event
     def set_x_axis_offset(self, offset: str):
@@ -39562,6 +39776,14 @@ class LineChartState(rx.State):
     uv_type: str = "monotone"
 
     @rx.event
+    def set_pv_type(self, pv_type: str):
+        self.pv_type = pv_type
+
+    @rx.event
+    def set_uv_type(self, uv_type: str):
+        self.uv_type = uv_type
+
+    @rx.event
     def munge_data(self):
         for row in self.data:
             row["uv"] += random.randint(-500, 500)
@@ -40803,6 +41025,13 @@ class ScatterChartState2(rx.State):
     }
   ]
 
+    @rx.event
+    def set_shape(self, shape: str):
+        self.shape = shape
+
+    @rx.event
+    def set_legend_type(self, legend_type: str):
+        self.legend_type = legend_type
 
 def scatter_shape():
   return rx.vstack(
@@ -42260,6 +42489,10 @@ Or you could could use a built-in setter for conciseness.
 options: list[str] = ["1", "2", "3", "4"]
 class SetterState2(rx.State):
     selected: str = "1"
+
+    @rx.event
+    def set_selected(self, selected: str):
+        self.selected = selected
 
 def code_setter_2():
     return rx.vstack(
