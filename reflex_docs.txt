@@ -10997,6 +10997,130 @@ Database (mydatabase) - Target database name
    - Makes schema available to the AI for queries
 
 
+---
+tags: AI
+description: Connect your apps to Anthropic's Claude models for advanced AI capabilities.
+---
+# Anthropic Integration
+
+The **Anthropic Integration** allows your app to use [Anthropic’s Claude models](https://www.anthropic.com/claude) for tasks such as text generation, summarization, reasoning, and other advanced AI capabilities. Once connected, you can call Claude directly from your workflows, UI actions, or automated triggers.
+
+
+## Step 1: Obtain an Anthropic API Key
+
+1. Go to the [Anthropic Console](https://console.anthropic.com/).
+2. Navigate to **API Keys** in your account settings.
+3. Click **Create Key** and give it a descriptive name (e.g., “AI Builder”).
+4. Copy the generated key.
+
+   * **Example:** `sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Anthropic** in your app settings.
+2. Paste your **Anthropic API Key** in the input field.
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can use Claude for AI-powered features across workflows and components.
+
+
+## Step 3: Notes
+
+* **Keep your key secure:** Do not hardcode your Anthropic API key in public code repositories.
+* **Use environment-specific keys:** Separate dev, staging, and production keys help manage access and security.
+* **Secure API access:** The key allows your app to interact with Anthropic endpoints securely and efficiently.
+
+
+
+
+---
+tags: DevTools
+description: Connect your apps to Linear to manage issues, projects, and sprints directly from workflows.
+---
+# Linear Integration
+
+The **Linear Integration** allows your app to connect to [Linear](https://linear.app/) to create, update, and track issues and projects seamlessly. Once connected, your app can trigger Linear actions from user interactions or automated workflows.
+
+## What You Can Do
+
+With Linear, your app can:
+- **Create and assign issues** automatically from user actions or AI workflows.  
+- **Update status and priority** of tickets and projects.  
+- **Sync with sprints and cycles** to keep work organized.  
+- **Fetch project and issue data** for dashboards, summaries, or automation.  
+- **Integrate with other tools** like Slack or GitHub through workflows.  
+- Power intelligent workflows (e.g., auto-triage or auto-summarize bug reports).
+
+## Step 1: Obtain a Linear API Key
+
+1. Go to your [Linear account](https://linear.app/).  
+2. Navigate to **Workspace Settings → API**.  
+3. Click **Create API Key**, give it a name, and copy the key.
+
+   * **Example:** `lin_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Linear** in your app settings.
+2. Paste your **Linear API Key** in the input field.  
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can interact with Linear to automate issue tracking and project management.
+
+## Step 3: Notes
+
+* **Keep your key secure:** Never expose your Linear API key in client-side code.  
+* **Use environment-specific keys:** Separate dev, staging, and production keys.  
+* **Streamlined workflows:** Automate ticket creation, status updates, and reporting directly from your app.  
+* **Real-time visibility:** Fetch and sync project data to power internal tools or dashboards.
+```
+
+
+---
+tags: AI
+description: Connect your apps to Hugging Face to access thousands of open models for text, vision, and multimodal tasks.
+---
+# Hugging Face Integration
+
+The **Hugging Face Integration** allows your app to use [Hugging Face](https://huggingface.co/) models for a wide range of AI tasks — including text generation, embeddings, translation, classification, image processing, and more. You can integrate both hosted models (via API) or local open-source models through the Transformers library.
+
+## What You Can Do
+
+With Hugging Face, your app can:
+- Access thousands of pre-trained **text, vision, and multimodal models**.  
+- Run **text generation**, summarization, translation, and classification tasks.  
+- Use **embeddings** for search, retrieval, and similarity.  
+- Deploy models locally with `transformers` or connect to hosted inference endpoints.  
+- Fine-tune or customize open models for your specific use cases.  
+- Integrate community and enterprise models seamlessly into workflows.
+
+## Step 1: Obtain a Hugging Face Access Token (Optional)
+
+1. Go to [Hugging Face](https://huggingface.co/).  
+2. Log in or create a free account.  
+3. Navigate to **Settings → Access Tokens**.  
+4. Click **Create New token**, set its scope, and copy it.
+   * **Example:** `hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Hugging Face** in your app settings.  
+2. Paste your **Hugging Face Access Token** if required.  
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can use Hugging Face models directly in workflows, UI actions, or automations.
+
+## Step 3: Notes
+
+* **Keep your token secure:** Never expose your Hugging Face token in client-side code.  
+* **Use environment-specific tokens:** Separate dev, staging, and production access.  
+* **Open-source flexibility:** Models can be run fully locally or through Hugging Face’s hosted endpoints.  
+* **Broad ecosystem:** Hugging Face supports thousands of community and commercial models for rapid prototyping and production use.
+```
+
+
 # Installation
 
 ```python exec
@@ -11064,6 +11188,199 @@ args = ["-y", "mcp-remote", "https://mcp.reflex.dev/mcp"]
 Note: Codex requires MCP servers to communicate over stdio. The `mcp-remote` package bridges the connection to the HTTP-based Reflex MCP server.
 
 
+---
+tags: Data Infrastructure
+description: Connect your apps to Airtable to read, create, and update records in real time.
+---
+# Airtable Integration
+
+The **Airtable Integration** lets your apps interact with Airtable bases to **store, fetch, and update structured data** directly from workflows, user actions, or automated triggers. Perfect for managing dynamic content, customer data, or workflows without complex backend setup.
+
+
+## What You Can Do
+
+With the Airtable Integration, your app can:
+
+* Read and display data from Airtable bases
+* Create new records dynamically from user actions
+* Update or delete records through workflows
+* Power AI experiences with live database content
+* Sync structured data without hosting your own database
+
+## Step 1: Get Your Airtable API Key
+
+1. Go to [Airtable](https://airtable.com/).
+2. Log in or create a free account.
+3. Navigate to [**Developer Hub**](https://airtable.com/create/tokens) from your account menu.
+4. Under **Personal access tokens**, click **Create token**.
+5. Add the appropriate scopes (e.g. `data.records:read` and `data.records:write`).
+6. Copy your API token.
+   * Example: `patl2IhDFoZK0Rabc12345xyz`
+
+## Step 2: Configure the Integration in Your App
+
+1. Open your app in the **AI Builder**.
+2. Click the **Settings** gear icon and navigate to the **Integrations** tab.
+3. Find and enable the **Airtable** integration.
+4. Paste your **API Key** in the input field.
+5. Click **Connect** to confirm the connection.
+
+## Step 3: Use in Your Workflows
+
+Once connected, you can use Airtable actions in your app to:
+
+* Fetch records to display dynamic lists
+* Add user submissions as new rows
+* Update status fields or metrics from AI workflows
+
+and more.
+
+
+
+---
+tags: Authentication
+description: Add Descope’s identity and authentication platform to your apps to manage user sign-in, onboarding, MFA, SSO, and flows with ease.
+---
+# Descope Integration
+
+The **Descope Integration** enables your app to leverage Descope’s full Customer Identity & Access Management (CIAM) features—visual authentication flows, identity management, SSO, MFA, tenant isolation, and more. Once set up, you can orchestrate secure user journeys across your application with minimal coding.
+
+
+```md alert warning
+# You must open your app in a new tab from the builder to test the Descope integration.
+
+![Open new tab to test Descope](/ai_builder/integrations/descope_new_tab.webp)
+```
+
+## What You Can Do
+
+With Descope Integration, your app can:
+- Handle user sign-up, login, and passwordless flows seamlessly  
+- Enable multifactor authentication (MFA), passkeys, and social login  
+- Support single sign-on (SSO) via OIDC/SAML  
+- Manage users, roles, tenants, and permissions via management APIs  
+- Orchestrate onboarding, branding, and multi-tenant flows via drag-and-drop workflows  
+- Sync user data with tools like HubSpot or Segment via built-in connectors
+
+
+## Step 1: Obtain Descope Credentials
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/descope.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+1. Log in to the **Descope Console** (or sign up).
+2. Create your first Project. 
+3. Go to the Project page under Settings.
+4. Copy the `Project ID`.
+
+
+## Step 2: Configure the Integration in Your App
+
+1. In your app’s settings or integration dashboard, select **Add Descope**.  
+2. Enter your **PROJECT_ID**.  
+3. (Optional) Pick a **DESCOPE_FLOW_ID** (e.g. “sign-up-or-login”) and **SESSION_SECRET_KEY** or press the Clipboard Copy to use default values.  
+4. Click **Connect** to validate credentials and enable Descope features.
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/descope_2.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+
+
+
+---
+tags: AI
+description: Connect your apps to Google’s Gemini models for advanced AI capabilities.
+---
+# Gemini Integration
+
+The **Gemini Integration** allows your app to use [Google’s Gemini models](https://aistudio.google.com/) for text generation, reasoning, multimodal analysis, and other advanced AI capabilities. Once connected, you can call Gemini directly from your workflows, UI actions, or automated triggers.
+
+## Step 1: Obtain a Gemini API Key
+
+1. Go to [Google AI Studio](https://aistudio.google.com/).
+2. Navigate to **Get API Key** or create a new key for your project.
+3. Copy the generated key.
+
+   * **Example:** `AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Gemini** in your app settings.  
+2. Paste your **Gemini API Key** in the input field.  
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can use Gemini for AI-powered features across workflows and components.
+
+## Step 3: Notes
+
+* **Keep your key secure:** Do not hardcode your Gemini API key in public code repositories.  
+* **Use environment-specific keys:** Separate dev, staging, and production keys help manage access and security.  
+* **Secure API access:** The key allows your app to interact with Gemini endpoints securely and efficiently.
+
+
+---
+tags: AI
+description: Add Cohere’s language models for text generation, classification, retrieval, embeddings, and more.
+---
+# Cohere Integration
+
+The **Cohere Integration** allows your app to use [Cohere’s](https://cohere.com) state-of-the-art language models for natural language understanding and generation. Once connected, your app can power search, summarization, embeddings, classification, and conversational AI features directly from workflows and triggers.
+
+
+## Step 1: Obtain a Cohere API Key
+
+1. Go to the [Cohere Dashboard](https://dashboard.cohere.com/).  
+2. Log in or create an account.  
+3. Navigate to **API Keys** in your account settings.  
+4. Click **Create Key**, give it a descriptive name (e.g., “AI Builder”), and copy the key.  
+   - **Example:** `kY9y0xxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Cohere** in your app settings.  
+2. Paste your **Cohere API Key** in the input field.  
+3. Click **Connect** to validate and save your integration.  
+
+Once connected, your app can access Cohere’s endpoints for language tasks like embeddings, classification, chat, and more.
+
+
+## Step 3: Notes
+
+- **Secure API Access:** Keep your Cohere API key private — do not hardcode it in public repositories.  
+- **Environment separation:** Use different keys for development, staging, and production environments.  
+- **Performance:** Cohere’s models support fast inference for production-ready experiences.  
+- **Observability:** Use the Cohere dashboard to monitor usage, quotas, and request logs.
+
+
+
 ```python exec
 from pcweb.pages.integrations.integration import integration_page
 ```
@@ -11071,6 +11388,34 @@ from pcweb.pages.integrations.integration import integration_page
 ```python eval
 integration_page()
 ```
+
+
+---
+tags: AI
+description: Connect your apps to Langchain for advanced AI capabilities.
+---
+# Langchain Integration
+The **LangChain Integration** allows your app to leverage the power of [LangChain](https://langchain.com/), a popular open-source framework for building applications with large language models (LLMs). Once connected, your app can orchestrate complex AI workflows, chain together multiple model calls, and integrate with various data sources and tools seamlessly.
+
+
+You can:
+
+* **Chain model calls together** to create multi-step reasoning flows.
+* **Connect multiple providers** (e.g., OpenAI, Anthropic, Gemini, Groq) through a single interface.
+* **Build intelligent agents** that can use tools, call APIs, or access external data sources dynamically.
+* **Work with structured data** by combining LLMs with databases, vector stores, and retrieval systems.
+* **Create RAG (Retrieval-Augmented Generation)** pipelines to ground model outputs in your own data.
+* **Integrate tools and memory** so models can reason over past interactions and context.
+* **Deploy reusable components** like prompt templates, chains, and agents for production-grade applications.
+
+LangChain essentially acts as a **“glue layer”** between language models, data, and logic — enabling teams to build more **powerful and reliable AI apps** without reinventing core orchestration features.
+
+
+## Configure the Integration in Your App
+
+1. Click the **Settings** gear icon and navigate to the **Integrations** tab.
+2. Find and enable the **LangChain** integration.
+
 
 
 ---
@@ -11403,6 +11748,126 @@ After registering your app, collect the following information:
 4. Click **Connect** to save the integration.
 
 Your app can now authenticate users through Azure AD with secure OAuth 2.0 flow.
+
+
+---
+tags: AI
+description: Add Cartesia’s powerful text-to-speech capabilities for realistic, real-time voice output and audio experiences.
+---
+# Cartesia Integration
+
+The **Cartesia Integration** allows your app to generate **high-quality, realistic speech from text** using Cartesia’s advanced voice models. Once connected, you can easily add real-time voice capabilities to workflows, user interactions, and automated experiences.
+
+
+## Step 1: Obtain a Cartesia API Key
+
+1. Go to the [Cartesia Console](https://www.cartesia.ai/).  
+2. Log in or create an account.  
+3. Navigate to **API Keys** in your account settings.  
+4. Click **New**, give it a descriptive name (e.g., “AI Builder”), and copy it.  
+   - Example: `sk_car_xxxxxxxxxxxxx`
+
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Open your app and go to **Integrations → Add Cartesia**.  
+2. Paste your **Cartesia API Key** in the input field.  
+3. Click **Connect** to validate and save your integration.  
+
+Once connected, your app can convert text to speech seamlessly in real time or through workflows.
+
+
+
+## Step 3: Notes
+
+- **Secure API Access:** Keep your Cartesia API key safe. Do not hardcode it in public code.  
+- **Environment isolation:** Use different keys for dev, staging, and production to ensure clean separation.  
+- **Low latency:** Cartesia supports real-time streaming for conversational experiences.  
+- **Usage management:** Monitor your Cartesia dashboard for quotas, billing, and usage insights.
+
+
+
+---
+tags: Data Infrastructure
+description: Connect your apps to HubSpot to manage contacts, companies, deals, and marketing workflows.
+---
+# HubSpot Integration
+
+The **HubSpot Integration** allows your app to use [HubSpot](https://www.hubspot.com/) as a CRM and marketing automation platform. Once connected, your app can sync leads, manage contacts, update pipelines, and trigger workflows directly from user actions or automated events.
+
+## Step 1: Obtain a HubSpot Access Token
+
+1. Go to your [HubSpot Developer Account](https://developers.hubspot.com/).  
+2. Navigate to **App → Private Apps** in your account settings.  
+3. Click **Create Private App**, configure scopes (e.g., `crm.objects.contacts.read/write`, `crm.schemas.companies.read`), and save.  
+4. Copy the **Access Token** from the Auth tab.
+   * **Example:** `pat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/hubspot.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add HubSpot** in your app settings.  
+2. Paste your **HubSpot Access Token** in the input field.  
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can sync and manage HubSpot data directly from workflows and UI actions.
+
+## Step 3: Notes
+
+* **Keep your token secure:** Do not hardcode your HubSpot token in public code repositories.  
+* **Use environment-specific tokens:** Separate dev, staging, and production tokens to manage access.  
+* **Secure API access:** The token allows your app to interact with HubSpot endpoints securely and efficiently.
+
+
+
+---
+tags: AI
+description: Connect your apps to Groq’s ultra-fast inference API for lightning-speed AI responses.
+---
+# Groq Integration
+
+The **Groq Integration** allows your app to use [Groq’s API](https://groq.com/) for ultra-fast AI inference. Once connected, your app can leverage Groq’s hosted models (including open models like Llama 4 and Qwen) to power real-time workflows, chat experiences, and other AI-driven features.
+
+## Step 1: Obtain a Groq API Key
+
+1. Go to the [Groq Console](https://console.groq.com/).  
+2. Navigate to **API Keys** in your account settings.  
+3. Click **Create API Key** and give it a descriptive name (e.g., “AI Builder”).  
+4. Copy the generated key.
+   * **Example:** `gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Groq** in your app settings.  
+2. Paste your **Groq API Key** in the input field.  
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can use Groq to deliver ultra-low latency AI responses across workflows and components.
+
+## Step 3: Notes
+
+* **Keep your key secure:** Do not hardcode your Groq API key in public code repositories.  
+* **Use environment-specific keys:** Separate dev, staging, and production keys help manage access and security.  
+* **Secure API access:** The key allows your app to interact with Groq endpoints securely and efficiently.
 
 
 ---
