@@ -10501,6 +10501,44 @@ rx.el.div(
   "Use **@OpenAI** to summarize the user feedback table."
 
 
+---
+tags: DevTools
+description: Integrate with GitHub to automate workflows and interact with your code repositories.
+---
+
+# Connecting to Github
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+The Github integration is important to make sure that you don't lose your progress. It also allows you to revert to previous versions of your app.
+
+
+```python eval
+rx.image(
+    src="/ai_builder/connecting_to_github.gif",
+    height="auto",
+    padding_bottom="2rem",
+)
+```
+
+The GitHub integration allows you to:
+
+- Save your app progress
+- Work on your code locally and push your local changes back to Reflex.Build
+
+
+## Github Commit History
+
+The commit history is a great way to see the changes that you have made to your app. You can also revert to previous versions of your app from here.
+
+```python eval
+image_zoom(rx.image(src="/ai_builder/github_commit_history.png"))
+```
+
+
 # Knowledge
 
 The **Knowledge** feature lets you add context or rules that the AI Builder can reference when generating apps. This ensures your apps follow your guidelines, standards, or specific business logic.
@@ -11219,6 +11257,7 @@ rx.el.div(
 - **PostgreSQL** - Recommended for production applications
 - **MySQL** - Popular open-source database
 - **SQLite** - Lightweight database, perfect for development and small applications
+- **MSSQL** - Microsoft SQL Server support
 
 ## Getting Started
 
@@ -11237,10 +11276,10 @@ The Database Integration offers two convenient ways to connect:
 
 This user-friendly form breaks down your database connection into individual fields:
 
-**For PostgreSQL and MySQL:**
-- **Database Type**: Select from dropdown (PostgreSQL/MySQL)
+**For PostgreSQL, MySQL and MSSQL:**
+- **Database Type**: Select from dropdown (PostgreSQL/MySQL/MSSQL)
 - **Hostname**: Your database server address (e.g., `localhost`, `db.company.com`)
-- **Port**: Automatically filled (PostgreSQL: 5432, MySQL: 3306) or specify custom port
+- **Port**: Automatically filled (PostgreSQL: 5432, MySQL: 3306, MSSQL: 1433) or specify custom port
 - **Username**: Your database username
 - **Password**: Your database password (securely handled)
 - **Database Name**: The specific database to connect to
@@ -11261,6 +11300,11 @@ postgresql://username:password@hostname:port/database_name
 **MySQL:**
 ```
 mysql://username:password@hostname:port/database_name
+```
+
+**MSSQL:**
+```
+mssql://username:password@hostname:port/database_name
 ```
 
 **SQLite:**
@@ -11470,7 +11514,7 @@ With the Airtable Integration, your app can:
 4. Under **Personal access tokens**, click **Create token**.
 5. Add the appropriate scopes (e.g. `data.records:read` and `data.records:write`).
 6. Copy your API token.
-   * Example: `patl2IhDFoZK0Rabc12345xyz`
+   * Example: `patxxxxxxxxxxxxxxxxxxxx`
 
 ## Step 2: Configure the Integration in Your App
 
@@ -11583,7 +11627,6 @@ The **Gemini Integration** allows your app to use [Google’s Gemini models](htt
 2. Navigate to **Get API Key** or create a new key for your project.
 3. Copy the generated key.
 
-   * **Example:** `AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 ## Step 2: Configure the Integration in Your App
 
@@ -11615,7 +11658,6 @@ The **Cohere Integration** allows your app to use [Cohere’s](https://cohere.co
 2. Log in or create an account.  
 3. Navigate to **API Keys** in your account settings.  
 4. Click **Create Key**, give it a descriptive name (e.g., “AI Builder”), and copy the key.  
-   - **Example:** `kY9y0xxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 
 ## Step 2: Configure the Integration in Your App
@@ -11794,7 +11836,7 @@ With Stripe, your app can:
 2. Navigate to **Developers → API Keys**.  
 3. Copy your **Secret Key** (or create a restricted key for added security).
 
-   * **Example:** `sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+   * **Example:** `sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 > 💡 Use test keys in development environments and live keys in production.
 
@@ -11869,8 +11911,6 @@ Video and streaming inputs are not yet supported.
 2. Navigate to **Settings → API Keys**.  
 3. Copy your Private API Key.
 
-   * **Example:** `YWpnxxxxxxxxxxx`
-
 
 ## Step 2: Set up your Model in Roboflow
 
@@ -11942,7 +11982,7 @@ With Supabase, your app can:
 5. Then go to **API Keys** and copy your `Supabase_Key` (the secret key).
 
    * **Example URL:** `https://your-project.supabase.co`  
-   * **Example Key:** `sb_secret_oeaGxxxxxxxxxxxxxxxxxxx.`
+   * **Example Key:** `sb_xxxxxxxxxxxxxxxxxxxxxxxxxxxx.`
 
 ## Step 2: Configure the Integration in Your App
 
@@ -12024,27 +12064,6 @@ description: Send transactional and automated emails directly from your AI-gener
 
 The **Resend Integration** allows your AI-generated apps to send emails directly from workflows, user actions, or automated triggers — perfect for notifications, confirmations, or any email-based communication your app needs.
 
-```python exec
-import reflex as rx
-from reflex_image_zoom import image_zoom
-```
-
-```python eval
-rx.el.div(
-    image_zoom(
-        rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/integrations/resend_light.webp",
-                "/ai_builder/integrations/resend_dark.webp",
-            ),
-            class_name="p-2 rounded-md h-auto",
-            border=f"0.81px solid {rx.color('slate', 5)}",
-        ),
-        class_name="rounded-md overflow-hidden",
-    ),
-    class_name="w-full flex flex-col rounded-md cursor-pointer",
-)
-```
 
 ## What You Can Do
 
@@ -12060,7 +12079,7 @@ With the Resend Integration, your app can:
 2. Log in or create a free account.
 3. Navigate to **API Keys** from the dashboard sidebar.
 4. Click **Create API Key**, give it a name (e.g. “AI Builder”), and copy it.
-   - Example: `re_1234567890abcdefghijklmn`
+   - Example: `re_xxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 ## Step 2: Configure the Integration in Your App
 
@@ -12122,19 +12141,38 @@ description: Use Okta for secure identity and access management via Single Sign-
 
 The **Okta Auth Manager Integration** allows your app to authenticate users through [Okta](https://okta.com). This integration provides secure OAuth 2.0 / OIDC authentication and supports multi-tenant environments with customizable access policies.
 
+
+## What You Can Do
+
+With Okta, your app can:
+- Authenticate users securely through Okta’s identity platform.  
+- Enable **SSO** for enterprise users.  
+- Manage user roles, groups, and access permissions.  
+- Protect sensitive data and actions with **OAuth 2.0** and **OpenID Connect (OIDC)**.  
+- Integrate with other identity workflows like MFA or adaptive policies.
+
+
 ```python exec
 import reflex as rx
 from reflex_image_zoom import image_zoom
 ```
 
+
+
+## Step 1: Set Up Okta OIDC App
+
+Before connecting, you need to create an OIDC application in the Okta Admin Console:
+
+1 - Go to [Okta Admin Console](https://login.okta.com) → **Applications** → **Applications**
+
+
+2 - Click **Create App Integration**
+
 ```python eval
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/integrations/okta_light.webp",
-                "/ai_builder/integrations/okta_dark.webp",
-            ),
+            src="/ai_builder/integrations/okta_auth_1.png",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -12144,33 +12182,94 @@ rx.el.div(
 )
 ```
 
-## Step 1: Set Up Okta OIDC App
+3 - Select **OIDC – OpenID Connect** and choose **Web Application**
 
-Before connecting, you need to create an OIDC application in the Okta Admin Console:
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/okta_auth_2.png",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-1. Go to [Okta Admin Console](https://login.okta.com) → **Applications**
-2. Click **Create App Integration**
-3. Select **OIDC – OpenID Connect** and choose **Web Application**
-4. Configure your app settings:
-   - **Sign-in redirect URIs**:
-     `https://sb-39b61a39-c9bb-4877-8926-b309598edc58.fly.dev/authorization-code/callback`
+4 - Configure your app settings:
+   - **Allow wildcard * in sign-in redirect URIs**
+   - **Sign-in redirect URIs** found in the Okta Auth Manager integration settings in AI Builder:
+     `https://{your-sandbox}/authorization-code/callback`
+   - **Sign-out redirect URIs**:
+     `https://{your-sandbox}`
    - Assign to the correct **Group** or **Everyone** depending on your access control
-5. Save the app integration.
 
-## Step 2: Gather Your Credentials
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/okta_auth_3.png",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-After creating your Okta app, collect the following information:
+5 - Save the app integration.
 
-- **OKTA_CLIENT_ID**: `0oa1abcdXYZ2efGhI5d7`
-  *Your app’s Client ID from the Okta Admin Console*
+6 - Copy your **Client ID** (`OKTA_CLIENT_ID`) and **Client Secret** (`OKTA_CLIENT_SECRET`) from the app settings.
 
-- **OKTA_CLIENT_SECRET**: `xYzABC1234567DefghIJKLmnopQrstuVW`
-  *Your app’s Client Secret (keep this secure)*
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/okta_auth_4.png",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-- **OKTA_ISSUER_URI**: `https://dev-12345678.okta.com/oauth2/default`
-  *The Issuer URL from your app’s settings*
+
+## Step 2: Finding Your Okta Issuer URI
+
+1. In the Okta Admin Console, go to **Security** → **API** → **Authorization Servers**
+2. Click on the **default** server and copy the **Issuer URI**.
+3. Remove the trailing `/oauth2/default` from the URI to get your **Okta Issuer URI** (`OKTA_ISSUER_URI`).
+
+Example:
+
+If your Issuer URI is `https://{yourOktaDomain}.okta.com/oauth2/default`
+
+Use `https://{yourOktaDomain}.okta.com`
+
+
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/okta_auth_5.png",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
 
 > **Note:** Always use separate Okta apps for dev, staging, and production environments to avoid mixing credentials.
+
 
 ## Step 3: Configure the Integration
 
@@ -12199,14 +12298,21 @@ import reflex as rx
 from reflex_image_zoom import image_zoom
 ```
 
+
+## Step 1: Create a Google OAuth Client
+
+1 - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+
+2 - Navigate to **APIs & Services → Credentials**
+
+3 - Click **Create Credentials**
+
+
 ```python eval
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/integrations/google_light.webp",
-                "/ai_builder/integrations/google_dark.webp",
-            ),
+            src="/ai_builder/integrations/google_auth_1.webp",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -12216,19 +12322,55 @@ rx.el.div(
 )
 ```
 
-## Step 1: Create a Google OAuth Client
+4 - Choose **OAuth client ID**.
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Navigate to **APIs & Services → Credentials**.
-3. Click **Create Credentials → OAuth Client ID**.
-4. Select **Web Application** as the application type.
-5. Add the following **Authorized JavaScript Origin**:
-   - https://3a992b51-c34a-405a-b90c-4b3320eb3b6a.fly.dev
-   - The URL can be copied directly from the Google Auth integration panel.
-6. Set your authorized redirect URIs to match your app environment.
-7. Save the client and copy the following credentials:
-   - **Client ID**: `YOUR_GOOGLE_CLIENT_ID`
-   - **Client Secret**: `YOUR_GOOGLE_CLIENT_SECRET`
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/google_auth_2.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+5 - Choose **Web Application** as the application type, name the application and enter your sandbox URL, which you get from the Google Auth integration panel, as the **Authorized JavaScript Origin** and **Authorized Redirect URIs**.
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/google_auth_3.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+6 - Copy the generated **Client ID** (`GOOGLE_CLIENT_ID`) and **Client Secret** (`GOOGLE_CLIENT_SECRET`).
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/google_auth_4.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+
 
 ## Step 2: Configure the Integration in Your App
 
@@ -12280,14 +12422,20 @@ import reflex as rx
 from reflex_image_zoom import image_zoom
 ```
 
+
+## Step 1: Set Up Azure App Registration
+
+Before connecting, you need to register your app in Azure Portal:
+
+1 - Go to [Azure Portal](https://portal.azure.com) → **App Registrations**
+
+2 - Click **New registration** as shown in the image below:
+
 ```python eval
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/integrations/azure_auth_light.webp",
-                "/ai_builder/integrations/azure_auth_dark.webp",
-            ),
+            src="/ai_builder/integrations/azure_auth_1.webp",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -12297,31 +12445,60 @@ rx.el.div(
 )
 ```
 
-## Step 1: Set Up Azure App Registration
+3 - Register your app. Ensure that for the Redirect URI you select **Web** and enter the following URI that you find in the Azure Auth Manager integration settings in AI Builder:
+   ```
+   https://{your-sandbox}/authorization-code/callback
+   ```
 
-Before connecting, you need to register your app in Azure Portal:
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/azure_auth_2.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-1. Go to [Azure Portal](https://portal.azure.com) → **App Registrations**
-2. Click **New registration**
-3. Configure your app settings
-4. In **Authentication**, add the Web Redirect URI: `https://3a992b51-c34a-405a-b90c-4b3320eb3b6a.fly.dev/authorization-code/callback`
+4 - On the next page get your `client_id` (`AZURE_CLIENT_ID`) and `tenant_id` (`AZURE_VALID_TENANT_IDS`) from the **Overview** tab.
 
-## Step 2: Gather Your Credentials
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/azure_auth_3.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-After registering your app, collect the following information:
+5 - Next click `Add a certificate or secret` and copy the generated secret value (`AZURE_CLIENT_SECRET`).
 
-- **AZURE_CLIENT_ID**: `12345678-1234-1234-1234-123456789abc`
-  *Your application (client) ID from App Registration*
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/integrations/azure_auth_4.webp",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
 
-- **AZURE_CLIENT_SECRET**: `abcdef123456~ABCdef123456-ABCdef123456`
-  *Client secret generated in Certificates & secrets*
 
-- **AZURE_VALID_TENANT_IDS**: `87654321-4321-4321-4321-210987654321`
-  *Comma-separated list of tenant IDs that can access your app*
 
-> **Note:** Keep your client secret secure and use different registrations for development, staging, and production environments.
-
-## Step 3: Configure the Integration
+## Step 2: Configure the Integration
 
 1. Go to the **Integrations** section in your app settings by clicking **`@`** and then clicking the **Integrations** tab at the top.
 2. Click **Add** next to Azure Auth Manager.
@@ -12497,41 +12674,53 @@ Once connected, your app can use Groq to deliver ultra-low latency AI responses 
 
 
 ---
-tags: DevTools
-description: Integrate with GitHub to automate workflows and interact with your code repositories.
+tags: Developer Tools
+description: Connect your app to GitHub to automate workflows, manage repositories, and integrate developer operations.
 ---
+# GitHub Integration
 
-# Connecting to Github
+The **GitHub Integration** lets your app connect directly to [GitHub](https://github.com) to automate actions, fetch data, and build powerful developer workflows. Once connected, your app can interact with repositories, issues, pull requests, and more.
 
-```python exec
-import reflex as rx
-from reflex_image_zoom import image_zoom
+## What You Can Do
+
+With GitHub, your app can:
+- Fetch and display repository data (commits, branches, issues, etc.).  
+- Create or update issues, pull requests, and discussions.  
+- Trigger workflows or CI/CD pipelines.  
+- Sync GitHub activity into your app’s dashboards or automations.  
+- Build custom developer tools using GitHub’s API.
+
+## Step 1: Generate a Personal Access Token
+
+1. Go to your [GitHub Settings](https://github.com/settings/tokens).  
+2. Navigate to **Developer settings → Personal access tokens**.  
+3. Click **Generate new token** (classic or fine-grained).  
+4. Select the required scopes (e.g., `repo`, `workflow`, `read:user`).  
+5. Copy the token.  
+   *Example:*  
 ```
 
-The Github integration is important to make sure that you don't lose your progress. It also allows you to revert to previous versions of your app.
+ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-
-```python eval
-rx.image(
-    src="/ai_builder/connecting_to_github.gif",
-    height="auto",
-    padding_bottom="2rem",
-)
 ```
 
-The GitHub integration allows you to:
+> 💡 Fine-grained tokens are recommended for better security.
 
-- Save your app progress
-- Work on your code locally and push your local changes back to Reflex.Build
+## Step 2: Configure the Integration in Your App
 
+1. In your app, go to **Integrations → Add GitHub**.  
+2. Paste your **GitHub Personal Access Token** in the input field.  
+3. Click **Connect** to validate and save your integration.
 
-## Github Commit History
+Once connected, your app can start interacting with GitHub through workflows and actions.
 
-The commit history is a great way to see the changes that you have made to your app. You can also revert to previous versions of your app from here.
+## Step 3: Notes
 
-```python eval
-image_zoom(rx.image(src="/ai_builder/github_commit_history.png"))
-```
+* **Keep your token secure:** Never expose your GitHub token in public code.  
+* **Use fine-grained permissions:** Limit access to only what’s needed.  
+* **API rate limits:** GitHub imposes API limits, so plan automations accordingly.  
+* **Combine with AI:** For example, auto-generate release notes from commits or summarize PRs with LLMs.
+
 
 
 # Reflex Build: Best Practices
