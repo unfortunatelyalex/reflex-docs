@@ -11376,50 +11376,6 @@ Once connected, your app can interact with Linear to automate issue tracking and
 
 
 
----
-tags: AI
-description: Connect your apps to Hugging Face to access thousands of open models for text, vision, and multimodal tasks.
----
-# Hugging Face Integration
-
-The **Hugging Face Integration** allows your app to use [Hugging Face](https://huggingface.co/) models for a wide range of AI tasks — including text generation, embeddings, translation, classification, image processing, and more. You can integrate both hosted models (via API) or local open-source models through the Transformers library.
-
-## What You Can Do
-
-With Hugging Face, your app can:
-- Access thousands of pre-trained **text, vision, and multimodal models**.  
-- Run **text generation**, summarization, translation, and classification tasks.  
-- Use **embeddings** for search, retrieval, and similarity.  
-- Deploy models locally with `transformers` or connect to hosted inference endpoints.  
-- Fine-tune or customize open models for your specific use cases.  
-- Integrate community and enterprise models seamlessly into workflows.
-
-## Step 1: Obtain a Hugging Face Access Token (Optional)
-
-1. Go to [Hugging Face](https://huggingface.co/).  
-2. Log in or create a free account.  
-3. Navigate to **Settings → Access Tokens**.  
-4. Click **Create New token**, set its scope, and copy it.
-   * **Example:** `hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-
-
-## Step 2: Configure the Integration in Your App
-
-1. Go to **Integrations → Add Hugging Face** in your app settings.  
-2. Paste your **Hugging Face Access Token** if required.  
-3. Click **Connect** to validate and save your integration.
-
-Once connected, your app can use Hugging Face models directly in workflows, UI actions, or automations.
-
-## Step 3: Notes
-
-* **Keep your token secure:** Never expose your Hugging Face token in client-side code.  
-* **Use environment-specific tokens:** Separate dev, staging, and production access.  
-* **Open-source flexibility:** Models can be run fully locally or through Hugging Face’s hosted endpoints.  
-* **Broad ecosystem:** Hugging Face supports thousands of community and commercial models for rapid prototyping and production use.
-```
-
-
 # Installation
 
 ```python exec
@@ -11678,6 +11634,50 @@ Once connected, your app can access Cohere’s endpoints for language tasks like
 - **Performance:** Cohere’s models support fast inference for production-ready experiences.  
 - **Observability:** Use the Cohere dashboard to monitor usage, quotas, and request logs.
 
+
+
+---
+tags: AI
+description: Connect your apps to Hugging Face to access thousands of open models for text, vision, and multimodal tasks.
+---
+# Hugging Face Integration
+
+The **Hugging Face Integration** allows your app to use [Hugging Face](https://huggingface.co/) models for a wide range of AI tasks — including text generation, embeddings, translation, classification, image processing, and more. You can integrate both hosted models (via API) or local open-source models through the Transformers library.
+
+## What You Can Do
+
+With Hugging Face, your app can:
+- Access thousands of pre-trained **text, vision, and multimodal models**.  
+- Run **text generation**, summarization, translation, and classification tasks.  
+- Use **embeddings** for search, retrieval, and similarity.  
+- Deploy models locally with `transformers` or connect to hosted inference endpoints.  
+- Fine-tune or customize open models for your specific use cases.  
+- Integrate community and enterprise models seamlessly into workflows.
+
+## Step 1: Obtain a Hugging Face Access Token (Optional)
+
+1. Go to [Hugging Face](https://huggingface.co/).  
+2. Log in or create a free account.  
+3. Navigate to **Settings → Access Tokens**.  
+4. Click **Create New token**, set its scope, and copy it.
+   * **Example:** `hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add Hugging Face** in your app settings.  
+2. Paste your **Hugging Face Access Token** if required.  
+3. Click **Connect** to validate and save your integration.
+
+Once connected, your app can use Hugging Face models directly in workflows, UI actions, or automations.
+
+## Step 3: Notes
+
+* **Keep your token secure:** Never expose your Hugging Face token in client-side code.  
+* **Use environment-specific tokens:** Separate dev, staging, and production access.  
+* **Open-source flexibility:** Models can be run fully locally or through Hugging Face’s hosted endpoints.  
+* **Broad ecosystem:** Hugging Face supports thousands of community and commercial models for rapid prototyping and production use.
+```
 
 
 ---
@@ -11961,6 +11961,62 @@ Once connected, your app can query and update your Supabase database directly fr
 
 
 ---
+tags: AI
+description: Connect to OpenAI's powerful language models for text generation, analysis, and more.
+---
+# OpenAI Integration
+
+The **OpenAI Integration** allows your app to use OpenAI APIs for features such as text generation, embeddings, and other AI-powered functionality.
+
+
+
+```python exec
+import reflex as rx
+from reflex_image_zoom import image_zoom
+```
+
+```python eval
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src=rx.color_mode_cond(
+                "/ai_builder/integrations/open_ai_light.webp",
+                "/ai_builder/integrations/open_ai_dark.webp",
+            ),
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
+)
+```
+
+## Step 1: Obtain an OpenAI API Key
+
+1. Go to the [OpenAI Platform](https://platform.openai.com/).
+2. Navigate to **API Keys** in your account settings.
+3. Click **Create new secret key**.
+4. Copy the generated key.
+   - Example: `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+
+## Step 2: Configure the Integration in Your App
+
+1. Go to **Integrations → Add OpenAI Integration** in your app settings.
+2. Enter your **OpenAI API Key** in the input field.
+3. Save the integration. Your app is now ready to make OpenAI API requests.
+
+---
+
+## Step 3: Notes
+
+- Keep your OpenAI key secure; do **not** hardcode it in public code repositories.
+- Use environment-specific secrets if you have separate development, staging, and production environments.
+- The key allows your app to interact with OpenAI endpoints securely and efficiently.
+
+
+---
 tags: Communication
 description: Send transactional and automated emails directly from your AI-generated applications using Resend.
 ---
@@ -12209,62 +12265,6 @@ The Reflex MCP server provides tools for accessing component documentation and R
 ## Enterprise Use
 
 For enterprise customers requiring on-premises deployment of the Reflex MCP server, please [book a demo](https://reflex.dev/pricing/) to discuss your requirements.
-
-
----
-tags: AI
-description: Connect to OpenAI's powerful language models for text generation, analysis, and more.
----
-# OpenAI Integration
-
-The **OpenAI Integration** allows your app to use OpenAI APIs for features such as text generation, embeddings, and other AI-powered functionality.
-
-
-
-```python exec
-import reflex as rx
-from reflex_image_zoom import image_zoom
-```
-
-```python eval
-rx.el.div(
-    image_zoom(
-        rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/integrations/open_ai_light.webp",
-                "/ai_builder/integrations/open_ai_dark.webp",
-            ),
-            class_name="p-2 rounded-md h-auto",
-            border=f"0.81px solid {rx.color('slate', 5)}",
-        ),
-        class_name="rounded-md overflow-hidden",
-    ),
-    class_name="w-full flex flex-col rounded-md cursor-pointer",
-)
-```
-
-## Step 1: Obtain an OpenAI API Key
-
-1. Go to the [OpenAI Platform](https://platform.openai.com/).
-2. Navigate to **API Keys** in your account settings.
-3. Click **Create new secret key**.
-4. Copy the generated key.
-   - Example: `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-
-
-## Step 2: Configure the Integration in Your App
-
-1. Go to **Integrations → Add OpenAI Integration** in your app settings.
-2. Enter your **OpenAI API Key** in the input field.
-3. Save the integration. Your app is now ready to make OpenAI API requests.
-
----
-
-## Step 3: Notes
-
-- Keep your OpenAI key secure; do **not** hardcode it in public code repositories.
-- Use environment-specific secrets if you have separate development, staging, and production environments.
-- The key allows your app to interact with OpenAI endpoints securely and efficiently.
 
 
 ---
