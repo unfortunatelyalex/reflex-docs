@@ -2,7 +2,7 @@
 
 This repository contains an automation script for merging the Reflex Documentation into one singular file. The automation is handled using GitHub Actions and Playwright to download, extract, and merge documentation files from the Reflex GitHub repository.
 
-- Last checked: `2025-11-09 03:41:26 CET`
+- Last checked: `2025-11-09 05:11:46 CET`
 - Last updated: `2025-11-08 19:12:31 CET`
 
 ## Workflow
