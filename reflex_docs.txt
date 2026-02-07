@@ -10243,7 +10243,7 @@ The AI Builder currently supports the following image types for upload and proce
 
 ## Upload an image to be used within the app
 
-If you want to upload an image to be used within the app, such as a company logo, then you can manually upload it to the `assets/` folder within the `code` tab, as shown below.
+If you want to upload an image to be used within the app, such as a company logo, then you can manually upload it to the `assets/` folder within the `code` tab. Drag and drop the image into the `assets/` folder.
 
 ```python exec
 import reflex as rx
@@ -10254,7 +10254,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/add_images_to_assets.webp",
+            src="/ai_builder/add_images_to_assets.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10269,11 +10269,14 @@ Video uploads are not currently supported but are coming soon!
 
 Integration Coming Soon!
 
+```python exec
+from pcweb.pages.docs import ai_builder
+```
 # Files
 
 To upload a file to the AI Builder click the `📎 Attach` button and select the file you want to upload from your computer. You can also drag and drop files directly into the chat window.
 
-This section does not cover uploading images. Check out ..... to learn more about uploading images.
+This section does not cover uploading images. Check out [Images]({ai_builder.images.path}) to learn more about uploading images.
 
 ```md alert
 ## Supported File Types
@@ -10455,7 +10458,7 @@ If you are working with a specialized / less well-known library, you can add cus
 ```md alert warning
 # Where to find the Knowledge Section
 
-![Where to find the Knowledge Section](/ai_builder/find_knowledge_tab.webp)
+![Where to find the Knowledge Section](/ai_builder/features/knowledge_light.avif)
 ```
 
 
@@ -10532,10 +10535,14 @@ The Github integration is important to make sure that you don't lose your progre
 
 
 ```python eval
-rx.image(
-    src="/ai_builder/connecting_to_github.gif",
-    height="auto",
-    padding_bottom="2rem",
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/connecting_to_github.avif",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+    ),
 )
 ```
 
@@ -10550,8 +10557,17 @@ The GitHub integration allows you to:
 The commit history is a great way to see the changes that you have made to your app. You can also revert to previous versions of your app from here.
 
 ```python eval
-image_zoom(rx.image(src="/ai_builder/github_commit_history.png"))
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/github_commit_history.avif",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+    ),
+)
 ```
+
 
 
 # Knowledge
@@ -10566,10 +10582,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/features/knowledge_light.webp",
-                    "/ai_builder/features/knowledge_dark.webp",
-                ),
+                src="/ai_builder/features/knowledge_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -10587,7 +10600,7 @@ rx.el.div(render_image())
 
 ## How to Add Knowledge
 
-1. In the AI Builder workspace, go to the **Knowledge** section by clicking the **`Context`** button in the bottom bar, and then on the top bar click the **`Knowledge`** tab.
+1. In the AI Builder top bar, click the more 3 dots icon and then click the **`Knowledge`** tab.
 2. Enter your rule, guideline, or context description.
 3. Save the entry. The AI Builder will automatically use it when generating apps.
 
@@ -10683,10 +10696,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/features/secrets_light.webp",
-                    "/ai_builder/features/secrets_dark.webp",
-                ),
+                src="/ai_builder/features/secrets_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -10730,10 +10740,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/features/secret_bulk_light.webp",
-                "/ai_builder/features/secret_bulk_dark.webp",
-            ),
+            src="/ai_builder/features/secret_bulk_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10760,10 +10767,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/features/diff_light.webp",
-                    "/ai_builder/features/diff_dark.webp",
-                ),
+                src="/ai_builder/features/diff_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -10880,6 +10884,7 @@ Use the integrated terminal to run commands, debug issues, and inspect logs—al
 
 ```python exec
 import reflex as rx
+from reflex_image_zoom import image_zoom
 ```
 
 Reflex Build allows you to install external python packages to use in your app. This is useful if you want to use a package that is not included in the default Reflex Build environment. Examples might include `openai`, `langsmith`, `requests`, etc.
@@ -10893,24 +10898,36 @@ There are two ways to install external packages:
 
 Enter the name of the package you want to install in the chat interface. The AI will then install the package for you.
 
+
 ```python eval
-rx.image(
-    src="/ai_builder/external_packages_input.gif",
-    height="auto",
-    padding_bottom="2rem",
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/external_packages_input.avif",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
 )
 ```
-
 
 ## Installing through the requirements.txt file
 
 Add the package to the `requirements.txt` file and then save the app. This will install the package in your app's environment and recompile your app.
 
 ```python eval
-rx.image(
-    src="/ai_builder/external_packages_requirements.gif",
-    height="auto",
-    padding_bottom="2rem",
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/external_packages_requirements.avif",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
 )
 ```
 
@@ -10918,6 +10935,7 @@ rx.image(
 
 ```python exec
 import reflex as rx
+from reflex_image_zoom import image_zoom
 ```
 
 Uploading an image (screenshot) of a website (web) app of what you are looking to build gives the AI really good context. 
@@ -10925,13 +10943,19 @@ Uploading an image (screenshot) of a website (web) app of what you are looking t
 *This is the recommended way to start an app generation.*
 
 
-Below is a GIF showing how to upload an image to the AI Builder:
+Below is an image showing how to upload an image to the AI Builder, you can click on the "Attach" button to upload an image, drag and drop an image, or paste an image from the clipboard:
 
 ```python eval
-rx.image(
-    src="/ai_builder/image_upload.gif",
-    height="auto",
-    padding_bottom="2rem",
+rx.el.div(
+    image_zoom(
+        rx.image(
+            src="/ai_builder/image_upload.avif",
+            class_name="p-2 rounded-md h-auto",
+            border=f"0.81px solid {rx.color('slate', 5)}",
+        ),
+        class_name="rounded-md overflow-hidden",
+    ),
+    class_name="w-full flex flex-col rounded-md cursor-pointer",
 )
 ```
 
@@ -10952,10 +10976,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/features/restore_light.webp",
-                "/ai_builder/features/restore_dark.webp",
-            ),
+            src="/ai_builder/features/restore_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11219,9 +11240,9 @@ Before jumping into the AI Builder, take time to plan your approach. Good prepar
 
 ### Auto-Generate Prompts from App Specs
 
-To save time and get higher-quality prompts, you can feed your full app spec into **Chat Mode** and ask it to break the spec into structured, build-ready prompts.
+To save time and get higher-quality prompts, you can feed your full app spec into the AI Builder and ask it to break the spec into structured, build-ready prompts.
 
-Chat Mode can translate your vision into:
+The AI Builder can translate your vision into:
 
 - Layout instructions
 - UI component definitions
@@ -11229,27 +11250,25 @@ Chat Mode can translate your vision into:
 - Styling preferences
 - Follow-up test plans
 
-Once generated, copy each prompt into the AI Builder to execute them in sequence.
-
 **Example workflow:**
 
-1. Switch to Chat Mode and paste your full app specification
-2. Ask **"Break this into a series of buildable prompts I can feed into the Agent Mode."**
-3. Copy each generated prompt into Agent Mode one by one
+1. Paste your full app specification into the AI Builder
+2. Ask **"Break this into a series of buildable prompts."**
+3. Execute each generated prompt in sequence
 4. Build iteratively using the structured prompts
 
 ### Working with Text Specifications
 
 If you have a structured app specification, don't paste the entire document into the builder at once. Break it down into logical sections and feed them in sequence.
 
-**Pro tip:** Use **Chat Mode** to help prepare prompts:
+**Pro tip:** Let the AI Builder help prepare prompts:
 
 Paste your full app spec and ask:
 
-  - **"Break this into buildable prompts I can feed into the builder."**
+  - **"Break this into buildable prompts."**
   - **"Write one prompt per feature/page to build this app."**
 
-This hybrid approach — planning in **Chat Mode**, then building in **Agent Mode** — lets you move faster and build smarter.
+This approach — planning first, then building iteratively — lets you move faster and build smarter.
 
 ### Writing Clear, Task-Oriented Prompts
 
@@ -11287,12 +11306,11 @@ You can drop in screenshots of websites, dashboards, apps, or even hand-drawn wi
 - Include any elements you want: forms, tables, nav, charts
 - You can annotate them with arrows, notes, or labels
 
-**Get UI/UX feedback using Chat Mode:**
+**Get UI/UX feedback:**
 
 Upload a screenshot and ask: **"What are 5 things I could do to improve the UI/UX of this?"**
 
-
-Follow up with: **Implement items 1, 2, and 4 in the builder.**
+Follow up with: **Implement items 1, 2, and 4.**
 
 Or request specific improvements: **Make this more minimal and mobile-first.**
 
@@ -11337,10 +11355,10 @@ To improve your design, ask the builder for more polished layouts, better struct
 
 **Suggested workflow:**
 
-1. In Chat Mode, upload an image or describe the layout.
+1. Upload an image or describe the layout.
 2. Ask: **"Tell me 5 things that would improve the UI/UX of this page."**
 3. Review the suggestions and decide which ones you want to apply.
-4. Switch to Agent Mode and implement: **"Improve visual hierarchy by increasing heading sizes and adding more spacing between sections."**
+4. Implement: **"Improve visual hierarchy by increasing heading sizes and adding more spacing between sections."**
 
 ### Using Knowledge to Guide the Build
 
@@ -11348,7 +11366,7 @@ The **Knowledge** panel lets you provide long-form references that influence how
 
 Once added, the builder will try to honor these rules throughout the session, ensuring consistency without repeating instructions.
 
-Try combining Knowledge with Chat Mode:
+Try combining Knowledge with your prompts:
 
   - **Use the style guide in Knowledge to improve this page.**
 
@@ -11428,10 +11446,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_1_light.webp",
-                "/ai_builder/overview/tutorial_1_dark.webp",
-            ),
+            src="/ai_builder/overview/tutorial_1_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11456,10 +11471,7 @@ Your dashboard now becomes much more useful with real-time filtering. Users can 
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_2_light.webp",
-                "/ai_builder/overview/tutorial_2_dark.webp",
-            ),
+            src="/ai_builder/overview/tutorial_2_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11486,10 +11498,7 @@ Your app now has full CRUD capability for employee records. The modal form provi
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_3_light.webp",
-                "/ai_builder/overview/tutorial_3_dark.webp",
-            ),
+            src="/ai_builder/overview/tutorial_3_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11516,10 +11525,7 @@ Your app now has proper navigation between the dashboard and chat functionality.
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/tutorial_4_light.webp",
-                "/ai_builder/overview/tutorial_4_dark.webp",
-            ),
+            src="/ai_builder/overview/tutorial_4_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11552,197 +11558,98 @@ The power of AI Builder is that you can iterate quickly with natural language pr
 
 # What Is Reflex Build
 
-Reflex Build is an AI-powered platform that lets anyone create full-stack web apps just by describing ideas in plain English—no coding needed. It includes a full-fledged built-in IDE, real-time collaboration (beta), and project sharing—all in your browser, no installation required.
+Reflex Build is an AI-powered platform that lets anyone create full-stack web apps just by describing ideas in plain English—no coding needed. It includes a full-fledged built-in IDE, real-time collaboration, and project sharing—all in your browser, no installation required.
 
 ```python exec
-from typing import List, TypedDict
-
 import reflex as rx
 from reflex_image_zoom import image_zoom
 
 
-class Feature(TypedDict):
-    title: str
-    description: str
-    icon: str
+landing_features = [
+    {
+        "title": "Database Integration",
+        "description": "Automatically integrate your database\ninto your application with ease",
+        "icon": "database",
+    },
+    {
+        "title": "Secure Secrets",
+        "description": "Safely manage your API keys and tokens\nwith a built in secrets manager",
+        "icon": "shield",
+    },
+    {
+        "title": "Live Preview",
+        "description": "See all application changes in real-time\nwith our interactive preview tab",
+        "icon": "eye",
+    },
+    {
+        "title": "Quick Download",
+        "description": "Download your complete project files\nwith just a single click operation",
+        "icon": "download",
+    },
+    {
+        "title": "Easy Deployment",
+        "description": "Deploy your application to production\nwith just a single click process",
+        "icon": "rocket",
+    },
+    {
+        "title": "Manual File Editing",
+        "description": "Edit your project files directly\nwith our intuitive code editor",
+        "icon": "code",
+    },
+    {
+        "title": "AI Package Manager",
+        "description": "Let AI handle your package installations\nvia natural prompting",
+        "icon": "sparkles",
+    },
+    {
+        "title": "Smart Prompting",
+        "description": "Get better development results\nwith AI-optimized prompt templates",
+        "icon": "message-circle",
+    },
+]
 
 
-class LandingState(rx.State):
-    features: List[Feature] = [
-        {
-            "title": "Database Integration",
-            "description": "Automatically integrate your database\ninto your application with ease",
-            "icon": "database",
-        },
-        {
-            "title": "Secure Secrets",
-            "description": "Safely manage your API keys and tokens\nwith a built in secrets manager",
-            "icon": "shield",
-        },
-        {
-            "title": "Live Preview",
-            "description": "See all application changes in real-time\nwith our interactive preview tab",
-            "icon": "eye",
-        },
-        {
-            "title": "Quick Download",
-            "description": "Download your complete project files\nwith just a single click operation",
-            "icon": "download",
-        },
-        {
-            "title": "Easy Deployment",
-            "description": "Deploy your application to production\nwith just a single click process",
-            "icon": "rocket",
-        },
-        {
-            "title": "Manual File Editing",
-            "description": "Edit your project files directly\nwith our intuitive code editor",
-            "icon": "code",
-        },
-        {
-            "title": "AI Package Manager",
-            "description": "Let AI handle your package installations\nvia natural prompting",
-            "icon": "sparkles",
-        },
-        {
-            "title": "Smart Prompting",
-            "description": "Get better development results\nwith AI-optimized prompt templates",
-            "icon": "message-circle",
-        },
-    ]
-
-
-class BuildDocState(rx.State):
-    current_feature: dict[str, str] = {
-        "light": "/ai_builder/what_is_reflex_build/project_bar_light.webp",
-        "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.webp",
-    }
-
-    image_opacity: float = 1.0  # Use float instead of string for opacity
-    transition_in_progress: bool = False
-
-    features: list[dict[str, str | dict[str, str]]] = [
-        {
-            "title": "Project Menu Bar",
-            "subtitle": "Browse previously built applications, create new sessions, store database variables, and much more!",
-            "img": {
-                "light": "/ai_builder/what_is_reflex_build/project_bar_light.webp",
-                "dark": "/ai_builder/what_is_reflex_build/project_bar_dark.webp",
-            },
-            "selected": True,
-        },
-        {
-            "title": "Chat Area",
-            "subtitle": "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
-            "img": {
-                "light": "/ai_builder/what_is_reflex_build/chat_light.webp",
-                "dark": "/ai_builder/what_is_reflex_build/chat_dark.webp",
-            },
-            "selected": False,
-        },
-        {
-            "title": "Application Workspace",
-            "subtitle": "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
-            "img": {
-                "light": "/ai_builder/what_is_reflex_build/file_tree_light.webp",
-                "dark": "/ai_builder/what_is_reflex_build/file_tree_dark.webp",
-            },
-            "selected": False,
-        },
-        {
-            "title": "Code Editor",
-            "subtitle": "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
-            "img": {
-                "light": "/ai_builder/what_is_reflex_build/code_light.webp",
-                "dark": "/ai_builder/what_is_reflex_build/code_dark.webp",
-            },
-            "selected": False,
-        },
-        {
-            "title": "Bottom Menu Bar",
-            "subtitle": "This menu contains important actions such as deploying, downloading, and sharing your application.",
-            "img": {
-                "light": "/ai_builder/what_is_reflex_build/bottom_light.webp",
-                "dark": "/ai_builder/what_is_reflex_build/bottom_dark.webp",
-            },
-            "selected": False,
-        },
-        {
-            "title": "Preview Tab",
-            "subtitle": "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
-            "img": {
-                "light": "/ai_builder/what_is_reflex_build/preview_light.webp",
-                "dark": "/ai_builder/what_is_reflex_build/preview_dark.webp",
-            },
-            "selected": False,
-        },
-    ]
-
-    @rx.event(background=True)
-    async def select_feature(self, index: int):
-        import asyncio
-
-        # Prevent multiple transitions at once
-        if self.transition_in_progress:
-            return
-
-        # Update the selected feature and image
-        async with self:
-            for i, feature in enumerate(self.features):
-                feature["selected"] = i == index
-
-            self.transition_in_progress = True
-
-            # Fade out
-            self.image_opacity = 0.0
-            yield
-            await asyncio.sleep(0.1)
-
-            self.current_feature = self.features[index]["img"]
-            await asyncio.sleep(0.2)
-
-            # # Fade in
-            self.image_opacity = 1.0
-            self.transition_in_progress = False
-
-
-feature_images = [
-    [
-        "/ai_builder/what_is_reflex_build/project_bar_light.webp",
-        "/ai_builder/what_is_reflex_build/project_bar_dark.webp",
-        "Project Menu Bar",
-        "Browse previously built applications, create new sessions, store database variables, and much more!",
-    ],
-    [
-        "/ai_builder/what_is_reflex_build/chat_light.webp",
-        "/ai_builder/what_is_reflex_build/chat_dark.webp",
-        "Chat Area",
-        "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
-    ],
-    [
-        "/ai_builder/what_is_reflex_build/file_tree_light.webp",
-        "/ai_builder/what_is_reflex_build/file_tree_dark.webp",
-        "Application Workspace",
-        "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
-    ],
-    [
-        "/ai_builder/what_is_reflex_build/code_light.webp",
-        "/ai_builder/what_is_reflex_build/code_dark.webp",
-        "Code Editor",
-        "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
-    ],
-    [
-        "/ai_builder/what_is_reflex_build/bottom_light.webp",
-        "/ai_builder/what_is_reflex_build/bottom_dark.webp",
-        "Bottom Menu Bar",
-        "This menu contains important actions such as deploying, downloading, and sharing your application.",
-    ],
-    [
-        "/ai_builder/what_is_reflex_build/preview_light.webp",
-        "/ai_builder/what_is_reflex_build/preview_dark.webp",
-        "Preview Tab",
-        "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
-    ],
+features_data = [
+    {
+        "title": "Project Menu Bar",
+        "subtitle": "Browse previously built applications, create new sessions, store database variables, and much more!",
+        "img": "/ai_builder/what_is_reflex_build/project_bar_light.avif",
+    },
+    {
+        "title": "Chat Area",
+        "subtitle": "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
+        "img": "/ai_builder/what_is_reflex_build/chat_light.avif",
+    },
+    {
+        "title": "Application Workspace",
+        "subtitle": "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
+        "img": "/ai_builder/what_is_reflex_build/file_tree_light.avif",
+    },
+    {
+        "title": "Code Editor",
+        "subtitle": "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
+        "img": "/ai_builder/what_is_reflex_build/code_light.avif",
+    },
+    {
+        "title": "Integrations",
+        "subtitle": "Easily connect with the tools your team already uses or extend your app with any Python SDK, library, or API.",
+        "img": "/ai_builder/what_is_reflex_build/integrations_light.avif",
+    },
+    {
+        "title": "Plan",
+        "subtitle": "Plan your application's development with the AI Builder. You can add or remove phases and tasks as you go.",
+        "img": "/ai_builder/what_is_reflex_build/plan_light.avif",
+    },
+    {
+        "title": "Top Menu Bar",
+        "subtitle": "This menu contains the main views of the application. Preview, Code, Plan, Integrations, Knowledge, Secrets and Settings. You can also see the current workspace RAM and CPU usage. Deploy, copy or share your application with the buttons in the top right corner.",
+        "img": "/ai_builder/what_is_reflex_build/top_light.avif",
+    },
+    {
+        "title": "Preview Tab",
+        "subtitle": "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
+        "img": "/ai_builder/what_is_reflex_build/preview_light.avif",
+    },
 ]
 
 
@@ -11753,20 +11660,16 @@ def feature_card(feature: dict) -> rx.Component:
                 rx.icon(
                     tag=feature["icon"],
                     size=15,
-                    class_name="inline-block mr-2 "
-                    + rx.color_mode_cond(
-                        "stroke-violet-8",
-                        "stroke-violet-9",
-                    ),
+                    class_name="inline-block mr-2 text-primary-11"
                 ),
-                rx.el.span(f"{feature['title']} ", class_name="text-sm font-bold"),
-                class_name="text-sm font-medium block align-center pt-5 px-2",
+                rx.el.span(f"{feature['title']}"),
+                class_name="text-sm font-semibold flex flex-row items-center pt-5 px-2 text-secondary-12",
             ),
             rx.el.span(
                 feature["description"],
-                class_name="text-sm font-regular block align-center px-2",
+                class_name="text-sm font-medium block align-center px-2 text-secondary-11",
             ),
-            class_name="flex flex-col",
+            class_name="flex flex-col gap-2",
         ),
         class_name="w-full rounded-md",
     )
@@ -11775,58 +11678,39 @@ def feature_card(feature: dict) -> rx.Component:
 def _docs_features() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.foreach(LandingState.features, feature_card),
+            rx.foreach(landing_features, feature_card),
             class_name="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4",
         ),
         class_name="flex flex-col w-full h-full justify-start align-start items-start py-4 gap-x-4 z-[99]",
     )
 
 
-def _docs_app_section_features_small_screen(feature: list[str]):
+def _docs_app_section_features_small_screen(feature: dict):
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(feature[0], feature[1]),
+                src=feature["img"],
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
             class_name="rounded-md overflow-hidden",
         ),
         rx.el.div(
-            rx.el.label(feature[2], class_name="text-sm font-bold cursor-pointer"),
-            rx.el.label(feature[3], class_name="text-sm font-light cursor-pointer"),
+            rx.el.label(feature["title"], class_name="text-sm font-bold cursor-pointer"),
+            rx.el.label(feature["subtitle"], class_name="text-sm font-light cursor-pointer"),
             class_name="flex flex-col px-1 py-2",
         ),
         class_name="w-full flex flex-col rounded-md cursor-pointer",
     )
 
 
-def _docs_app_section_toggles(feature: dict, index: int):
+def _docs_app_section_toggles(feature: dict):
     return rx.el.div(
-        rx.el.label(feature["title"], class_name="text-sm font-bold cursor-pointer"),
+        rx.el.label(feature["title"], class_name="text-sm font-bold"),
         rx.el.label(
-            feature["subtitle"], class_name="text-sm font-light cursor-pointer"
+            feature["subtitle"], class_name="text-sm font-light"
         ),
-        on_click=BuildDocState.select_feature(index),
-        class_name="w-full flex flex-col max-w-md rounded-md p-4 cursor-pointer "
-        + rx.cond(
-            feature["selected"],
-            "",
-            rx.color_mode_cond("hover:bg-slate-5", "hover:bg-slate-3"),
-        ),
-        border=rx.cond(
-            feature["selected"],
-            f"0.81px solid {rx.color('purple', 7)}",
-            "",
-        ),
-        box_shadow=rx.cond(
-            feature["selected"],
-            rx.color_mode_cond(
-                "5px 5px oklch(0.946 0.033 307.174 / 0.5)",
-                "",
-            ),
-            "",
-        ),
+        class_name="w-full flex flex-col max-w-md rounded-md p-4",
     )
 
 
@@ -11847,27 +11731,20 @@ def _docs_app_sections():
                 class_name="flex flex-col w-full max-w-lg gap-y-1",
             ),
             rx.foreach(
-                BuildDocState.features[:5],
-                lambda feature, index: _docs_app_section_toggles(feature, index),
+                features_data[:5],
+                lambda feature: _docs_app_section_toggles(feature),
             ),
             class_name="flex flex-col gap-y-4 justify-start max-w-sm",
         ),
         rx.el.div(
             image_zoom(
                 rx.image(
-                    src=rx.color_mode_cond(
-                        BuildDocState.current_feature["light"],
-                        BuildDocState.current_feature["dark"],
-                    ),
+                    src=features_data[0]["img"],
                     class_name="p-2 rounded-md h-auto",
                     border=f"0.81px solid {rx.color('slate', 5)}",
                 ),
                 class_name="rounded-md overflow-hidden",
             ),
-            style={
-                "opacity": f"{BuildDocState.image_opacity}",
-                "transition": "opacity 300ms ease-in-out",
-            },
             class_name="w-full max-w-4xl",
         ),
         class_name="flex flex-row w-full h-full justify-between align-center items-center py-4 gap-x-4 z-[99]",
@@ -11880,7 +11757,7 @@ def _docs_app_sections_small_screen():
         rx.el.div(
             rx.grid(
                 rx.foreach(
-                    feature_images,
+                    features_data,
                     lambda feature: _docs_app_section_features_small_screen(feature),
                 ),
                 class_name="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-full",
@@ -11934,10 +11811,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/templates_light.webp",
-                "/ai_builder/overview/templates_dark.webp",
-            ),
+            src="/ai_builder/overview/templates_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11955,10 +11829,7 @@ To use a template, simply click the template and then in the bottom right corner
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/fork_template_light.webp",
-                "/ai_builder/overview/fork_template_dark.webp",
-            ),
+            src="/ai_builder/overview/fork_template_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11984,10 +11855,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/general_light.webp",
-                    "/ai_builder/app_lifecycle/general_dark.webp",
-                ),
+                src="/ai_builder/app_lifecycle/general_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12006,16 +11874,25 @@ rx.el.div(render_image())
 
 ## How to Access Settings
 
-1. In the AI Builder workspace, click the **Settings** icon located at the bottom-left of the screen, inside the chat box area.
-2. This will open the **General** tab to see your app’s main settings.
+1. In the AI Builder workspace, on the top bar click the more 3 dots icon and then click the **Settings** tab.
+2. This will open the **Settings** tab to see your app’s main settings.
 
 ## What You Can Do
 
 - **Change App Name**
   Update the name of your app to reflect its purpose or version.
 
+- **Change App Visibility**
+  Update the visibility of your app to public or private.
+
 - **View App ID**
   Find the unique identifier for your app, which can be used for integrations or support.
+
+- **Fork App**
+  Fork your app to create a copy of it.
+
+-- **Download App**
+  Download your app to your local machine.
 
 - **Delete App**
   Permanently remove an app you no longer need. **Warning:** This action cannot be undone.
@@ -12035,10 +11912,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/copy_light.webp",
-                    "/ai_builder/app_lifecycle/copy_dark.webp",
-                ),
+                src="/ai_builder/app_lifecycle/copy_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12056,7 +11930,7 @@ rx.el.div(render_image())
 
 ## How to Copy an App
 
-1. In the Reflex Build workspace, click the **Copy** button (bottom-right corner).
+1. In the Reflex Build workspace, click on the arrow down icon next to the deploy button and click on the **Copy** button. You can also do this in the Settings tab.
 2. Reflex Build will create a new app in your workspace with the same:
    - Code files and components
    - State and configuration
@@ -12089,7 +11963,7 @@ import reflex as rx
 
 It is easy to deploy your app into production from Reflex Build to Reflex Cloud.
 
-Simply click the `Deploy` button in the bottom right corner of Reflex Build, as shown below:
+Simply click the `Deploy` button in the top right corner of Reflex Build, as shown below:
 
 
 
@@ -12101,10 +11975,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/deploy_light.webp",
-                    "/ai_builder/app_lifecycle/deploy_dark.webp",
-                ),
+                src="/ai_builder/app_lifecycle/deploy_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12145,10 +12016,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/download_light.webp",
-                    "/ai_builder/app_lifecycle/download_dark.webp",
-                ),
+                src="/ai_builder/app_lifecycle/download_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12166,9 +12034,8 @@ rx.el.div(render_image())
 
 ## How to Download
 
-1. In the AI Builder workspace, go to the **bottom-right corner**.
-2. Click the **Download** button.
-3. A `.zip` file will be generated containing your entire Reflex app, including:
+1. In the AI Builder workspace, click on the arrow down icon next to the deploy button and click on the **Download** button. You can also do this in the Settings tab.
+2. A `.zip` file will be generated containing your entire Reflex app, including:
    - Source code (`.py` files, components, state, etc.)
    - `requirements.txt` with dependencies
    - Config files (`rxconfig.py`, `.env`, etc.)
@@ -12187,10 +12054,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src=rx.color_mode_cond(
-                "/ai_builder/overview/fork_template_light.webp",
-                "/ai_builder/overview/fork_template_dark.webp",
-            ),
+            src="/ai_builder/overview/fork_template_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -12204,7 +12068,7 @@ rx.el.div(
 ## How to Fork an App
 
 1. Browse or open an app you’d like to use as a starting point.
-2. Click the **Fork** button in the app’s bottom right corner.
+2. Click the **Fork** button in the app’s top right corner.
 3. The AI Builder will create a **copy of the app** in your workspace.
 4. You can now **edit, customize, and expand** your forked app independently of the original.
 
@@ -12239,10 +12103,7 @@ def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src=rx.color_mode_cond(
-                    "/ai_builder/app_lifecycle/share_light.webp",
-                    "/ai_builder/app_lifecycle/share_dark.webp",
-                ),
+                src="/ai_builder/app_lifecycle/share_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12260,7 +12121,7 @@ rx.el.div(render_image())
 
 ## How to Share
 
-1. In the AI Builder workspace, click the **Share** button (bottom-right corner).
+1. In the AI Builder workspace, click on the arrow down icon next to the deploy button and click on the **Share** button.
 2. A popup will appear with a **shareable link**.
 3. Copy the link and send it to teammates, collaborators, or stakeholders.
 
