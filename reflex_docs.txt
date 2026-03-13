@@ -5441,6 +5441,7 @@ More auth documentation on the way. Check back soon!
 
 ```python exec
 import reflex as rx
+from pcweb import constants
 from pcweb.styles.styles import get_code_style, cell_style
 
 ```
@@ -5497,7 +5498,7 @@ env:
 ### Obtain Required Tokens
 
 1. **Reflex Access Token**
-   - Visit [Reflex Cloud Tokens](https://cloud.reflex.dev/tokens/)
+   - Visit [Reflex Cloud Tokens]({constants.REFLEX_CLOUD_URL.rstrip("/")}/tokens/)
    - Navigate to Account Settings → Tokens
    - Create a new token and copy the value
    - Replace `your-token-here` in the configuration
@@ -6157,6 +6158,7 @@ Clicking on the `Settings` tab in the Cloud UI on the project page allows a user
 ```python exec
 import reflex as rx
 from reflex_image_zoom import image_zoom
+from pcweb.constants import REFLEX_CLOUD_URL
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
 from pcweb.styles.styles import get_code_style, cell_style
@@ -6251,7 +6253,7 @@ rx.el.table(
                 rx.el.td(
                     rx.el.div(
                         rx.image(
-                            src=f"https://cloud.reflex.dev/flags/{COUNTRIES_CODES[region]}.svg",
+                            src=f"{REFLEX_CLOUD_URL.rstrip('/')}/flags/{COUNTRIES_CODES[region]}.svg",
                             class_name="rounded-[2px] mr-2 w-5 h-4",
                         ),
                         REGIONS_DICT[region],
@@ -6309,6 +6311,7 @@ packages:
 ```python exec
 import reflex as rx
 from reflex_image_zoom import image_zoom
+from pcweb import constants
 from pcweb.pages.docs import hosting
 from pcweb.pages import docs
 from pcweb.styles.styles import get_code_style, cell_style
@@ -6407,7 +6410,7 @@ You can also specify a project uuid instead of name:
 project: 12345678-1234-1234-1234-1234567890ab
 ```
 
-You can go to the homepage of the project in the reflex cloud dashboard to find your project uuid in the url `https://cloud.reflex.dev/project/uuid`
+You can go to the homepage of the project in the reflex cloud dashboard to find your project uuid in the url `{constants.REFLEX_CLOUD_URL.rstrip("/")}/project/uuid`
 
 ### Apt Packages
 
