@@ -692,6 +692,7 @@ On linux, `~/.local/share/reflex` is used.
 
 ```python exec
 from pcweb import constants
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.pages.docs import wrapping_react, custom_components, styling, events
 from pcweb.pages.docs.custom_components import custom_components as cc
 ```
@@ -751,7 +752,7 @@ from reflex_image_zoom import image_zoom
 ```
 
 ```python eval
-image_zoom(rx.image(src="/architecture.png"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/architecture.webp"))
 ```
 
 ```python eval
@@ -1100,7 +1101,7 @@ meta_data = (
 @rx.page(
     title='My Beautiful App',
     description='A beautiful app built with Reflex',
-    image='/splash.png',
+    image='https://web.reflex-assets.dev/other/logo.jpg',
     meta=meta,
 )
 def index():
@@ -2457,6 +2458,7 @@ With our hosting service, you can deploy this app with a single command within m
 
 ```python exec
 from pcweb.pages.docs import advanced_onboarding
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 ## Directory Structure
@@ -2500,7 +2502,7 @@ The `assets` directory is where you can store any static assets you want to be p
 For example, if you save an image to `assets/image.png` you can display it from your app like this:
 
 ```python
-rx.image(src="/image.png")
+rx.image(src=f"{REFLEX_ASSETS_CDN}other/image.png")
 ```
 j
 ## Main Project
@@ -5137,6 +5139,7 @@ button_style = {"background_color": rx.color("accent", 10), "box_shadow": shadow
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.styles.colors import c_color
 image_style = {
   "width": "400px",
@@ -5153,7 +5156,7 @@ It is straightforward to create accounts and API tokens with PyPI. There is offi
 
 ```python eval
 rx.center(
-  rx.image(src="/custom_components/pypi_register.png", style=image_style, margin_bottom="16px", loading="lazy"),
+  rx.image(src=f"{REFLEX_ASSETS_CDN}custom_components/pypi_register.webp", style=image_style, margin_bottom="16px", loading="lazy"),
 )
 ```
 
@@ -5161,7 +5164,7 @@ A user can use username and password to authenticate with PyPI when publishing.
 
 ```python eval
 rx.center(
-  rx.image(src="/custom_components/pypi_account_settings.png", style=image_style, margin_bottom="16px", loading="lazy"),
+  rx.image(src=f"{REFLEX_ASSETS_CDN}custom_components/pypi_account_settings.webp", style=image_style, margin_bottom="16px", loading="lazy"),
 )
 ```
 
@@ -5169,7 +5172,7 @@ Scroll down to the API tokens section and click on the "Add API token" button. F
 
 ```python eval
 rx.center(
-  rx.image(src="/custom_components/pypi_api_tokens.png", style=image_style, width="700px", loading="lazy"),
+  rx.image(src=f"{REFLEX_ASSETS_CDN}custom_components/pypi_api_tokens.webp", style=image_style, width="700px", loading="lazy"),
 )
 ```
 
@@ -5178,6 +5181,7 @@ rx.center(
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.pages.docs import custom_components
 from pcweb.pages.docs.custom_components import custom_components as custom_components_gallery
 ```
@@ -5190,7 +5194,7 @@ Check out the custom components gallery [here]({custom_components_gallery.path})
 
 ```python eval
 rx.center(
-  rx.image(src="/custom_components/pypi_reflex_custom_components.png", width="400px", border_radius="15px", border="1px solid"),
+  rx.image(src=f"{REFLEX_ASSETS_CDN}custom_components/pypi_reflex_custom_components.webp", width="400px", border_radius="15px", border="1px solid"),
 )
 ```
 
@@ -5652,6 +5656,7 @@ rx.table.root(
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
@@ -5666,7 +5671,7 @@ To scale your app you can choose different VMTypes. VMTypes are different config
 To scale your VM in the Cloud UI, click on the `Settings` tab in the Cloud UI on the app page, and then click on the `Scale` tab as shown below. Clicking on the `Change VM` button will allow you to scale your app.
 
 ```python eval
-image_zoom(rx.image(src="/scaling_vms.webp", padding_bottom="20px"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/scaling_vms.webp", padding_bottom="20px"))
 ```
 
 ### VMTypes in the CLI
@@ -5920,6 +5925,7 @@ One thing that is important to note is that in the hypothetical example where yo
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 from pcweb.pages import docs
 ```
@@ -5954,7 +5960,7 @@ You will be redirected to your browser where you can authenticate through Github
 Once you are at this URL and you have successfully authenticated, click on the one project you have in your workspace. You should get a screen like this:
 
 ```python eval
-image_zoom(rx.image(src="/cloud_project_page.png", alt="Reflex Cloud Dashboard"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/cloud_project_page.webp", alt="Reflex Cloud Dashboard"))
 ```
 
 This screen shows the login command and the deploy command. As we are already logged in, we can skip the login command.
@@ -6009,6 +6015,7 @@ All your flag values, i.e. environment variables or regions or tokens, are saved
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -6033,7 +6040,7 @@ Once you have purchased your domain, you can add it to your Reflex Cloud app by 
 2 - Once your app is deployed click the `Custom Domain` tab and add your custom domain to the input field and press the Add domain button. You should now see a page like below:
 
 ```python eval
-image_zoom(rx.image(src="/custom-domains-DNS-inputs.png"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/custom-domains-DNS-inputs.webp"))
 ```
 
 ```python eval
@@ -6043,7 +6050,7 @@ rx.box(height="20px")
 3 - On the domain registrar's website, navigate to the DNS settings for your domain. It should look something like the image below:
 
 ```python eval
-image_zoom(rx.image(src="/custom-domains-DNS-before.png"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/custom-domains-DNS-before.webp"))
 ```
 
 ```python eval
@@ -6053,7 +6060,7 @@ rx.box(height="20px")
 4 - Add all four of the DNS records provided by Reflex Cloud to your domain registrar's DNS settings. If there is already an A name record, delete it and replace it with the one provided by Reflex Cloud. Your DNS settings should look like the image below:
 
 ```python eval
-image_zoom(rx.image(src="/custom-domains-DNS-after.png"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/custom-domains-DNS-after.webp"))
 ```
 
 ```md alert warning
@@ -6073,7 +6080,7 @@ rx.box(height="20px")
 5 - Once you have added the DNS records, refresh the page on the Reflex Cloud page (it may take a few minutes to a few hours to update successfully). If the records are correct, you should see a success message like the one below:
 
 ```python eval
-image_zoom(rx.image(src="/custom-domains-success.png"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/custom-domains-success.webp"))
 ```
 
 ```python eval
@@ -6118,6 +6125,7 @@ If you want to set a billing limit for your project, you can do so by going to t
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -6138,7 +6146,7 @@ If you are a User you have the ability to create, deploy and delete apps, but yo
 As an Admin you will see the an `Add user` button in the top right of the screen, as shown in the image below. Clicking on this will allow you to add a user to the project. You will need to enter the email address of the user you wish to add.
 
 ```python eval
-image_zoom(rx.image(src="/hosting_adding_team_members.png", alt="Adding team members to Reflex Cloud"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/hosting_adding_team_members.webp", alt="Adding team members to Reflex Cloud"))
 ```
 
 ```python eval
@@ -6158,7 +6166,7 @@ Clicking on the `Settings` tab in the Cloud UI on the project page allows a user
 ```python exec
 import reflex as rx
 from reflex_image_zoom import image_zoom
-from pcweb.constants import REFLEX_CLOUD_URL
+from pcweb.constants import REFLEX_ASSETS_CDN, REFLEX_CLOUD_URL
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
 from pcweb.styles.styles import get_code_style, cell_style
@@ -6216,7 +6224,7 @@ To scale your app you can choose different regions. Regions are different locati
 To scale your app to multiple regions in the Cloud UI, click on the `Settings` tab in the Cloud UI on the app page, and then click on the `Regions` tab as shown below. Clicking on the `Add new region` button will allow you to scale your app to multiple regions.
 
 ```python eval
-image_zoom(rx.image(src="/scaling_regions.webp", padding_bottom="20px"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/scaling_regions.webp", padding_bottom="20px"))
 ```
 
 The table below show all the regions that can be deployed in.
@@ -6493,6 +6501,7 @@ reflex deploy --config cloud-staging.yml
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
@@ -6513,7 +6522,7 @@ There are many actions you can take in the Cloud UI to manage your app. Below ar
 To stop an app follow the arrow in the image below and press on the `Stop app` button. Pausing an app will stop it from running and will not be accessible to users until you resume it. In addition, this will stop you being billed for your app.
 
 ```python eval
-image_zoom(rx.image(src="/stopping_app.webp", padding_bottom="20px"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/stopping_app.webp", padding_bottom="20px"))
 ```
 
 ```md alert info
@@ -6526,13 +6535,13 @@ image_zoom(rx.image(src="/stopping_app.webp", padding_bottom="20px"))
 To delete an app click on the `Settings` tab in the Cloud UI on the app page.
 
 ```python eval
-image_zoom(rx.image(src="/environment_variables.webp"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/environment_variables.webp"))
 ```
 
 Then click on the `Danger` tab as shown below.
 
 ```python eval
-image_zoom(rx.image(src="/deleting_app.webp"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/deleting_app.webp"))
 ```
 
 Here there is a `Delete app` button. Pressing this button will delete the app and all of its data. This action is irreversible.
@@ -6672,6 +6681,7 @@ rx.table.root(
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
@@ -6683,7 +6693,7 @@ from pcweb.styles.styles import get_code_style, cell_style
 To view the app logs follow the arrow in the image below and press on the `Logs` dropdown.
 
 ```python eval
-image_zoom(rx.image(src="/view_logs.webp", padding_bottom="20px"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/view_logs.webp", padding_bottom="20px"))
 ```
 
 ```md alert info
@@ -6696,13 +6706,13 @@ image_zoom(rx.image(src="/view_logs.webp", padding_bottom="20px"))
 To view the deployment history follow the arrow in the image below and press on the `Deployments`.
 
 ```python eval
-image_zoom(rx.image(src="/view_deployment_logs.webp"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/view_deployment_logs.webp"))
 ```
 
 This brings you to the page below where you can see the deployment history of your app. Click on deployment you wish to explore further.
 
 ```python eval
-image_zoom(rx.image(src="/view_deployment_logs_2.webp", padding_bottom="20px"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/view_deployment_logs_2.webp", padding_bottom="20px"))
 ```
 
 ```md alert info
@@ -6713,11 +6723,12 @@ image_zoom(rx.image(src="/view_deployment_logs_2.webp", padding_bottom="20px"))
 This brings you to the page below where you can view the deployment logs of your app by clicking the `Build logs` dropdown.
 
 ```python eval
-image_zoom(rx.image(src="/view_deployment_logs_3.webp"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/view_deployment_logs_3.webp"))
 ```
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -6758,13 +6769,13 @@ You access the values of `envs` by referencing `os.environ` with their names as 
 To find the secrets tab, click on the `Settings` tab in the Cloud UI on the app page.
 
 ```python eval
-image_zoom(rx.image(src="/environment_variables.webp"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/environment_variables.webp"))
 ```
 
 Then click on the `Secrets` tab as shown below.
 
 ```python eval
-image_zoom(rx.image(src="/environment_variables_2.webp"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/environment_variables_2.webp"))
 ```
 
 From here you can add or edit your environment variables. You will need to restart your app for these changes to take effect.
@@ -6896,6 +6907,7 @@ docker run -d -p 3000:3000 -p 8000:8000 --name app reflex-project:latest
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -6906,14 +6918,14 @@ A token gives someone else all the permissions you have as a User or Admin. They
 To access or create tokens, first click the avatar in the top-right corner to open the drop-down menu, then click `Account Settings`.
 
 ```python eval
-image_zoom(rx.image(src="/hosting_tokens_1.png", alt="Adding tokens to Reflex Cloud", padding="1em 0em"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/hosting_tokens_1.webp", alt="Adding tokens to Reflex Cloud", padding="1em 0em"))
 ```
 
 Clicking `Account Settings` will redirect you to both the `Settings` and `Tokens` dashboards. Click the `Tokens` tab at the top to access your tokens or create new ones.
 
 
 ```python eval
-image_zoom(rx.image(src="/hosting_tokens_2.png", alt="Adding tokens to Reflex Cloud", padding="1em 0em"))
+image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/hosting_tokens_2.webp", alt="Adding tokens to Reflex Cloud", padding="1em 0em"))
 ```
 
 
@@ -6966,6 +6978,7 @@ def client_storage_example():
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.pages.docs import styling
 ```
 
@@ -6998,7 +7011,7 @@ rx.grid(
 		lambda i: rx.card(
 			rx.inset(
 				rx.image(
-					src="/reflex_banner.png",
+					src=f"{REFLEX_ASSETS_CDN}other/reflex_banner.png",
 					width="100%",
 					height="auto",
 				),
@@ -7366,6 +7379,7 @@ def stats_2(stat_name: str = "Orders", value: int = 6500, prev_value: int = 1200
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Top Banner
@@ -7454,7 +7468,7 @@ class TopBannerSignup(rx.ComponentState):
             ~cls.hide,
                 rx.flex(
                     rx.image(
-                        src="/logo.jpg",
+                        src=f"{REFLEX_ASSETS_CDN}other/logo.jpg",
                         width="2em",
                         height="auto",
                         border_radius="25%",
@@ -7637,6 +7651,7 @@ top_banner_newsletter = TopBannerNewsletter.create
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Navigation Bar
@@ -7663,7 +7678,7 @@ def navbar() -> rx.Component:
 		rx.desktop_only(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"), align_items="center"),
 				rx.hstack(
 					navbar_link("Home", "/#"),
@@ -7680,7 +7695,7 @@ def navbar() -> rx.Component:
 		rx.mobile_and_tablet(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2em",
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em",
 							 height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="6", weight="bold"), align_items="center"),
 				rx.menu.root(
@@ -7718,7 +7733,7 @@ def navbar_dropdown() -> rx.Component:
 		rx.desktop_only(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"), align_items="center"),
 				rx.hstack(
 					navbar_link("Home", "/#"),
@@ -7745,7 +7760,7 @@ def navbar_dropdown() -> rx.Component:
 		rx.mobile_and_tablet(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="6", weight="bold"), align_items="center"),
 				rx.menu.root(
 					rx.menu.trigger(rx.icon("menu", size=30)),
@@ -7786,7 +7801,7 @@ def navbar_searchbar() -> rx.Component:
 		rx.desktop_only(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"), align_items="center"),
 				rx.input(
 					rx.input.slot(rx.icon("search")),
@@ -7801,7 +7816,7 @@ def navbar_searchbar() -> rx.Component:
 		rx.mobile_and_tablet(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="6", weight="bold"), align_items="center"),
 				rx.input(
 					rx.input.slot(rx.icon("search")),
@@ -7836,7 +7851,7 @@ def navbar_icons() -> rx.Component:
 		rx.desktop_only(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"), align_items="center"),
 				rx.hstack(
 					navbar_icons_item("Home", "home", "/#"),
@@ -7852,7 +7867,7 @@ def navbar_icons() -> rx.Component:
 		rx.mobile_and_tablet(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="6", weight="bold"), align_items="center"),
 				rx.menu.root(
 					rx.menu.trigger(rx.icon("menu", size=30)),
@@ -7888,7 +7903,7 @@ def navbar_buttons() -> rx.Component:
 		rx.desktop_only(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"), align_items="center"),
 				rx.hstack(
 					navbar_link("Home", "/#"),
@@ -7910,7 +7925,7 @@ def navbar_buttons() -> rx.Component:
 		rx.mobile_and_tablet(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="6", weight="bold"), align_items="center"),
 				rx.menu.root(
 					rx.menu.trigger(rx.icon("menu", size=30)),
@@ -7949,7 +7964,7 @@ def navbar_user() -> rx.Component:
 		rx.desktop_only(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"), align_items="center"),
 				rx.hstack(
 					navbar_link("Home", "/#"),
@@ -7976,7 +7991,7 @@ def navbar_user() -> rx.Component:
 		rx.mobile_and_tablet(
 			rx.hstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="6", weight="bold"), align_items="center"),
 				rx.menu.root(
 					rx.menu.trigger(rx.icon_button(
@@ -8005,6 +8020,7 @@ def navbar_user() -> rx.Component:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
 	return rx.link(
@@ -8085,7 +8101,7 @@ def sidebar() -> rx.Component:
 		rx.desktop_only(
 			rx.vstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em",
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em",
 								height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"),
 					align="center",
@@ -8180,7 +8196,7 @@ def sidebar_bottom_profile() -> rx.Component:
 		rx.desktop_only(
 			rx.vstack(
 				rx.hstack(
-					rx.image(src="/logo.jpg", width="2.25em",
+					rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em",
 								height="auto", border_radius="25%"),
 					rx.heading("Reflex", size="7", weight="bold"),
 					align="center",
@@ -8427,6 +8443,7 @@ def sidebar_top_profile() -> rx.Component:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Footer Bar
@@ -8485,7 +8502,7 @@ def footer() -> rx.Component:
             rx.flex(
                 rx.vstack(
                     rx.hstack(
-                        rx.image(src="/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
+                        rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.25em", height="auto", border_radius="25%"),
                         rx.heading("Reflex", size="7", weight="bold"),
                         align_items="center"
                     ),
@@ -8594,7 +8611,7 @@ def footer_newsletter() -> rx.Component:
             rx.divider(),
             rx.flex(
                 rx.hstack(
-                    rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+                    rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
                     rx.text("© 2024 Reflex, Inc", size="3", white_space="nowrap", weight="medium"),
                     spacing="2",
                     align="center",
@@ -8687,7 +8704,7 @@ def footer_three_columns() -> rx.Component:
             rx.divider(),
             rx.flex(
                 rx.hstack(
-                    rx.image(src="/logo.jpg", width="2em", height="auto", border_radius="25%"),
+                    rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2em", height="auto", border_radius="25%"),
                     rx.text("© 2024 Reflex, Inc", size="3", white_space="nowrap", weight="medium"),
                     spacing="2",
                     align="center",
@@ -9650,6 +9667,7 @@ def render_menu():
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Smart Checkboxes Group
@@ -9659,7 +9677,7 @@ A smart checkboxes group where you can track all checked boxes, as well as place
 ## Recipe
 
 ```python eval
-rx.center(rx.image(src="/gallery/smart_checkboxes.gif"))
+rx.center(rx.image(src=f"{REFLEX_ASSETS_CDN}templates/smart_checkboxes.webp"))
 ```
 
 This recipe use a `dict[str, bool]` for the checkboxes state tracking.
@@ -9719,6 +9737,7 @@ def index() -> rx.Component:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Login Form
@@ -9732,7 +9751,7 @@ def login_default() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.center(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Sign in to your account", size="6", as_="h2", text_align="center", width="100%"),
 				direction="column",
 				spacing="5",
@@ -9780,7 +9799,7 @@ def login_default_icons() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.center(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Sign in to your account", size="6", as_="h2", text_align="center", width="100%"),
 				direction="column",
 				spacing="5",
@@ -9828,7 +9847,7 @@ def login_single_thirdparty() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.flex(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Sign in to your account", size="6", as_="h2", text_align="left", width="100%"),
 				rx.hstack(
 					rx.text("New here?", size="3", text_align="left"),
@@ -9891,7 +9910,7 @@ def login_multiple_thirdparty() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.flex(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Sign in to your account", size="6", as_="h2", width="100%"),
 				rx.hstack(
 					rx.text("New here?", size="3", text_align="left"),
@@ -9963,6 +9982,7 @@ def login_multiple_thirdparty() -> rx.Component:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Sign up Form
@@ -9975,7 +9995,7 @@ def signup_default() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.center(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Create an account", size="6", as_="h2", text_align="center", width="100%"),
 				direction="column",
 				spacing="5",
@@ -10027,7 +10047,7 @@ def signup_default_icons() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.center(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Create an account", size="6", as_="h2", text_align="center", width="100%"),
 				direction="column",
 				spacing="5",
@@ -10081,7 +10101,7 @@ def signup_single_thirdparty() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.flex(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Create an account", size="6", as_="h2", text_align="left", width="100%"),
 				rx.hstack(
 					rx.text("Already registered?", size="3", text_align="left"),
@@ -10148,7 +10168,7 @@ def signup_multiple_thirdparty() -> rx.Component:
 	return rx.card(
 		rx.vstack(
 			rx.flex(
-				rx.image(src="/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
+				rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="2.5em", height="auto", border_radius="25%"),
 				rx.heading("Create an account", size="6", as_="h2", width="100%"),
 				rx.hstack(
 					rx.text("Already registered?", size="3", text_align="left"),
@@ -10250,6 +10270,7 @@ If you want to upload an image to be used within the app, such as a company logo
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10257,7 +10278,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/add_images_to_assets.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/add_images_to_assets.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10458,10 +10479,17 @@ There is no built-in integration for Scikit-learn. But if you ask the AI Builder
 
 If you are working with a specialized / less well-known library, you can add custom knowledge to help the AI Builder understand how to use it. Simply provide a brief description of the library, its purpose, and example usage in the **Knowledge** section of your app settings. This will guide the AI Builder when it attempts to call functions from that library.
 
+```python exec
+import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
+```
+
 ```md alert warning
 # Where to find the Knowledge Section
+```
 
-![Where to find the Knowledge Section](/ai_builder/features/knowledge_light.avif)
+```python eval
+rx.image(src=f"{REFLEX_ASSETS_CDN}ai_builder/features/knowledge_light.avif", alt="Where to find the Knowledge Section", class_name="rounded-lg border border-secondary-a4 mb-2")
 ```
 
 
@@ -10479,6 +10507,7 @@ Once in your app, you can access your integrations by clicking the flow or cog i
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10487,8 +10516,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/shortcut_light.webp",
-                "/ai_builder/features/shortcut_dark.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/shortcut_light.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/shortcut_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10531,6 +10560,7 @@ description: Integrate with GitHub to automate workflows and interact with your 
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10541,7 +10571,7 @@ The Github integration is important to make sure that you don't lose your progre
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/connecting_to_github.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/connecting_to_github.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10563,7 +10593,7 @@ The commit history is a great way to see the changes that you have made to your 
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/github_commit_history.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/github_commit_history.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10579,13 +10609,14 @@ The **Knowledge** feature lets you add context or rules that the AI Builder can 
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/features/knowledge_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/features/knowledge_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -10634,6 +10665,7 @@ The Testing feature allows you to automatically test your generated applications
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10642,8 +10674,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/test_light.webp",
-                "/ai_builder/features/test_dark.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/test_light.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/test_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -10693,13 +10725,14 @@ The **Secrets** feature allows you to securely store environment-specific values
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/features/secrets_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/features/secrets_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -10736,6 +10769,7 @@ OPENAI_API_KEY=sk-xxxxxx
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10743,7 +10777,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/features/secret_bulk_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/features/secret_bulk_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10764,13 +10798,14 @@ The AI Builder includes a powerful dual-mode editor that lets you view and edit 
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/features/diff_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/features/diff_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -10887,6 +10922,7 @@ Use the integrated terminal to run commands, debug issues, and inspect logs—al
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10906,7 +10942,7 @@ Enter the name of the package you want to install in the chat interface. The AI 
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/external_packages_input.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/external_packages_input.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10924,7 +10960,7 @@ Add the package to the `requirements.txt` file and then save the app. This will 
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/external_packages_requirements.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/external_packages_requirements.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10938,6 +10974,7 @@ rx.el.div(
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10952,7 +10989,7 @@ Below is an image showing how to upload an image to the AI Builder, you can clic
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/image_upload.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/image_upload.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -10972,6 +11009,7 @@ The **Restore Checkpoint** feature allows you to roll back your app to any previ
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -10979,7 +11017,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/features/restore_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/features/restore_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11037,6 +11075,7 @@ The App Style feature allows you to customize the visual appearance of your AI-g
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -11045,8 +11084,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/style_light.webp",
-                "/ai_builder/features/style_dark.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/style_light.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/style_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11075,8 +11114,8 @@ rx.el.div(
     image_zoom(
         rx.image(
             src=rx.color_mode_cond(
-                "/ai_builder/features/theme_light.webp",
-                "/ai_builder/features/theme_dark.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/theme_light.webp",
+                f"{REFLEX_ASSETS_CDN}ai_builder/features/theme_dark.webp",
             ),
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
@@ -11442,6 +11481,7 @@ This will create your main dashboard page with both tabular and visual represent
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -11449,7 +11489,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/tutorial_1_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/tutorial_1_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11474,7 +11514,7 @@ Your dashboard now becomes much more useful with real-time filtering. Users can 
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/tutorial_2_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/tutorial_2_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11501,7 +11541,7 @@ Your app now has full CRUD capability for employee records. The modal form provi
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/tutorial_3_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/tutorial_3_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11528,7 +11568,7 @@ Your app now has proper navigation between the dashboard and chat functionality.
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/tutorial_4_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/tutorial_4_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11566,6 +11606,8 @@ Reflex Build is an AI-powered platform that lets anyone create full-stack web ap
 ```python exec
 import reflex as rx
 from reflex_image_zoom import image_zoom
+
+from pcweb.constants import REFLEX_ASSETS_CDN
 
 
 landing_features = [
@@ -11616,42 +11658,42 @@ features_data = [
     {
         "title": "Project Menu Bar",
         "subtitle": "Browse previously built applications, create new sessions, store database variables, and much more!",
-        "img": "/ai_builder/what_is_reflex_build/project_bar_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/project_bar_light.avif",
     },
     {
         "title": "Chat Area",
         "subtitle": "See your prompts in action with visual cues, editing notifications, and file generations every step of the way.",
-        "img": "/ai_builder/what_is_reflex_build/chat_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/chat_light.avif",
     },
     {
         "title": "Application Workspace",
         "subtitle": "Your workspace contains all the folders and files of your application. You can add new files and folders as well!",
-        "img": "/ai_builder/what_is_reflex_build/file_tree_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/file_tree_light.avif",
     },
     {
         "title": "Code Editor",
         "subtitle": "The code editor displays the current selected file. You can edit the code directly and save it instantly.",
-        "img": "/ai_builder/what_is_reflex_build/code_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/code_light.avif",
     },
     {
         "title": "Integrations",
         "subtitle": "Easily connect with the tools your team already uses or extend your app with any Python SDK, library, or API.",
-        "img": "/ai_builder/what_is_reflex_build/integrations_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/integrations_light.avif",
     },
     {
         "title": "Plan",
         "subtitle": "Plan your application's development with the AI Builder. You can add or remove phases and tasks as you go.",
-        "img": "/ai_builder/what_is_reflex_build/plan_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/plan_light.avif",
     },
     {
         "title": "Top Menu Bar",
         "subtitle": "This menu contains the main views of the application. Preview, Code, Plan, Integrations, Knowledge, Secrets and Settings. You can also see the current workspace RAM and CPU usage. Deploy, copy or share your application with the buttons in the top right corner.",
-        "img": "/ai_builder/what_is_reflex_build/top_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/top_light.avif",
     },
     {
         "title": "Preview Tab",
         "subtitle": "The preview tab showcases a live application. You can navigate to other applications directly from this tab, refresh the app, and even view it in full screen.",
-        "img": "/ai_builder/what_is_reflex_build/preview_light.avif",
+        "img": f"{REFLEX_ASSETS_CDN}ai_builder/what_is_reflex_build/preview_light.avif",
     },
 ]
 
@@ -11807,6 +11849,7 @@ Reflex has many certified templates, seen on the `Trending` tab of the Reflex Bu
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -11814,7 +11857,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/templates_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/templates_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11832,7 +11875,7 @@ To use a template, simply click the template and then in the bottom right corner
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/fork_template_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/fork_template_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -11852,13 +11895,14 @@ The **General App Settings** section lets you manage key aspects of your app, in
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/app_lifecycle/general_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/app_lifecycle/general_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -11909,13 +11953,14 @@ This is useful when you want to experiment with changes without affecting the or
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/app_lifecycle/copy_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/app_lifecycle/copy_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -11972,13 +12017,14 @@ Simply click the `Deploy` button in the top right corner of Reflex Build, as sho
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/app_lifecycle/deploy_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/app_lifecycle/deploy_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12013,13 +12059,14 @@ You can download your Reflex Build project if you want to work on it locally or 
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/app_lifecycle/download_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/app_lifecycle/download_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12050,6 +12097,7 @@ The **Fork App** feature lets you take an existing app and create your own versi
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 ```
 
@@ -12057,7 +12105,7 @@ from reflex_image_zoom import image_zoom
 rx.el.div(
     image_zoom(
         rx.image(
-            src="/ai_builder/overview/fork_template_light.avif",
+            src=f"{REFLEX_ASSETS_CDN}ai_builder/overview/fork_template_light.avif",
             class_name="p-2 rounded-md h-auto",
             border=f"0.81px solid {rx.color('slate', 5)}",
         ),
@@ -12100,13 +12148,14 @@ When you share, Reflex Build generates a unique link that points to the current 
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from reflex_image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
         image_zoom(
             rx.image(
-                src="/ai_builder/app_lifecycle/share_light.avif",
+                src=f"{REFLEX_ASSETS_CDN}ai_builder/app_lifecycle/share_light.avif",
                 class_name="p-2 rounded-md h-auto",
                 border=f"0.81px solid {rx.color('slate', 5)}",
             ),
@@ -12848,7 +12897,7 @@ Parameters:
 ```
 
 ```python demo
-rx.button("Download", on_click=rx.download(url="/reflex_banner.png", filename="different_name_logo.png"), id="download button")
+rx.button("Download", on_click=rx.download(url="/reflex_banner.webp", filename="different_name_logo.webp"), id="download button")
 ```
 
 
@@ -14751,6 +14800,7 @@ rx.box(
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.pages.docs import library
 from pcweb.styles.styles import get_code_style_rdx, cell_style
 ```
@@ -14940,8 +14990,8 @@ To render a different component depending on whether the app is in `light` mode 
 
 ```python demo
 rx.color_mode_cond(
-    light=rx.image(src="/logos/light/reflex.svg", alt="Reflex Logo light", height="4em"),
-    dark=rx.image(src="/logos/dark/reflex.svg", alt="Reflex Logo dark", height="4em"),
+    light=rx.image(src=f"{REFLEX_ASSETS_CDN}logos/light/reflex.svg", alt="Reflex Logo light", height="4em"),
+    dark=rx.image(src=f"{REFLEX_ASSETS_CDN}logos/dark/reflex.svg", alt="Reflex Logo dark", height="4em"),
 )
 ```
 
@@ -17112,6 +17162,7 @@ app.add_page(index)
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Assets
@@ -17143,7 +17194,7 @@ assets
 Then you can display it using a `rx.image` component:
 
 ```python demo
-rx.image(src="/Reflex.svg", width="5em")
+rx.image(src=f"{REFLEX_ASSETS_CDN}other/Reflex.svg", width="5em")
 ```
 
 ```md alert
@@ -17169,6 +17220,7 @@ Shared assets are placed next to your Python file and are linked to the app's ex
 ```python box
 # my_component.py
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 
 # my_script.js is located in the same directory as this Python file
 def my_component():
@@ -17183,6 +17235,7 @@ You can also specify a subfolder for shared assets:
 ```python box
 # my_component.py
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 
 # image.png is located in a subfolder next to this Python file
 def my_component_with_image():
@@ -17206,6 +17259,7 @@ You can add a `favicon.ico` file to the `assets/` folder to change the favicon.
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.pages.docs import library
 from pcweb.pages.docs import api_reference
 from pcweb.styles.styles import get_code_style
@@ -17288,7 +17342,7 @@ If you want to let the users of your app download files from your server to thei
 For some basic usage, simply providing the path to your resource in a `rx.link` will work, and clicking the link will download or display the resource.
 
 ```python demo
-rx.link("Download", href="/reflex_banner.png")
+rx.link("Download", href="/reflex_banner.webp")
 ```
 
 ### With `rx.download` event
@@ -17300,7 +17354,7 @@ The `rx.download` event also allows the download to be triggered from another ba
 ```python demo
 rx.button(
     "Download",
-    on_click=rx.download(url="/reflex_banner.png"),
+    on_click=rx.download(url="/reflex_banner.webp"),
 )
 ```
 
@@ -17310,7 +17364,7 @@ rx.button(
 rx.button(
     "Download and Rename",
     on_click=rx.download(
-        url="/reflex_banner.png",
+        url="/reflex_banner.webp",
         filename="different_name_logo.png"
     ),
 )
@@ -17531,7 +17585,7 @@ For example, the `rx.image` component has a `src` prop that specifies the URL of
 
 ```python demo
 rx.image(
-    src="https://reflex.dev/logo.jpg",
+    src="https://web.reflex-assets.dev/other/logo.jpg",
     alt="Reflex Logo",
 )
 ```
@@ -26301,7 +26355,7 @@ If you are using the html component and want pretty default styles, consider set
 In this example, we render an image.
 
 ```python demo
-rx.html("<img src='https://reflex.dev/reflex_banner.png' />")
+rx.html("<img src='https://web.reflex-assets.dev/other/reflex_banner.png' />")
 ```
 
 
@@ -30081,6 +30135,7 @@ components:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Box
@@ -30114,7 +30169,7 @@ rx.flex(
     rx.box(background="linear-gradient(45deg, var(--tomato-9), var(--plum-9))", width="20%", height="100%"),
     rx.box(background="linear-gradient(red, yellow, blue, orange)", width="20%", height="100%"),
     rx.box(background="radial-gradient(at 0% 30%, red 10px, yellow 30%, #1e90ff 50%)", width="20%", height="100%"),
-    rx.box(background="center/cover url('/reflex_banner.png')", width="20%", height="100%"),
+    rx.box(background=f"center/cover url('{REFLEX_ASSETS_CDN}other/reflex_banner.png')", width="20%", height="100%"),
     spacing="2",
     width="100%",
     height="10vh",
@@ -30279,6 +30334,7 @@ components:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Aspect Ratio
@@ -30345,7 +30401,7 @@ rx.flex(
     *[
         rx.box(
             rx.aspect_ratio(
-                rx.image(src="/logo.jpg", width="100%", height="100%"),
+                rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="100%", height="100%"),
                 ratio=ratio,
             ),
             width="20%",
@@ -30392,7 +30448,7 @@ components:
 Inset: |
     lambda **props: rx.card(
         rx.inset(
-            rx.image(src="/reflex_banner.png", height="auto"),
+            rx.image(src=f"{REFLEX_ASSETS_CDN}other/reflex_banner.png", height="auto"),
             **props,
         ),
         width="500px",
@@ -30402,6 +30458,7 @@ Inset: |
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Inset
@@ -30415,7 +30472,7 @@ Nesting an Inset component inside a Card will render the content from edge to ed
 ```python demo
 rx.card(
     rx.inset(
-        rx.image(src="/reflex_banner.png", width="100%", height="auto"),
+        rx.image(src=f"{REFLEX_ASSETS_CDN}other/reflex_banner.png", width="100%", height="auto"),
         side="top",
         pb="current",
     ),
@@ -30434,7 +30491,7 @@ content would have had if it went to the edge of the parent component.
 rx.card(
     rx.text("The inset below uses a bottom side."),
     rx.inset(
-        rx.image(src="/reflex_banner.png", width="100%", height="auto"),
+        rx.image(src=f"{REFLEX_ASSETS_CDN}other/reflex_banner.png", width="100%", height="auto"),
         side="bottom",
         pt="current",
     ),
@@ -30447,7 +30504,7 @@ rx.card(
     rx.flex(
         rx.text("This inset uses a right side, which requires a flex with direction row."),
         rx.inset(
-            rx.box(background="center/cover url('/reflex_banner.png')", height="100%"),
+            rx.box(background=f"center/cover url('{REFLEX_ASSETS_CDN}other/reflex_banner.png')", height="100%"),
             width="100%",
             side="right",
             pl="current",
@@ -30463,7 +30520,7 @@ rx.card(
 rx.card(
     rx.flex(
         rx.inset(
-            rx.box(background="center/cover url('/reflex_banner.png')", height="100%"),
+            rx.box(background=f"center/cover url('{REFLEX_ASSETS_CDN}other/reflex_banner.png')", height="100%"),
             width="100%",
             side="left",
             pr="current",
@@ -30487,6 +30544,7 @@ Card: |
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # Card
@@ -30522,7 +30580,7 @@ commonly used to make a Card clickable.
 rx.card(
     rx.link(
         rx.flex(
-            rx.avatar(src="/reflex_banner.png"),
+            rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/reflex_banner.png"),
             rx.box(
                 rx.heading("Quick Start"),
                 rx.text("Get started with Reflex in 5 minutes."),
@@ -31793,6 +31851,7 @@ Upload: |
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 ```
 
 # File Upload
@@ -31806,6 +31865,7 @@ You can let users upload files and keep track of them in your app’s state. The
 
 ```python
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 class State(rx.State):
     uploaded_files: list[str] = []
 
@@ -31862,6 +31922,7 @@ Here is the standard pattern for handling file uploads:
 
 ```python
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 
 def create_unique_filename(file_name: str):
     import random
@@ -31925,7 +31986,7 @@ def upload_component():
 Below is an example of how to allow multiple file uploads (in this case images).
 
 ```python demo box
-rx.image(src="/upload.gif")
+rx.image(src=f"{REFLEX_ASSETS_CDN}other/upload.gif")
 ```
 
 ```python
@@ -31988,7 +32049,7 @@ def index():
 Below is an example of how to allow only a single file upload and render (in this case a video).
 
 ```python demo box
-rx.el.video(src="/upload_single_video.webm", auto_play=True, controls=True, loop=True)
+rx.el.video(src=f"{REFLEX_ASSETS_CDN}other/upload_single_video.webm", auto_play=True, controls=True, loop=True)
 ```
 
 ```python
@@ -32765,6 +32826,7 @@ components:
 ```python exec
 import random
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 import reflex.components.radix.primitives as rdxp
 from pcweb.templates.docpage import style_grid
 ```
@@ -32999,7 +33061,7 @@ def form_select():
 ```python demo
 rx.card(
     rx.flex(
-        rx.image(src="/reflex_banner.png", width="100%", height="auto"),
+        rx.image(src=f"{REFLEX_ASSETS_CDN}other/reflex_banner.png", width="100%", height="auto"),
         rx.flex(
             rx.heading("Reflex Swag", size="4", margin_bottom="4px"),
             rx.heading("$99", size="6", margin_bottom="4px"),
@@ -34354,6 +34416,7 @@ components:
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.pages.docs import library
 ```
 
@@ -34363,14 +34426,14 @@ The Image component can display an image given a `src` path as an argument.
 This could either be a local path from the assets folder or an external link.
 
 ```python demo
-rx.image(src="/logo.jpg", width="100px", height="auto")
+rx.image(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", width="100px", height="auto")
 ```
 
 Image composes a box and can be styled similarly.
 
 ```python demo
 rx.image(
-    src="/logo.jpg",
+    src=f"{REFLEX_ASSETS_CDN}other/logo.jpg",
     width="100px",
     height="auto",
     border_radius="15px 50px",
@@ -35042,12 +35105,13 @@ rx.flex(
 components:
     - rx.avatar
 Avatar: |
-    lambda **props: rx.hstack(rx.avatar(src="/logo.jpg", **props), rx.avatar(fallback="RX", **props), spacing="3")
+    lambda **props: rx.hstack(rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", **props), rx.avatar(fallback="RX", **props), spacing="3")
 ---
 # Avatar
 
 ```python exec
 import reflex as rx
+from pcweb.constants import REFLEX_ASSETS_CDN
 from pcweb.templates.docpage import style_grid
 ```
 
@@ -35058,7 +35122,7 @@ The Avatar component is used to represent a user, and display their profile pict
 To create an avatar component with an image, pass the image URL as the `src` prop.
 
 ```python demo
-rx.avatar(src="/logo.jpg")
+rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg")
 ```
 
 To display a text such as initials, set the `fallback` prop without passing the `src` prop.
@@ -35079,15 +35143,15 @@ The `size` prop controls the size and spacing of the avatar. The acceptable size
 
 ```python demo
 rx.flex(
-    rx.avatar(src="/logo.jpg", fallback="RX", size="1"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="2"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="3"),
-    rx.avatar(src="/logo.jpg", fallback="RX"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="4"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="5"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="6"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="7"),
-    rx.avatar(src="/logo.jpg", fallback="RX", size="8"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="1"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="2"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="3"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="4"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="5"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="6"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="7"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", size="8"),
     spacing="1",
 )
 ```
@@ -35141,15 +35205,15 @@ The `radius` prop sets specific radius value, ignoring the global theme. It can 
 
 ```python demo
 rx.grid(
-    rx.avatar(src="/logo.jpg", fallback="RX", radius="none"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", radius="none"),
     rx.avatar(fallback="RX", radius="none"),
-    rx.avatar(src="/logo.jpg", fallback="RX", radius="small"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", radius="small"),
     rx.avatar(fallback="RX", radius="small"),
-    rx.avatar(src="/logo.jpg", fallback="RX", radius="medium"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", radius="medium"),
     rx.avatar(fallback="RX", radius="medium"),
-    rx.avatar(src="/logo.jpg", fallback="RX", radius="large"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", radius="large"),
     rx.avatar(fallback="RX", radius="large"),
-    rx.avatar(src="/logo.jpg", fallback="RX", radius="full"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RX", radius="full"),
     rx.avatar(fallback="RX", radius="full"),
     rows="2",
     spacing="2",
@@ -35175,7 +35239,7 @@ As part of a user profile page, the Avatar component is used to display the user
 
 ```python demo
 rx.flex(
-    rx.avatar(src="/logo.jpg", fallback="RU", size="9"),
+    rx.avatar(src=f"{REFLEX_ASSETS_CDN}other/logo.jpg", fallback="RU", size="9"),
     rx.text("Reflex User", weight="bold", size="4"),
     rx.text("@reflexuser", color_scheme="gray"),
     rx.button("Edit Profile", color_scheme="indigo", variant="solid"),
