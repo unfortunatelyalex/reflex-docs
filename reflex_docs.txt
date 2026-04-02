@@ -1197,7 +1197,7 @@ rx.table.root(
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
 from pcweb.styles.styles import get_code_style, cell_style
@@ -1232,7 +1232,7 @@ This will deploy your app with the `c2m4` VMType, giving your app 2 CPU cores an
 
 ```python exec
 import reflex as rx
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.pages.pricing.calculator import compute_table_base
 ```
 
@@ -1466,7 +1466,7 @@ One thing that is important to note is that in the hypothetical example where yo
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.pages import docs
 ```
 
@@ -1556,7 +1556,7 @@ All your flag values, i.e. environment variables or regions or tokens, are saved
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 # Custom Domains
@@ -1631,7 +1631,7 @@ rx.box(height="20px")
 
 ```python exec
 import reflex as rx
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.pages.pricing.calculator import compute_table_base
 from pcweb.pages.docs import hosting 
 ```
@@ -1666,7 +1666,7 @@ If you want to set a billing limit for your project, you can do so by going to t
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 # Project
@@ -1705,7 +1705,7 @@ Clicking on the `Settings` tab in the Cloud UI on the project page allows a user
 
 ```python exec
 import reflex as rx
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.constants import REFLEX_ASSETS_CDN, REFLEX_CLOUD_URL
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
@@ -1858,7 +1858,7 @@ packages:
 
 ```python exec
 import reflex as rx
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb import constants
 from pcweb.pages.docs import hosting
 from pcweb.pages import docs
@@ -2042,7 +2042,7 @@ reflex deploy --config cloud-staging.yml
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
 from pcweb.styles.styles import get_code_style, cell_style
@@ -2222,7 +2222,7 @@ rx.table.root(
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 from pcweb.pages.docs import hosting 
 from pcweb.pages import docs
 from pcweb.styles.styles import get_code_style, cell_style
@@ -2269,7 +2269,7 @@ image_zoom(rx.image(src=f"{REFLEX_ASSETS_CDN}other/view_deployment_logs_3.webp")
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 # Secrets (Environment Variables)
@@ -2448,7 +2448,7 @@ docker run -d -p 3000:3000 -p 8000:8000 --name app reflex-project:latest
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 # Tokens
@@ -2498,7 +2498,7 @@ If you want to upload an image to be used within the app, such as a company logo
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -2735,7 +2735,7 @@ Once in your app, you can access your integrations by clicking the flow or cog i
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -2788,7 +2788,7 @@ description: Integrate with GitHub to automate workflows and interact with your 
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 The Github integration is important to make sure that you don't lose your progress. It also allows you to revert to previous versions of your app.
@@ -2837,7 +2837,7 @@ The **Knowledge** feature lets you add context or rules that the AI Builder can 
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -2893,7 +2893,7 @@ The Testing feature allows you to automatically test your generated applications
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -2953,7 +2953,7 @@ The **Secrets** feature allows you to securely store environment-specific values
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -2997,7 +2997,7 @@ OPENAI_API_KEY=sk-xxxxxx
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -3026,7 +3026,7 @@ The AI Builder includes a powerful dual-mode editor that lets you view and edit 
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -3150,7 +3150,7 @@ Use the integrated terminal to run commands, debug issues, and inspect logs—al
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 Reflex Build allows you to install external python packages to use in your app. This is useful if you want to use a package that is not included in the default Reflex Build environment. Examples might include `openai`, `langsmith`, `requests`, etc.
@@ -3202,7 +3202,7 @@ rx.el.div(
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 Uploading an image (screenshot) of a website (web) app of what you are looking to build gives the AI really good context. 
@@ -3237,7 +3237,7 @@ The **Restore Checkpoint** feature allows you to roll back your app to any previ
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -3303,7 +3303,7 @@ The App Style feature allows you to customize the visual appearance of your AI-g
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -3719,7 +3719,7 @@ This will create your main dashboard page with both tabular and visual represent
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -3842,7 +3842,7 @@ Reflex Build is an AI-powered platform that lets anyone create full-stack web ap
 
 ```python exec
 import reflex as rx
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 from pcweb.constants import REFLEX_ASSETS_CDN
 
@@ -4087,7 +4087,7 @@ Reflex has many certified templates, seen on the `Trending` tab of the Reflex Bu
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -4133,7 +4133,7 @@ The **General App Settings** section lets you manage key aspects of your app, in
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -4191,7 +4191,7 @@ This is useful when you want to experiment with changes without affecting the or
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -4255,7 +4255,7 @@ Simply click the `Deploy` button in the top right corner of Reflex Build, as sho
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -4297,7 +4297,7 @@ You can download your Reflex Build project if you want to work on it locally or 
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
@@ -4335,7 +4335,7 @@ The **Fork App** feature lets you take an existing app and create your own versi
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 ```
 
 ```python eval
@@ -4386,7 +4386,7 @@ When you share, Reflex Build generates a unique link that points to the current 
 ```python exec
 import reflex as rx
 from pcweb.constants import REFLEX_ASSETS_CDN
-from reflex_image_zoom import image_zoom
+from pcweb.components.image_zoom import image_zoom
 
 def render_image():
     return rx.el.div(
