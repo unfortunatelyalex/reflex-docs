@@ -1,3 +1,6 @@
+"""Reflex documentation."""
+
+
 ```python exec
 import os
 
@@ -782,6 +785,174 @@ Congratulations! You have built your first chatbot. From here, you can read thro
 With our hosting service, you can deploy this app with a single command within minutes. Check out our [Hosting Quick Start](https://reflex.dev/docs/hosting/deploy-quick-start/).
 
 
+"""Utility classes for the chat app tutorial."""
+
+from __future__ import annotations
+
+import os
+
+import openai  # pyright: ignore[reportMissingImports]
+import reflex as rx
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+
+class ChatappState(rx.State):
+    """State for the chat app tutorial."""
+
+    # The current question being asked.
+    question: str
+
+    # Keep track of the chat history as a list of (question, answer) tuples.
+    chat_history: list[tuple[str, str]]
+
+    def set_question(self, q: str):
+        """Set the current question."""
+        self.question = q
+
+    def set_question1(self, q: str):
+        """Set the current question (variant 1)."""
+        self.question = q
+
+    def set_question2(self, q: str):
+        """Set the current question (variant 2)."""
+        self.question = q
+
+    def set_question3(self, q: str):
+        """Set the current question (variant 3)."""
+        self.question = q
+
+    def answer(self) -> None:
+        """Answer the question with a static response."""
+        # Our chatbot is not very smart right now...
+        answer = "I don't know!"
+        self.chat_history.append((self.question, answer))
+
+    def answer2(self) -> None:
+        """Answer the question and clear the input."""
+        # Our chatbot is not very smart right now...
+        answer = "I don't know!"
+        self.chat_history.append((self.question, answer))
+        # Clear the question input.
+        self.question = ""
+
+    async def answer3(self):
+        """Answer with a streaming static response."""
+        import asyncio
+
+        # Our chatbot is not very smart right now...
+        answer = "I don't know!"
+        self.chat_history.append((self.question, ""))
+
+        # Clear the question input.
+        self.question = ""
+        # Yield here to clear the frontend input before continuing.
+        yield
+
+        for i in range(len(answer)):
+            await asyncio.sleep(0.1)
+            self.chat_history[-1] = (self.chat_history[-1][0], answer[: i + 1])
+            yield
+
+    async def answer4(self):
+        """Answer using the OpenAI API with streaming."""
+        # Our chatbot has some brains now!
+        client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+        session = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": self.question}],
+            stop=None,
+            temperature=0.7,
+            stream=True,
+        )
+
+        # Add to the answer as the chatbot responds.
+        answer = ""
+        self.chat_history.append((self.question, answer))
+
+        # Clear the question input.
+        self.question = ""
+        # Yield here to clear the frontend input before continuing.
+        yield
+
+        async for item in session:
+            if hasattr(item.choices[0].delta, "content"):
+                if item.choices[0].delta.content is None:
+                    # presence of 'None' indicates the end of the response
+                    break
+                answer += item.choices[0].delta.content
+                self.chat_history[-1] = (self.chat_history[-1][0], answer)
+                yield
+
+
+"""Getting started docs."""
+
+
+# Open Source Templates
+
+Check out what the community is building with Reflex. See 2000+ more public projects on [Github](https://github.com/reflex-dev/reflex/network/dependents). Want to get your app featured? Submit it [here](https://github.com/reflex-dev/templates). Copy the template command and use it during `reflex init`
+
+```python exec
+import reflex as rx
+
+from pcweb.components.code_card import gallery_app_card
+from pcweb.pages.gallery.sidebar import TemplatesState, pagination, sidebar
+
+
+@rx.memo
+def skeleton_card() -> rx.Component:
+    return rx.skeleton(
+        class_name="box-border shadow-large border rounded-xl w-full h-[280px] overflow-hidden",
+        loading=True,
+    )
+
+
+def component_grid() -> rx.Component:
+    from pcweb.pages.gallery.apps import gallery_apps_data
+
+    posts = []
+    for path, document in list(gallery_apps_data.items()):
+        posts.append(
+            rx.cond(
+                TemplatesState.filtered_templates.contains(document.metadata["title"]),
+                gallery_app_card(app=document.metadata),
+                None,
+            )
+        )
+    return rx.box(
+        *posts,
+        rx.box(
+            rx.el.h4(
+                "No templates found",
+                class_name="text-base font-semibold text-slate-12 text-nowrap",
+            ),
+            class_name="flex-col gap-2 flex absolute left-1 top-0 z-[-1] w-full",
+        ),
+        class_name="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full relative",
+    )
+
+
+def gallery() -> rx.Component:
+    return rx.el.section(
+        rx.box(
+            sidebar(),
+            rx.box(
+                component_grid(),
+                pagination(),
+                class_name="flex flex-col",
+            ),
+            class_name="flex flex-col gap-6 lg:gap-10 w-full",
+        ),
+        id="gallery",
+        class_name="mx-auto",
+    )
+```
+
+```python eval
+gallery()
+```
+
+
 """Common styles for questions and answers."""
 
 import reflex as rx
@@ -810,3 +981,12 @@ answer_style = message_style | {
 # Styles for the action bar.
 input_style = {"border_width": "1px", "box_shadow": shadow, "width": "350px"}
 button_style = {"background_color": rx.color("accent", 10), "box_shadow": shadow}
+
+
+```python exec
+from pcweb.pages.integrations.integration import integration_page
+```
+
+```python eval
+integration_page()
+```
